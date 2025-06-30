@@ -1,11 +1,28 @@
+"use client";
+
+import { useRef } from "react";
+import { useLenis } from "@/hooks/useLenis";
+import SectionHero from "@/components/SectionHero";
+import SectionProjects from "@/components/SectionProjects";
+import SectionAbout from "@/components/SectionAbout";
+import SectionDemos from "@/components/SectionDemos";
+import SectionContact from "@/components/SectionContact";
+
 export default function Home() {
+  const mainRef = useRef<HTMLElement | null>(null);
+  useLenis(mainRef);
+
   return (
-    <main className="bg-[var(--color-navy)] min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-5xl font-bold text-[var(--color-electric)] mb-6">
-        Anoopchandra.dev Portfolio 🚀
-      </h1>
-      <div className="bg-[var(--color-coral)] text-[var(--color-white)] px-4 py-2 rounded-xl shadow">
-        Electric coral action!
+    <main
+      ref={mainRef}
+      className="snap-y snap-proximity h-screen overflow-y-scroll scroll-smooth"
+    >
+      <div>
+        <SectionHero />
+        <SectionProjects />
+        <SectionAbout />
+        <SectionDemos />
+        <SectionContact />
       </div>
     </main>
   );
