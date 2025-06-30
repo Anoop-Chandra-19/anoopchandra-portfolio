@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { useLenis } from "@/hooks/useLenis";
 import SectionHero from "@/components/SectionHero";
 import SectionProjects from "@/components/SectionProjects";
 import SectionAbout from "@/components/SectionAbout";
 import SectionDemos from "@/components/SectionDemos";
-import SectionContact from "@/components/SectionContact";
+
 
 export default function Home() {
   const mainRef = useRef<HTMLElement | null>(null);
@@ -18,11 +18,10 @@ export default function Home() {
       className="snap-y snap-proximity h-screen overflow-y-scroll scroll-smooth"
     >
       <div>
-        <SectionHero />
-        <SectionProjects />
-        <SectionAbout />
-        <SectionDemos />
-        <SectionContact />
+        <SectionHero id = "hero"/>
+        <SectionProjects id = "projects"/>
+        <SectionAbout id = "about"/>
+        <SectionDemos id = "demos"/>
       </div>
     </main>
   );
