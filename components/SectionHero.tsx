@@ -64,6 +64,14 @@ export default function SectionHero({ id } : { id: string }) {
       >
         Hi, I'm Anoopchandra Parampalli (but friends call me Anoop).
       </motion.h1>
+      <motion.p
+        className="relative z-10 mt-2 text-xl md:text-2xl font-bold text-[var(--color-coral)] text-center"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.1, delay: 0.45, ease: "easeOut" }}
+      >
+        AI/ML Engineer 
+      </motion.p>
       {/* Subtext */}
       <motion.p
         className="relative z-10 mt-4 text-lg md:text-xl text-white/85 max-w-xl text-center font-light"
@@ -71,7 +79,7 @@ export default function SectionHero({ id } : { id: string }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.1, delay: 0.65, ease: "easeOut" }}
       >
-        I build AI, custom PCs, and anything else that can be torn down and rebuilt—always for the person, not just the specs.
+        I build AI, custom PCs, and anything else that can be torn down and rebuilt - always for the person, not just the specs.
       </motion.p>
       {/* Scroll Down Cue */}
       <motion.div
