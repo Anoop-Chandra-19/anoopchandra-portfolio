@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
+import SentimentDemo from "./SentimentDemo";
 
 // Placeholder for future demo components
 function ComingSoon() {
@@ -18,7 +21,7 @@ const demoInfo = {
   sentiment: {
     title: "Sentiment Analysis",
     desc: "Type anything—AI reads your mood.",
-    DemoComponent: ComingSoon,
+    DemoComponent: SentimentDemo,
   },
   playground: {
     title: "ML Playground",
@@ -30,6 +33,9 @@ const demoInfo = {
 export default function DemoCard({ demo }: { demo: keyof typeof demoInfo }) {
   const [open, setOpen] = useState(false);
   const { title, desc, DemoComponent } = demoInfo[demo];
+
+  // This ensures we only render on the client (avoids SSR hydration issues)
+  const isBrowser = typeof window !== "undefined";
 
   return (
     <div className="
@@ -60,27 +66,44 @@ export default function DemoCard({ demo }: { demo: keyof typeof demoInfo }) {
       >
         Try Now
       </button>
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-navy)]/80 backdrop-blur">
-          <div className="
-            relative bg-[var(--color-white)] rounded-2xl p-8 w-[95vw] max-w-2xl shadow-2xl 
-            border-2 border-[var(--color-electric)]
-            transition-colors duration-300
-          ">
-            <button
+      {open && isBrowser &&
+        createPortal(
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-navy)]/80 backdrop-blur"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+          >
+            <motion.div
               className="
-                absolute top-4 right-4 text-[var(--color-electric)] 
-                hover:text-[var(--color-coral)] text-2xl font-bold
+                relative bg-[var(--color-white)] rounded-2xl p-8 w-[95vw] max-w-2xl shadow-2xl 
+                border-2 border-[var(--color-electric)]
+                transition-colors duration-300
               "
-              onClick={() => setOpen(false)}
-              aria-label="Close demo"
+              initial={{ scale: 0.96, y: 40, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.96, y: 40, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 26 }}
+              role="dialog"
+              aria-modal="true"
+              tabIndex={-1}
             >
-              ×
-            </button>
-            <DemoComponent />
-          </div>
-        </div>
-      )}
+              <button
+                className="
+                  absolute top-4 right-4 text-[var(--color-electric)] 
+                  hover:text-[var(--color-coral)] text-2xl font-bold
+                "
+                onClick={() => setOpen(false)}
+                aria-label="Close demo"
+              >
+                ×
+              </button>
+              <DemoComponent />
+            </motion.div>
+          </motion.div>,
+          document.body
+        )}
     </div>
   );
 }
