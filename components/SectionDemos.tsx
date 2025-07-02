@@ -7,7 +7,7 @@ export default function SectionDemos({ id }: { id: string }) {
       className="
         snap-start min-h-screen 
         flex flex-col items-center justify-center 
-        bg-[var(--color-navy)] text-[var(--color-white)]
+        bg-gradient-to-tr from-black to-[var(--color-navy)]
         transition-colors duration-300
       "
     >

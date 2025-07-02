@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useLenis } from "@/hooks/useLenis";
 import SectionHero from "@/components/SectionHero";
 import SectionProjects from "@/components/SectionProjects";

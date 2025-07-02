@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Anoopchandra Parampalli - AI/ML Portfolio",
+  title: "Anoopchandra Parampalli. AI/ML Engineer",
   description: "Apple-inspired portfolio of Anoopchandra Parampalli - AI/ML engineer, builder, and creator.",
 };
 
@@ -25,6 +25,9 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <LenisProvider>
           <Navbar />
