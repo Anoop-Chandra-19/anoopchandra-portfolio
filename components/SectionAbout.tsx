@@ -19,10 +19,10 @@ const skills = [
   { name: "Hugging Face", icon: <SiHuggingface color="#FFD21E" size={28} /> },
   { name: "FastAPI", icon: <SiFastapi color="#009688" size={28} /> },
   { name: "AWS", icon: <SiAmazonwebservices color="#FF9900" size={28} /> },
-  { name: "PostgreSQL", icon: <SiPostgresql color="#336791" size={28} /> },
-  { name: "MongoDB", icon: <SiMongodb color="#4DB33D" size={28} /> },
   { name: "Docker", icon: <SiDocker color="#2496ED" size={28} /> },
   { name: "Kubernetes", icon: <SiKubernetes color="#326ce5" size={28} /> },
+  { name: "PostgreSQL", icon: <SiPostgresql color="#336791" size={28} /> },
+  { name: "MongoDB", icon: <SiMongodb color="#4DB33D" size={28} /> },
   { name: "Redis", icon: <SiRedis color="#DC382D" size={28} /> },
   { name: "Git", icon: <SiGit color="#F1502F" size={28} /> },
 ];

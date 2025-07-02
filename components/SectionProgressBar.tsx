@@ -1,37 +1,42 @@
 "use client";
 
-import { useEffect, useState, RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface SectionProgressBarProps {
-  scrollContainerRef: RefObject<HTMLElement | null>;
-}
-
-export default function SectionProgressBar({ scrollContainerRef }: SectionProgressBarProps) {
-  const [progress, setProgress] = useState(0);
+export default function SectionProgressBar() {
   const [visible, setVisible] = useState(false);
+  const fillRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const container = scrollContainerRef?.current;
-    if (!container) return;
+    let ticking = false;
 
-    const handler = () => {
-      const scrollTop = container.scrollTop;
-      const scrollHeight = container.scrollHeight;
-      const clientHeight = container.clientHeight;
-      const total = Math.max(scrollHeight - clientHeight, 1);
-      const percent = Math.min(scrollTop / total, 1);
-      setProgress(percent);
+    function updateProgress() {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = Math.min(scrollY / totalHeight, 1);
 
-      // Show after scrolling 40px or 5% of total scroll, hide otherwise
-      setVisible(scrollTop > 40 || percent > 0.05);
+      if (fillRef.current) {
+        fillRef.current.style.height = `${percent * 100}%`;
+      }
+
+      setVisible(scrollY > 40 || percent > 0.05);
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateProgress(); // Run on mount
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
     };
-
-    container.addEventListener("scroll", handler, { passive: true });
-    handler();
-
-    return () => container.removeEventListener("scroll", handler);
-  }, [scrollContainerRef]);
+  }, []);
 
   return (
     <AnimatePresence>
@@ -54,16 +59,15 @@ export default function SectionProgressBar({ scrollContainerRef }: SectionProgre
             }}
           >
             {/* Gradient fill: Top-to-bottom */}
-            <motion.div
-              className="absolute left-0 top-0 w-3 rounded-full
-                bg-gradient-to-b from-[var(--color-electric)] via-[var(--color-teal)] to-[var(--color-coral)]"
+            <div
+              ref={fillRef}
+              className="absolute left-0 top-0 w-3 rounded-full bg-gradient-to-b from-[var(--color-electric)] via-[var(--color-teal)] to-[var(--color-coral)]"
               style={{
-                height: `${progress * 100}%`,
+                height: "0.4rem", // start at minimum
                 minHeight: "0.4rem",
+                transition: "height 0.22s cubic-bezier(0.22, 1, 0.36, 1)",
+                willChange: "height, transform",
               }}
-              initial={{ height: 0 }}
-              animate={{ height: `${progress * 100}%` }}
-              transition={{ ease: "easeOut", duration: 0.22 }}
             />
           </div>
         </motion.div>
