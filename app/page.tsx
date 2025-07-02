@@ -12,7 +12,7 @@ export default function Home() {
 
   return (
     <>
-      <SectionProgressBar /> {/* No props needed */}
+      <SectionProgressBar />
       <main>
         <SectionHero id="hero" />
         <SectionProjects id="projects" />
