@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import {
   SiPython, SiTypescript, SiReact, SiNextdotjs, SiFastapi, SiPytorch,
-  SiAwsamplify, SiMongodb, SiDocker, SiRedis
+  SiAmazonwebservices, SiMongodb, SiDocker, SiRedis, SiKubernetes, SiGit, SiTensorflow, SiPostgresql,
+  SiHuggingface
 } from "react-icons/si";
 import { TbRobot } from "react-icons/tb";
 
@@ -12,13 +13,18 @@ const skills = [
   { name: "TypeScript", icon: <SiTypescript color="#3178C6" size={28} /> },
   { name: "React", icon: <SiReact color="#61DBFB" size={28} /> },
   { name: "Next.js", icon: <SiNextdotjs color="#fff" size={28} /> },
-  { name: "FastAPI", icon: <SiFastapi color="#009688" size={28} /> },
-  { name: "PyTorch", icon: <SiPytorch color="#EE4C2C" size={28} /> },
   { name: "LLM", icon: <TbRobot color="#cc00e6" size={28} /> },
-  { name: "AWS", icon: <SiAwsamplify color="#FF9900" size={28} /> },
+  { name: "PyTorch", icon: <SiPytorch color="#EE4C2C" size={28} /> },
+  { name: "TensorFlow", icon: <SiTensorflow color="#FF6F00" size={28} /> },
+  { name: "Hugging Face", icon: <SiHuggingface color="#FFD21E" size={28} /> },
+  { name: "FastAPI", icon: <SiFastapi color="#009688" size={28} /> },
+  { name: "AWS", icon: <SiAmazonwebservices color="#FF9900" size={28} /> },
+  { name: "PostgreSQL", icon: <SiPostgresql color="#336791" size={28} /> },
   { name: "MongoDB", icon: <SiMongodb color="#4DB33D" size={28} /> },
   { name: "Docker", icon: <SiDocker color="#2496ED" size={28} /> },
+  { name: "Kubernetes", icon: <SiKubernetes color="#326ce5" size={28} /> },
   { name: "Redis", icon: <SiRedis color="#DC382D" size={28} /> },
+  { name: "Git", icon: <SiGit color="#F1502F" size={28} /> },
 ];
 
 const education = [
