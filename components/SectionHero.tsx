@@ -14,11 +14,11 @@ export default function SectionHero({ id }: { id: string }) {
   return (
     <section
       id={id}
-      className="relative min-h-screen snap-start flex items-center bg-gradient-to-br from-black to-[var(--color-navy)] px-8 py-10 overflow-hidden"
+      className="relative min-h-screen snap-start flex items-center bg-gradient-to-br from-black to-[var(--color-navy)] px-8 py-10 overflow-hidden md:pt-24 pt-20"
     >
       {/* Top accent bar ONLY */}
       <motion.div
-        className="absolute top-0 left-0 h-3 md:h-4 bg-gradient-to-r from-[var(--color-electric)] via-[var(--color-teal)] to-[var(--color-coral)] z-20"
+        className="absolute top-0 left-0 h-3 md:h-4 bg-gradient-to-r from-[var(--color-electric)] via-[var(--color-teal)] to-[var(--color-coral)] z-20 "
         initial={{ width: 0, opacity: 0 }}
         animate={{ width: "100%", opacity: 1 }}
         transition={{ duration: 1, ease: easeInOut, delay: 0.1 }}
