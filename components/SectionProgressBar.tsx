@@ -47,7 +47,7 @@ export default function SectionProgressBar() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 40 }}
           transition={{ duration: 0.32, ease: "easeOut" }}
-          className="fixed right-8 top-1/2 -translate-y-1/2 z-[9999] flex flex-col items-center"
+          className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center"
           style={{ height: "70vh" }}
           aria-label="Scroll progress"
         >
