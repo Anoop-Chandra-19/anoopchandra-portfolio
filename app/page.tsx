@@ -8,17 +8,20 @@ import SectionDemos from "@/components/SectionDemos";
 import SectionProgressBar from "@/components/SectionProgressBar";
 
 export default function Home() {
-  useLenis(); // No ref, window scroll only!
+  useLenis(); 
 
   return (
     <>
       <SectionProgressBar />
       <main>
-        <SectionHero id="hero" />
-        <SectionProjects id="projects" />
-        <SectionAbout id="about" />
-        <SectionDemos id="demos" />
+        <div className="flex-grow bg-gradient-to-br from-black to-[var(--color-navy)]">
+          <SectionHero id="hero" />
+          <SectionProjects id="projects" />
+          <SectionAbout id="about" />
+          <SectionDemos id="demos" />
+        </div>
       </main>
     </>
   );
 }
+
