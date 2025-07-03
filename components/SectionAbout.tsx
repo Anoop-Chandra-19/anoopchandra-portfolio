@@ -69,7 +69,7 @@ export default function SectionAbout({ id }: { id: string }) {
         {/* Photo + Profile */}
         <div className="flex flex-col md:flex-row gap-10 items-center md:items-start">
           <motion.div
-            className="rounded-full overflow-hidden border-4 border-[var(--color-electric)] shadow-lg w-36 h-36 md:w-44 md:h-44 shrink-0 bg-white dark:bg-navy"
+            className="rounded-full overflow-hidden border-4 border-[var(--color-electric)] shadow-lg w-36 h-36 md:w-44 md:h-44 shrink-0 bg-navy"
             initial={{ scale: 0.88, opacity: 0, y: 30 }}
             whileInView={{ scale: 1, opacity: 1, y: 0 }}
             whileHover={{ scale: 1.08, boxShadow: "0 8px 40px 0 #cc00e655" }}
@@ -91,14 +91,14 @@ export default function SectionAbout({ id }: { id: string }) {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.22 }}
             viewport={{ once: true }}
-            className="bg-white/90 dark:bg-[#23263A] rounded-xl shadow p-6 flex flex-col gap-2 w-full md:max-w-2xl"
+            className="bg-[#23263A] rounded-xl shadow p-6 flex flex-col gap-2 w-full md:max-w-2xl"
           >
-            <div className="text-lg font-bold text-navy dark:text-white mb-1">Anoopchandra Parampalli</div>
+            <div className="text-lg font-bold text-white mb-1">Anoopchandra Parampalli</div>
             <div className="text-[var(--color-coral)] font-medium text-xs uppercase mb-1">AI/ML Engineer • Boston, MA</div>
-            <div className="text-navy/80 dark:text-white/70 text-sm">
+            <div className="text-white/70 text-sm">
               <span className="font-medium">Email:</span> <a href="mailto:anoopchandraparampalli@email.com" className="hover:underline">anoopchandraparampalli@email.com</a>
             </div>
-            <div className="text-navy/80 dark:text-white/70 text-sm">
+            <div className="text-white/70 text-sm">
               <span className="font-medium">Fun fact:</span> Can debug PC builds in under 10 minutes!
             </div>
           </motion.div>
@@ -112,9 +112,9 @@ export default function SectionAbout({ id }: { id: string }) {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 70, damping: 14, delay: 0.32 }}
             viewport={{ once: true }}
-            className="text-lg text-navy dark:text-white/90 mt-3 mb-5 text-left w-full"
+            className="text-lg text-white/90 mt-3 mb-5 text-left w-full"
           >
-            I build AI, custom PCs, and anything that can be torn down and rebuilt – always for the person, not just the specs.<br /><br />
+            I build AI, custom PCs, and anything else that can be torn down and rebuilt – always for the person, not just the specs.<br /><br />
             Whether it's designing a scalable LLM backend, tuning a transformer for music, or tracking down a loose screw in a PC build, I love creating tech that solves real problems and brings ideas to life.
           </motion.p>
         </div>
@@ -195,8 +195,8 @@ export default function SectionAbout({ id }: { id: string }) {
                 <div className={`font-bold text-base mb-1 ${ed.color === "electric" ? "text-[var(--color-electric)]" : "text-[var(--color-teal)]"}`}>
                   {ed.degree}
                 </div>
-                <div className="text-[15px] font-medium text-navy dark:text-white/90 text-center">{ed.school}</div>
-                <div className="text-xs text-navy/80 dark:text-white/60 text-center">
+                <div className="text-[15px] font-medium text-white/90 text-center">{ed.school}</div>
+                <div className="text-xs text-white/60 text-center">
                   {ed.date}{ed.gpa && <span> - {ed.gpa}</span>}
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function SectionAbout({ id }: { id: string }) {
           transition={{ type: "spring", stiffness: 70, damping: 14, delay: 0.52 }}
         >
           <h3 className="text-xl font-bold text-[var(--color-coral)] mb-2">My AM5 Memory Fix Story</h3>
-          <p className="text-md text-navy dark:text-white/80">
+          <p className="text-md text-white/80">
             So this is funny and (in hindsight) pretty interesting. I was building my new PC with a Ryzen 7 7800X3D - an amazing processor, but like most new tech, a little quirky.<br /><br />
             After hours of assembling everything, my rig refused to boot—just memory errors, no matter what I tried. Swapping RAM slots, one stick at a time, endless reboots... nothing worked. I even went to sleep disappointed, thinking I'd have to start all over.<br /><br />
             The next day, while doom-scrolling forums, I found a random post: <span className="italic">"Overtightening the CPU cooler can cause memory controller issues with AM5. Try loosening the screws."</span> At that point, why not? I loosened the cooler screws a little, powered on... and my PC started memory training!<br /><br />
