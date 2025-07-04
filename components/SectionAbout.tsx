@@ -54,7 +54,7 @@ export default function SectionAbout({ id }: { id: string }) {
       <div className="absolute left-1/2 top-0 -translate-x-1/2 -z-10 w-[600px] h-[340px] bg-[radial-gradient(ellipse_at_center,_var(--color-coral)_18%,_transparent_70%)] blur-3xl opacity-15 pointer-events-none" />
       
       {/* Container */}
-      <div className="max-w-5xl mx-auto flex flex-col gap-10 pt-36 md:px-0 px-2">
+      <div className="max-w-5xl mx-auto flex flex-col gap-10 pt-24 md:px-0 px-2">
         {/* Headline */}
         <motion.h2
           initial={{ opacity: 0, x: -60 }}
