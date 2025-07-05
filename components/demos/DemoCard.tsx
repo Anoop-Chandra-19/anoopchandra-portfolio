@@ -66,6 +66,8 @@ export default function TerminalDemoSection() {
   // Animate boot sequence when entering boot state
   useEffect(() => {
     if (termState !== "boot") return;
+
+    let isCancelled = false;
     const lines = [
       "anoop@portfolio:~$ ./boot-demo-terminal",
       "Initializing AI Demo Subsystem...",
@@ -75,18 +77,27 @@ export default function TerminalDemoSection() {
       "Ready.",
       "",
     ];
+    let current = [];
     setBootLines([]);
+    
     let idx = 0;
     const next = () => {
-      setBootLines((bl) => [...bl, lines[idx]]);
+      if (isCancelled) return;
+      current.push(lines[idx]);
+      setBootLines([...current]);
       idx++;
       if (idx < lines.length) {
         setTimeout(next, 330);
       } else {
-        setTimeout(() => setTermState("menu"), 500);
+        setTimeout(() => {
+          if (!isCancelled) setTermState("menu");
+        }, 500);
       }
     };
     next();
+    return () => {
+      isCancelled = true; // Prevent further booting if effect is cleaned up (component unmounts or termState changes)
+    };
   }, [termState]);
 
   // Keyboard navigation
@@ -158,7 +169,7 @@ export default function TerminalDemoSection() {
   }, [isOnScreen]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-[90vh] bg-gradient-to-tr from-black to-[var(--color-navy)] py-20">
+    <div className="flex flex-col items-center justify-center w-full min-h-[90vh] bg-gradient-to-tr from-black to-[var(--color-navy)] py-10">
       {/* Title */}
       <h2 className="text-4xl md:text-5xl font-bold mb-10
         text-[var(--color-electric)] drop-shadow-lg
@@ -233,15 +244,8 @@ export default function TerminalDemoSection() {
                 className="whitespace-pre-wrap text-[var(--color-electric)] text-base min-h-[14rem] flex items-center justify-center select-none"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "20rem" }}
               >
-                <div>
-                  {bootLines.map((l, i) => (
-                    <span key={i}>
-                      {l}
-                      <br />
-                    </span>
-                  ))}
-                  <span className="inline-block animate-pulse text-[var(--color-coral)]">_</span>
-                </div>
+                {bootLines.join("\n")}
+                <span className="inline-block animate-pulse text-[var(--color-coral)]">_</span>
               </motion.pre>
             )}
 
@@ -302,7 +306,7 @@ export default function TerminalDemoSection() {
                         <span
                           className={`inline-block w-7 text-right mr-2 select-none ${selected ? "text-[var(--color-electric)] font-extrabold" : "text-[var(--color-navy)]"}`}
                         >
-                          {selected ? "[>]" : "[ ]"}
+                          {selected ? "[>]" : "[]"}
                         </span>
                         <span className="text-2xl">{demo.icon}</span>
                         <span>{demo.title}</span>
