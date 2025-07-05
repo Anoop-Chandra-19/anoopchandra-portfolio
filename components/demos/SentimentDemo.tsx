@@ -39,14 +39,13 @@ export default function SentimentDemo() {
     if (e.key === "Enter" && ready && !predicting) {
       if (input.trim().toLowerCase() === "help") {
         setModalOpen(true);
-        setHistory([
-          ...history,
+        setHistory(prev =>[
+          ...prev,
           {
             prompt: input,
             output: <span className="ml-4 text-[var(--color-electric)]">[info modal opened]</span>,
           },
         ]);
-        setInput("");
       } else {
         handlePredict();
       }
@@ -76,7 +75,7 @@ export default function SentimentDemo() {
           <input
             className="flex-1 bg-transparent text-white border-0 outline-none px-2 py-0 font-mono placeholder-white/50 text-base"
             type="text"
-            placeholder="Type a sentence or 'help'..."
+            placeholder="Type a sentence to analyze sentiment..."
             value={input}
             onChange={e => setInput(e.target.value)}
             disabled={loading || predicting}
@@ -112,7 +111,7 @@ export default function SentimentDemo() {
             className="ml-2 font-mono underline hover:text-[var(--color-teal)] text-[var(--color-electric)] focus:outline-none"
             onClick={() => setModalOpen(true)}
           >
-            Type 'help' or click here for info
+            Click here for info on how this demo works
           </button>
         </div>
       </div>
