@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ---- Lazy load your real demo components! ----
+// ---- Lazy load demo components ----
 const DoodleClassifierDemo = React.lazy(() => import("./DoodleClassifier"));
 const SentimentDemo = React.lazy(() => import("./SentimentDemo"));
 const PlaygroundDemo = React.lazy(() => import("./PlaygroundDemo"));
@@ -245,7 +245,6 @@ export default function TerminalDemoSection() {
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "20rem" }}
               >
                 {bootLines.join("\n")}
-                <span className="inline-block animate-pulse text-[var(--color-coral)]">_</span>
               </motion.pre>
             )}
 
