@@ -1,160 +1,165 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-
-// HuggingFace API endpoint for sentiment (DistilBERT SST-2)
-const HF_API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english";
-const HF_API_HEADERS = {
-  "Content-Type": "application/json",
-  "Authorization": `Bearer ${process.env.NEXT_PUBLIC_HF_TOKEN}`,
-};
+import React, { useState } from "react";
+import { FaGithub } from "react-icons/fa";
+import { useSentimentModel } from "@/hooks/useSentimentModel";
+import InfoModal from "../InfoModal";
 
 export default function SentimentDemo() {
-  const [text, setText] = useState("");
-  const [result, setResult] = useState<{ label: string; score: number } | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { predict, loading, error, ready } = useSentimentModel();
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState<{ sentiment: string; confidence: number } | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [predicting, setPredicting] = useState(false);
+  const [history, setHistory] = useState<{ prompt: string; output: React.ReactNode }[]>([]);
 
-  async function analyzeSentiment(input: string) {
-    setLoading(true);
-    setError(null);
-    setResult(null);
+  // Only use "$" as CLI prompt; no user@host
+  const prompt = <span className="text-[var(--color-electric)] font-bold">$</span>;
 
-    try {
-      const response = await fetch(HF_API_URL, {
-        method: "POST",
-        headers: HF_API_HEADERS,
-        body: JSON.stringify({ inputs: input }),
-      });
+  const handlePredict = async () => {
+    setPredicting(true);
+    const r = await predict(input);
+    setHistory([
+      ...history,
+      {
+        prompt: input,
+        output: (
+          <span className={`ml-4 ${r?.sentiment === "Positive" ? "text-[var(--color-teal)]" : "text-[var(--color-coral)]"} font-bold`}>
+            {r
+              ? `${r.sentiment} (${(r.confidence * 100).toFixed(1)}%)`
+              : "Unknown"}
+          </span>
+        ),
+      },
+    ]);
+    setResult(r);
+    setInput("");
+    setPredicting(false);
+  };
 
-      const text = await response.text();
-      try {
-        const data = JSON.parse(text);
-        if (Array.isArray(data) && data.length > 0) {
-          const sorted = [...data].sort((a, b) => b.score - a.score);
-          setResult(sorted[0]);
-        } else if (data.error) {
-          throw new Error(data.error);
-        } else {
-          throw new Error("Invalid API response.");
-        }
-      } catch (err) {
-        // If JSON.parse fails, show a helpful error message
-        setError(
-          "The Hugging Face API returned an unexpected response. If this is your first request, the model is likely spinning up (free endpoints can take 30s+). Please try again in a few seconds."
-        );
+  const handleInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && ready && !predicting) {
+      if (input.trim().toLowerCase() === "help") {
+        setModalOpen(true);
+        setHistory([
+          ...history,
+          {
+            prompt: input,
+            output: <span className="ml-4 text-[var(--color-electric)]">[info modal opened]</span>,
+          },
+        ]);
+        setInput("");
+      } else {
+        handlePredict();
       }
-    } catch (err: any) {
-      setError(err.message || "Unknown error");
     }
-    setLoading(false);
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setText(e.target.value);
-    if (e.target.value.trim().length > 2) {
-      analyzeSentiment(e.target.value.trim());
-    } else {
-      setResult(null);
-    }
-  }
-
-  // Color & emoji by label
-  let label = "";
-  let emoji = "";
-  let barColor = "";
-  if (result) {
-    if (result.label === "POSITIVE") {
-      label = "Positive";
-      emoji = "😊";
-      barColor = "bg-[var(--color-teal)]";
-    } else if (result.label === "NEGATIVE") {
-      label = "Negative";
-      emoji = "😠";
-      barColor = "bg-[var(--color-coral)]";
-    } else {
-      label = "Neutral";
-      emoji = "😐";
-      barColor = "bg-[var(--color-electric)]";
-    }
-  }
+  };
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <label htmlFor="sentiment-input" className="mb-2 text-lg font-semibold text-[var(--color-navy)]">
-        Type something and get real sentiment (Hugging Face API):
-      </label>
-      <input
-        id="sentiment-input"
-        type="text"
-        value={text}
-        onChange={handleChange}
-        className="rounded-lg border border-[var(--color-electric)] px-4 py-2 mb-6 w-full max-w-sm focus:outline-none focus:border-[var(--color-teal)] text-[var(--color-navy)]"
-        placeholder="Type your message here..."
-        autoFocus
-      />
-
-      <AnimatePresence>
+    <div
+      className="w-full font-mono text-base text-white bg-transparent"
+      style={{
+        fontFamily:
+          "'JetBrains Mono', 'Fira Mono', 'ui-monospace', SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+      }}
+    >
+      {/* CLI scrollback/history */}
+      <div>
+        {history.map((h, i) => (
+          <div key={i} className="flex items-start">
+            {prompt}
+            <span className="ml-2">{h.prompt}</span>
+            {h.output}
+          </div>
+        ))}
+        {/* CLI input line */}
+        <div className="flex items-center mt-2">
+          {prompt}
+          <input
+            className="flex-1 bg-transparent text-white border-0 outline-none px-2 py-0 font-mono placeholder-white/50 text-base"
+            type="text"
+            placeholder="Type a sentence or 'help'..."
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            disabled={loading || predicting}
+            aria-label="Input text for sentiment analysis"
+            onKeyDown={handleInputKey}
+            autoFocus
+            spellCheck={false}
+          />
+        </div>
+        {/* CLI Output: loading/error/result */}
         {loading && (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-[var(--color-electric)] text-lg mb-4 animate-pulse"
-          >
-            Analyzing...
-          </motion.div>
+          <div className="flex items-center mt-1">
+            <span className="text-[var(--color-teal)]">[model]</span>
+            <span className="ml-2 text-[var(--color-teal)] animate-pulse">Loading AI model...</span>
+          </div>
         )}
         {error && (
-          <motion.div
-            key="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-[var(--color-coral)] text-sm mb-4"
-          >
-            {error}
-          </motion.div>
+          <div className="flex items-center mt-1">
+            <span className="text-[var(--color-coral)]">[error]</span>
+            <span className="ml-2 text-[var(--color-coral)]">{error}</span>
+          </div>
         )}
-        {result && !loading && (
-          <motion.div
-            key={label}
-            initial={{ opacity: 0, y: 24, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -24, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-            className={`flex flex-col items-center`}
-          >
-            <span className="text-5xl mb-2">{emoji}</span>
-            <span
-              className={`text-xl font-bold rounded-lg px-4 py-1
-                ${barColor} text-white shadow transition`}
-            >
-              {label} ({(result.score * 100).toFixed(0)}%)
-            </span>
-            <div className="w-48 mt-4 h-3 rounded-full bg-[var(--color-white)]/40 overflow-hidden">
-              <div
-                className={`h-3 rounded-full transition-all duration-500 ${barColor}`}
-                style={{
-                  width: `${Math.round(result.score * 100)}%`,
-                }}
-              />
-            </div>
-          </motion.div>
+        {predicting && !loading && (
+          <div className="flex items-center mt-1">
+            <span className="text-[var(--color-teal)]">[ai]</span>
+            <span className="ml-2">Analyzing...</span>
+          </div>
         )}
-      </AnimatePresence>
-      <button
-        type="button"
-        className="mt-6 text-sm underline text-[var(--color-teal)]"
-        onClick={() =>
-          window.open(
-            "https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english",
-            "_blank"
-          )
-        }
-      >
-        How does this work?
-      </button>
+        {/* Help link */}
+        <div className="flex items-center mt-4">
+          <span className="text-[var(--color-electric)]">[info]</span>
+          <button
+            className="ml-2 font-mono underline hover:text-[var(--color-teal)] text-[var(--color-electric)] focus:outline-none"
+            onClick={() => setModalOpen(true)}
+          >
+            Type 'help' or click here for info
+          </button>
+        </div>
+      </div>
+      {/* Info modal */}
+      <InfoModal open={modalOpen} onClose={() => setModalOpen(false)} title="How does this Demo Work?">
+        <p>
+          This demo uses a <span className="text-[var(--color-teal)] font-semibold">quantized LSTM neural network </span>
+          trained on thousands of real-world reviews to predict sentiment—
+          <b> right in your browser</b>, with no server or API calls.
+        </p>
+        <ul className="list-disc pl-6 mt-4 space-y-1 text-sm">
+          <li>
+            <b>Tokenization:</b> Your sentence is split into words and mapped to unique numbers using the original training word index.
+          </li>
+          <li>
+            <b>Padded Sequence:</b> The input is padded/truncated to 64 tokens, matching model training.
+          </li>
+          <li>
+            <b>Model Inference:</b> The encoded sequence is run through a <span className="text-[var(--color-teal)] font-semibold">TensorFlow.js LSTM model</span> client-side, using your device's GPU.
+          </li>
+          <li>
+            <b>Output:</b> The model predicts a confidence score (0–1) mapped to positive or negative sentiment.
+          </li>
+        </ul>
+        <p className="mt-4 text-sm text-white/70">
+          <b>Tip:</b> This demo works best with longer sentences and real-world phrases (just like the reviews it was trained on).
+          For short statements like <i>'i love this'</i> or <i>'worst movie'</i>, results can be less reliable.
+          For the most accurate reading, type out a full opinion - just like you'd write a review!
+        </p>
+        <p className="mt-4 text-xs text-white/70">
+          <b>Tech Stack:</b> Next.js, React, Tailwind CSS, Framer Motion, TensorFlow.js, Python/Keras, Quantized LSTM.
+        </p>
+        <p className="mt-4">
+          <b className="text-[var(--color-coral)]">Source code:</b>{" "}
+          The Python training and model export code for this LSTM sentiment model is open source.
+          &nbsp;
+          <a
+            href="https://github.com/Anoop-Chandra-19/portfolio_models"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-[var(--color-electric)] font-semibold underline hover:text-[var(--color-coral)] transition"
+          >
+            <FaGithub className="inline mr-1" />
+            View on GitHub
+          </a>
+        </p>
+      </InfoModal>
     </div>
   );
 }
