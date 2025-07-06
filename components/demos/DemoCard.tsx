@@ -33,24 +33,6 @@ const DEMOS = [
 
 type TerminalState = "intro" | "boot" | "menu" | "demo" | "exit";
 
-function useOnScreen(
-  ref: React.RefObject<Element | null>,
-  rootMargin: string = "0px"
-): boolean {
-  const [isIntersecting, setIntersecting] = useState<boolean>(false);
-
-  useEffect(() => {
-    const observer = new window.IntersectionObserver(
-      ([entry]: IntersectionObserverEntry[]) => setIntersecting(entry.isIntersecting),
-      { rootMargin }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [ref, rootMargin]);
-
-  return isIntersecting;
-}
-
 export default function TerminalDemoSection() {
   const [termState, setTermState] = useState<TerminalState>("intro");
   const [bootLines, setBootLines] = useState<string[]>([]);
@@ -59,7 +41,6 @@ export default function TerminalDemoSection() {
   const [minLoading, setMinLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
-  const isOnScreen = useOnScreen(terminalRef, "-20%");
   const [isFocused, setIsFocused] = useState(false);
 
   // Animate boot sequence when entering boot state
@@ -160,12 +141,6 @@ export default function TerminalDemoSection() {
     setBootLines([]);
     setMinLoading(false);
   }
-
-  useEffect(() => {
-    if (isOnScreen && terminalRef.current) {
-      terminalRef.current.focus();
-    }
-  }, [isOnScreen]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-[90vh] bg-gradient-to-tr from-black to-[var(--color-navy)] py-10">
