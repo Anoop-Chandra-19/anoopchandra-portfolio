@@ -1,9 +1,14 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { motion, useAnimation } from "framer-motion";
 import { useLenisInstance } from "./LenisProvider";
 import ContactModal from "./ContactModal";
+
+type NavLink = {
+  label: string;
+  id: string;
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -56,14 +61,14 @@ export default function Navbar() {
     });
   }, [scrolled, controls]);
 
-  const navLinks = [
+  const navLinks: NavLink[] = useMemo(() => [
     { label: "Projects", id: "projects" },
     { label: "About", id: "about" },
     { label: "Demos", id: "demos" },
     { label: "Resume", id: "resume" },
-  ];
+  ], []);
 
-  function handleNavClick(link: any) {
+  function handleNavClick(link: NavLink) {
     if (link.id === "resume") {
       window.open("/Anoopchandra_resume.pdf", "_blank");
     } else {
@@ -84,7 +89,7 @@ export default function Navbar() {
     } else {
       setUnderlineProps(prev => ({ ...prev, visible: false }));
     }
-  }, [hovered]);
+  }, [hovered, navLinks]);
 
   return (
     <>

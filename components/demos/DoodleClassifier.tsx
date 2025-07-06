@@ -19,7 +19,7 @@ export default function DoodleClassifier() {
 
   // Strokes for undo
   const strokes = useRef<Array<Array<{ x: number; y: number }>>>([]);
-  let currentStroke: Array<{ x: number; y: number }> = [];
+  const currentStroke = useRef<Array<{ x: number; y: number }>>([]);
 
   const [predicting, setPredicting] = useState(false);
   const [predictions, setPredictions] = useState<{ className: string; score: number }[]>([]);
@@ -29,6 +29,33 @@ export default function DoodleClassifier() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
+
+    // ---- Preprocess canvas to [1,28,28,1] grayscale for model, update preview ----
+  function preprocess(onlyPreview = false): tf.Tensor4D | void {
+    const src = canvasRef.current!;
+    const temp = document.createElement("canvas");
+    temp.width = 28;
+    temp.height = 28;
+    const tctx = temp.getContext("2d")!;
+    tctx.fillStyle = "#000";
+    tctx.fillRect(0, 0, 28, 28);
+    tctx.drawImage(src, 0, 0, 28, 28);
+
+    // --- Update model input preview
+    if (previewRef.current) {
+      const pctx = previewRef.current.getContext("2d")!;
+      pctx.clearRect(0, 0, 28, 28);
+      pctx.drawImage(temp, 0, 0);
+    }
+
+    const img = tctx.getImageData(0, 0, 28, 28);
+    const input = [];
+    for (let i = 0; i < img.data.length; i += 4) {
+      input.push(img.data[i]);
+    }
+    if (onlyPreview) return;
+    return tf.tensor4d(input, [1, 28, 28, 1]);
+  }
 
   // ---- Drawing logic (mouse/touch) ----
   useEffect(() => {
@@ -66,7 +93,7 @@ export default function DoodleClassifier() {
       ctx.beginPath();
       const [x, y] = getPos(e);
       ctx.moveTo(x, y);
-      currentStroke = [{ x, y }];
+      currentStroke.current = [{ x, y }];
     }
 
     function draw(e: MouseEvent | TouchEvent) {
@@ -76,13 +103,13 @@ export default function DoodleClassifier() {
       const [x, y] = getPos(e);
       ctx.lineTo(x, y);
       ctx.stroke();
-      currentStroke.push({ x, y });
+      currentStroke.current.push({ x, y });
     }
 
     function endDraw() {
-      if (drawing && currentStroke.length) {
-        strokes.current.push([...currentStroke]);
-        currentStroke = [];
+      if (drawing && currentStroke.current.length) {
+        strokes.current.push([...currentStroke.current]);
+        currentStroke.current = [];
       }
       drawing = false;
     }
@@ -106,7 +133,6 @@ export default function DoodleClassifier() {
       canvas.removeEventListener("touchmove", draw);
       canvas.removeEventListener("touchend", endDraw);
     };
-    // eslint-disable-next-line
   }, []);
 
   // ---- Undo support ----
@@ -127,7 +153,7 @@ export default function DoodleClassifier() {
       });
       ctx.stroke();
     }
-    updatePreview();
+    preprocess(true); // Update preview after redraw
   }, []);
 
   function handleUndo() {
@@ -139,33 +165,6 @@ export default function DoodleClassifier() {
   // ---- Model input preview ----
   function updatePreview() {
     preprocess(true);
-  }
-
-  // ---- Preprocess canvas to [1,28,28,1] grayscale for model, update preview ----
-  function preprocess(onlyPreview = false): tf.Tensor4D | void {
-    const src = canvasRef.current!;
-    const temp = document.createElement("canvas");
-    temp.width = 28;
-    temp.height = 28;
-    const tctx = temp.getContext("2d")!;
-    tctx.fillStyle = "#000";
-    tctx.fillRect(0, 0, 28, 28);
-    tctx.drawImage(src, 0, 0, 28, 28);
-
-    // --- Update model input preview
-    if (previewRef.current) {
-      const pctx = previewRef.current.getContext("2d")!;
-      pctx.clearRect(0, 0, 28, 28);
-      pctx.drawImage(temp, 0, 0);
-    }
-
-    const img = tctx.getImageData(0, 0, 28, 28);
-    const input = [];
-    for (let i = 0; i < img.data.length; i += 4) {
-      input.push(img.data[i]);
-    }
-    if (onlyPreview) return;
-    return tf.tensor4d(input, [1, 28, 28, 1]);
   }
 
   // ---- Predict ----
@@ -182,7 +181,7 @@ export default function DoodleClassifier() {
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
       setPredictions(top);
-    } catch (e) {
+    } catch {
       setError("Prediction failed.");
     } finally {
       setPredicting(false);

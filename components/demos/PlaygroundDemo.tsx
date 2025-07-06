@@ -60,7 +60,7 @@ export default function PlaygroundDemo() {
     newC: (Centroid & { n?: number })[],
     steps: number = 8
   ): Centroid[][] {
-    let frames: Centroid[][] = [];
+    const frames: Centroid[][] = [];
     for (let s = 1; s <= steps; ++s) {
       frames.push(
         newC.map((c, i) => ({
@@ -85,18 +85,18 @@ export default function PlaygroundDemo() {
 
     while (changed && steps < 20) {
       // Assign points to nearest centroid
-      let newAssigns = points.map(p => {
+      const newAssigns = points.map(p => {
         let best = 0, bestDist = Infinity;
         for (let i = 0; i < c.length; ++i) {
-          let dx = p.x - c[i].x, dy = p.y - c[i].y;
-          let d = dx * dx + dy * dy;
+          const dx = p.x - c[i].x, dy = p.y - c[i].y;
+          const d = dx * dx + dy * dy;
           if (d < bestDist) { bestDist = d; best = i; }
         }
         return best;
       });
 
       // Update centroids
-      let newCentroids = Array.from({ length: k }, () => ({ x: 0, y: 0, n: 0 }));
+      const newCentroids = Array.from({ length: k }, () => ({ x: 0, y: 0, n: 0 }));
       newAssigns.forEach((cluster, i) => {
         newCentroids[cluster].x += points[i].x;
         newCentroids[cluster].y += points[i].y;
@@ -152,11 +152,11 @@ export default function PlaygroundDemo() {
 
   // Simple Perceptron Trainer (binary)
   function trainPerceptron(points: Point[]) {
-    let w = [0, 0, 0]; // bias, w1, w2
+    const w = [0, 0, 0]; // bias, w1, w2
     for (let epoch = 0; epoch < 24; ++epoch) {
-      for (let pt of points) {
-        let yhat = w[0] + w[1] * pt.x + w[2] * pt.y > 0 ? 1 : 0;
-        let err = (pt.class ?? 0) - yhat;
+      for (const pt of points) {
+        const yhat = w[0] + w[1] * pt.x + w[2] * pt.y > 0 ? 1 : 0;
+        const err = (pt.class ?? 0) - yhat;
         w[0] += 0.13 * err;
         w[1] += 0.13 * err * pt.x;
         w[2] += 0.13 * err * pt.y;
@@ -178,8 +178,8 @@ export default function PlaygroundDemo() {
   // Draw perceptron decision boundary (SVG line)
   function DecisionBoundary({ w }: { w: [number, number, number] }) {
     // w[0] + w[1] * x + w[2] * y = 0  -->  y = -(w[0] + w[1] * x)/w[2]
-    let y0 = - (w[0] + w[1] * 0) / (w[2] || 1e-8);
-    let y1 = - (w[0] + w[1] * 1) / (w[2] || 1e-8);
+    const y0 = - (w[0] + w[1] * 0) / (w[2] || 1e-8);
+    const y1 = - (w[0] + w[1] * 1) / (w[2] || 1e-8);
     return (
       <line
         x1={0} y1={y0}

@@ -36,7 +36,7 @@ export default function SectionHero({ id }: { id: string }) {
             variants={headlineLine}
             className="block text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--color-electric)] leading-tight"
           >
-            Hi, I'm Anoopchandra
+            Hi, I&apos;m Anoopchandra
           </motion.span>
           <motion.span
             variants={headlineLine}
@@ -109,6 +109,15 @@ export default function SectionHero({ id }: { id: string }) {
           onBlur={() => setIsHover(false)}
           style={{ outline: "none" }}
         >
+          {/* Hover tooltip */}
+          <motion.div
+            className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-sm px-3 py-1 rounded-lg pointer-events-none"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: isHover ? 1 : 0, y: isHover ? 0 : 10 }}
+            transition={{ duration: 0.2 }}
+          >
+            👋 Hi!
+          </motion.div>
           <Image
             src="/anoopchandra.jpg"
             alt="Anoopchandra Parampalli portrait"

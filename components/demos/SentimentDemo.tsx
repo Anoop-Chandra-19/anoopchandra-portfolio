@@ -6,7 +6,6 @@ import InfoModal from "../InfoModal";
 export default function SentimentDemo() {
   const { predict, loading, error, ready } = useSentimentModel();
   const [input, setInput] = useState("");
-  const [result, setResult] = useState<{ sentiment: string; confidence: number } | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [predicting, setPredicting] = useState(false);
   const [history, setHistory] = useState<{ prompt: string; output: React.ReactNode }[]>([]);
@@ -30,7 +29,6 @@ export default function SentimentDemo() {
         ),
       },
     ]);
-    setResult(r);
     setInput("");
     setPredicting(false);
   };
@@ -130,16 +128,16 @@ export default function SentimentDemo() {
             <b>Padded Sequence:</b> The input is padded/truncated to 64 tokens, matching model training.
           </li>
           <li>
-            <b>Model Inference:</b> The encoded sequence is run through a <span className="text-[var(--color-teal)] font-semibold">TensorFlow.js LSTM model</span> client-side, using your device's GPU.
+            <b>Model Inference:</b> The encoded sequence is run through a <span className="text-[var(--color-teal)] font-semibold">TensorFlow.js LSTM model</span> client-side, using your device&apos;s GPU.
           </li>
           <li>
-            <b>Output:</b> The model predicts a confidence score (0–1) mapped to positive or negative sentiment.
+            <b>Output:</b> The model predicts a confidence score (0-1) mapped to positive or negative sentiment.
           </li>
         </ul>
         <p className="mt-4 text-sm text-white/70">
           <b>Tip:</b> This demo works best with longer sentences and real-world phrases (just like the reviews it was trained on).
-          For short statements like <i>'i love this'</i> or <i>'worst movie'</i>, results can be less reliable.
-          For the most accurate reading, type out a full opinion - just like you'd write a review!
+          For short statements like <i>&apos;i love this&apos;</i> or <i>&apos;worst movie&apos;</i>, results can be less reliable.
+          For the most accurate reading, type out a full opinion - just like you&apos;d write a review!
         </p>
         <p className="mt-4 text-xs text-white/70">
           <b>Tech Stack:</b> Next.js, React, Tailwind CSS, Framer Motion, TensorFlow.js, Python/Keras, Quantized LSTM.

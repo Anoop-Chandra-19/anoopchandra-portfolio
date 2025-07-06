@@ -77,7 +77,7 @@ export default function TerminalDemoSection() {
       "Ready.",
       "",
     ];
-    let current = [];
+    const current: string[] = [];
     setBootLines([]);
     
     let idx = 0;

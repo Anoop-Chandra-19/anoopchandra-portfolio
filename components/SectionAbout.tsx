@@ -115,7 +115,7 @@ export default function SectionAbout({ id }: { id: string }) {
             className="text-lg text-white/90 mt-3 mb-5 text-left w-full"
           >
             I build AI, custom PCs, and anything else that can be torn down and rebuilt - always for the person, not just the specs.<br /><br />
-            Whether it's designing a scalable LLM backend, tuning a transformer for music, or tracking down a loose screw in a PC build, I love creating tech that solves real problems and brings ideas to life.
+            Whether it&apos;s designing a scalable LLM backend, tuning a transformer for music, or tracking down a loose screw in a PC build, I love creating tech that solves real problems and brings ideas to life.
           </motion.p>
         </div>
 
@@ -190,7 +190,7 @@ export default function SectionAbout({ id }: { id: string }) {
             ))}
           </div>
           <div className="flex w-full max-w-2xl mx-auto mt-4 gap-4 justify-between">
-            {education.map((ed, idx) => (
+            {education.map((ed) => (
               <div key={ed.degree} className="flex-1 flex flex-col items-center min-w-[120px]">
                 <div className={`font-bold text-base mb-1 ${ed.color === "electric" ? "text-[var(--color-electric)]" : "text-[var(--color-teal)]"}`}>
                   {ed.degree}
@@ -215,8 +215,8 @@ export default function SectionAbout({ id }: { id: string }) {
           <h3 className="text-xl font-bold text-[var(--color-coral)] mb-2">My AM5 Memory Fix Story</h3>
           <p className="text-md text-white/80">
             So this is funny and (in hindsight) pretty interesting. I was building my new PC with a Ryzen 7 7800X3D - an amazing processor, but like most new tech, a little quirky.<br /><br />
-            After hours of assembling everything, my rig refused to boot—just memory errors, no matter what I tried. Swapping RAM slots, one stick at a time, endless reboots... nothing worked. I even went to sleep disappointed, thinking I'd have to start all over.<br /><br />
-            The next day, while doom-scrolling forums, I found a random post: <span className="italic">"Overtightening the CPU cooler can cause memory controller issues with AM5. Try loosening the screws."</span> At that point, why not? I loosened the cooler screws a little, powered on... and my PC started memory training!<br /><br />
+            After hours of assembling everything, my rig refused to boot - just memory errors, no matter what I tried. Swapping RAM slots, one stick at a time, endless reboots... nothing worked. I even went to sleep disappointed, thinking I&apos;d have to start all over.<br /><br />
+            The next day, while doom-scrolling forums, I found a random post: <span className="italic">&quot;Overtightening the CPU cooler can cause memory controller issues with AM5. Try loosening the screws.&quot;</span> At that point, why not? I loosened the cooler screws a little, powered on... and my PC started memory training!<br /><br />
             Twenty minutes later, Windows was installed and I was gaming. Lesson learned: sometimes the weirdest hardware bugs have the simplest (and least expected) fixes!
           </p>
         </motion.div>
