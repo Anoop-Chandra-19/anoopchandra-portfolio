@@ -39,7 +39,7 @@ const education = [
     degree: "MS, Applied Machine Intelligence",
     school: "Northeastern University, Boston, MA",
     date: "July 2025",
-    gpa: "GPA: 3.86/4.0",
+    gpa: "GPA: 3.89/4.0",
     color: "electric"
   }
 ];
@@ -94,7 +94,7 @@ export default function SectionAbout({ id }: { id: string }) {
             className="bg-[#23263A] rounded-xl shadow p-6 flex flex-col gap-2 w-full md:max-w-2xl"
           >
             <div className="text-lg font-bold text-white mb-1">Anoopchandra Parampalli</div>
-            <div className="text-[var(--color-coral)] font-medium text-xs uppercase mb-1">AI/ML Engineer • Boston, MA</div>
+            <div className="text-[var(--color-coral)] font-medium text-xs uppercase mb-1">AI/ML Engineer</div>
             <div className="text-white/70 text-sm">
               <span className="font-medium">Email:</span> <a href="mailto:anoopchandraparampalli@email.com" className="hover:underline">anoopchandraparampalli@email.com</a>
             </div>
@@ -114,7 +114,7 @@ export default function SectionAbout({ id }: { id: string }) {
             viewport={{ once: true }}
             className="text-lg text-white/90 mt-3 mb-5 text-left w-full"
           >
-            I build AI, custom PCs, and anything else that can be torn down and rebuilt – always for the person, not just the specs.<br /><br />
+            I build AI, custom PCs, and anything else that can be torn down and rebuilt - always for the person, not just the specs.<br /><br />
             Whether it's designing a scalable LLM backend, tuning a transformer for music, or tracking down a loose screw in a PC build, I love creating tech that solves real problems and brings ideas to life.
           </motion.p>
         </div>
