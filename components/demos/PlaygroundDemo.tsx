@@ -227,60 +227,39 @@ export default function PlaygroundDemo() {
             aria-label="Switch to Classifier Explorer"
           >Classifier</button>
         </div>
-        {/* --- Controls --- */}
-        <div className="flex gap-3 items-center justify-between mb-1">
+
+        {/* --- Cluster/Class Switch Above Plot --- */}
+        <div className="flex gap-3 items-center justify-between mb-1 w-full">
           {mode === "kmeans" ? (
-            <>
-              <div className="flex gap-2 items-center">
-                <label className="font-semibold text-white">Clusters:</label>
-                <input
-                  type="range" min={2} max={8} value={k}
-                  onChange={e => setK(Number(e.target.value))}
-                  className="accent-[var(--color-electric)]"
-                  disabled={running}
-                  aria-label="Number of clusters"
-                />
-                <span className="font-mono text-electric text-lg">{k}</span>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={handleReset}
-                  className="px-3 py-1 rounded bg-[var(--color-navy)] text-white text-sm border border-[var(--color-electric)] hover:bg-[var(--color-electric)]/10 transition"
-                  disabled={running || points.length === 0}
-                >Reset</button>
-                <button onClick={runKMeans}
-                  className="px-3 py-1 rounded bg-[var(--color-electric)] text-white text-sm font-semibold shadow-lg hover:bg-[var(--color-coral)] transition"
-                  disabled={running || points.length < k}
-                >Run K-Means</button>
-              </div>
-            </>
+            <div className="flex gap-2 items-center w-full">
+              <label className="font-semibold text-white">Clusters:</label>
+              <input
+                type="range" min={2} max={8} value={k}
+                onChange={e => setK(Number(e.target.value))}
+                className="accent-[var(--color-electric)] flex-1"
+                disabled={running}
+                aria-label="Number of clusters"
+                style={{ maxWidth: 180 }}
+              />
+              <span className="font-mono text-electric text-lg">{k}</span>
+            </div>
           ) : (
-            <>
-              <div className="flex gap-2 items-center">
-                <label className="font-semibold text-white">Point class:</label>
-                <button
-                  onClick={handleNextClass}
-                  className={`w-7 h-7 rounded-full border-2 shadow ${currentClass === 0 ? 'border-[var(--color-electric)]' : 'border-[var(--color-coral)]'}`}
-                  style={{ background: COLORS[currentClass % COLORS.length] }}
-                  aria-label="Switch point class"
-                  disabled={running}
-                ></button>
-                <span className="text-white/60 text-xs">Click to change</span>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={handleReset}
-                  className="px-3 py-1 rounded bg-[var(--color-navy)] text-white text-sm border border-[var(--color-electric)] hover:bg-[var(--color-electric)]/10 transition"
-                  disabled={running || points.length === 0}
-                >Reset</button>
-                <button onClick={runClassifier}
-                  className="px-3 py-1 rounded bg-[var(--color-electric)] text-white text-sm font-semibold shadow-lg hover:bg-[var(--color-coral)] transition"
-                  disabled={running || points.length < 2}
-                >Run Classifier</button>
-              </div>
-            </>
+            <div className="flex gap-2 items-center w-full">
+              <label className="font-semibold text-white">Point class:</label>
+              <button
+                onClick={handleNextClass}
+                className={`w-7 h-7 rounded-full border-2 shadow ${currentClass === 0 ? 'border-[var(--color-electric)]' : 'border-[var(--color-coral)]'}`}
+                style={{ background: COLORS[currentClass % COLORS.length] }}
+                aria-label="Switch point class"
+                disabled={running}
+              ></button>
+              <span className="text-white/60 text-xs">Click to change</span>
+            </div>
           )}
         </div>
+
         {/* --- Plot --- */}
-        <div className="w-full aspect-square bg-navy rounded-lg border-2 border-electric relative shadow-xl overflow-hidden">
+        <div className="w-full aspect-square bg-navy rounded-lg border-2 border-electric relative shadow-xl overflow-hidden max-w-xl mx-auto max-h-[70vw] min-h-[220px] md:max-h-none md:min-h-[340px]">
           <svg
             ref={svgRef}
             width="100%" height="100%" viewBox="0 0 1 1"
@@ -352,6 +331,34 @@ export default function PlaygroundDemo() {
             }
           </svg>
         </div>
+
+        {/* --- Action Buttons: Centered, just below the plot --- */}
+        <div className="flex gap-3 justify-center items-center w-full mt-4">
+          {mode === "kmeans" ? (
+            <>
+              <button onClick={handleReset}
+                className="px-4 py-2 rounded bg-[var(--color-navy)] text-white text-base md:text-sm border border-[var(--color-electric)] hover:bg-[var(--color-electric)]/10 transition"
+                disabled={running || points.length === 0}
+              >Reset</button>
+              <button onClick={runKMeans}
+                className="px-4 py-2 rounded bg-[var(--color-electric)] text-white text-base md:text-sm font-semibold shadow-lg hover:bg-[var(--color-coral)] transition"
+                disabled={running || points.length < k}
+              >Run K-Means</button>
+            </>
+          ) : (
+            <>
+              <button onClick={handleReset}
+                className="px-4 py-2 rounded bg-[var(--color-navy)] text-white text-base md:text-sm border border-[var(--color-electric)] hover:bg-[var(--color-electric)]/10 transition"
+                disabled={running || points.length === 0}
+              >Reset</button>
+              <button onClick={runClassifier}
+                className="px-4 py-2 rounded bg-[var(--color-electric)] text-white text-base md:text-sm font-semibold shadow-lg hover:bg-[var(--color-coral)] transition"
+                disabled={running || points.length < 2}
+              >Run Classifier</button>
+            </>
+          )}
+        </div>
+
         {/* --- Footer / Instructions --- */}
         <div className="mt-2 text-xs text-white/60 text-center">
           {mode === "kmeans" ? (
@@ -375,6 +382,7 @@ export default function PlaygroundDemo() {
           </button>
         </div>
       </motion.div>
+
       {/* ---- Info Modal ---- */}
       <InfoModal open={modalOpen} onClose={() => setModalOpen(false)} title="How does this Demo Work?">
         {mode === "kmeans" ? (

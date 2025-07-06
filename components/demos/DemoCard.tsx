@@ -62,7 +62,6 @@ export default function TerminalDemoSection() {
   const isOnScreen = useOnScreen(terminalRef, "-20%");
   const [isFocused, setIsFocused] = useState(false);
 
-
   // Animate boot sequence when entering boot state
   useEffect(() => {
     if (termState !== "boot") return;
@@ -364,6 +363,21 @@ export default function TerminalDemoSection() {
                 </div>
                 <div className="pt-2 text-[var(--color-electric)] text-xs opacity-70">
                   Press <kbd>Esc</kbd> to return to menu.
+                  {/* ---- Mobile/Touch: terminal-style exit button ---- */}
+                  <span className="inline-block md:hidden ml-3">
+                    <button
+                      onClick={() => {
+                        setTermState("menu");
+                        setLaunchedDemo(null);
+                      }}
+                      className="font-mono text-green-400 px-2 py-1 rounded bg-black border border-[var(--color-navy)] ml-2 hover:bg-[var(--color-electric)]/10 active:bg-[var(--color-electric)]/30 transition"
+                      style={{ fontSize: "1rem" }}
+                      aria-label="Exit demo and return to menu"
+                    >
+                      $ exit
+                    </button>
+                    <span className="ml-2 text-white/60">(tap to return)</span>
+                  </span>
                 </div>
               </motion.div>
             )}
