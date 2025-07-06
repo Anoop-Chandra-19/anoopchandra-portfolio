@@ -55,14 +55,14 @@ export default function SectionProjects({ id }: { id: string }) {
               target={project.link ? "_blank" : undefined}
               rel={project.link ? "noopener noreferrer" : undefined}
               tabIndex={project.link ? 0 : -1}
-              initial={{ opacity: 0, y: 44 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, x: -64 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
               transition={{
-                duration: 0.72,
-                delay: i * 0.16,
+                duration: 0.90,
+                delay: i * 0.20,
                 type: "spring",
-                bounce: 0.21,
+                bounce: 0.12,
               }}
               className={`flex flex-col md:flex-row bg-[#23263A] rounded-2xl overflow-hidden shadow-lg group transition-transform duration-300 
                 ${project.link ? "hover:scale-[1.018] cursor-pointer" : "opacity-70 cursor-not-allowed"}
