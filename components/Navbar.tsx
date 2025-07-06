@@ -1,14 +1,16 @@
 "use client";
 import { useRef, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { motion, useAnimation } from "framer-motion";
+import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useLenisInstance } from "./LenisProvider";
 import ContactModal from "./ContactModal";
+import HamburgerIcon from "./HamburgerIcon";
 
 type NavLink = {
   label: string;
   id: string;
 };
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -91,47 +93,73 @@ export default function Navbar() {
     }
   }, [hovered, navLinks]);
 
+  // For ESC key to close menu
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    }
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [mobileMenuOpen]);
+
   return (
     <>
       <ContactModal open={modalOpen} onClose={() => setModalOpen(false)} />
 
-      {/* Mobile menu popover */}
-      {mobileMenuOpen && (
-        <div className="absolute inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur">
-          <div className="bg-[var(--color-navy)] rounded-2xl p-8 flex flex-col gap-6 items-center shadow-lg w-[90vw] max-w-xs relative">
-            <button
-              className="absolute top-5 right-5 text-2xl text-[var(--color-electric)]"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-label="Close menu"
+      {/* Mobile menu popover w/ animation */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            key="mobile-menu"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur"
+            initial={{ opacity: 0, y: 40, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 40, scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 240, damping: 24 }}
+            aria-modal="true"
+            role="dialog"
+          >
+            <motion.div
+              className="bg-[var(--color-navy)] rounded-2xl p-8 flex flex-col gap-6 items-center shadow-lg w-[90vw] max-w-xs relative"
+              initial={{ opacity: 0, y: 80, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 80, scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.04 }}
+              tabIndex={-1}
             >
-              ×
-            </button>
-            {navLinks.map(link => (
+              {/* Nav links */}
+              {navLinks.map(link => (
+                <button
+                  key={link.id}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleNavClick(link);
+                  }}
+                  className="text-xl text-white font-bold hover:text-[var(--color-coral)] w-full py-2 transition-colors duration-200"
+                  aria-label={link.label}
+                  tabIndex={0}
+                  type="button"
+                >
+                  {link.label}
+                </button>
+              ))}
               <button
-                key={link.id}
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  handleNavClick(link);
+                  setModalOpen(true);
                 }}
-                className="text-xl text-white font-bold hover:text-[var(--color-coral)] w-full py-2"
-                aria-label={link.label}
+                className="bg-[var(--color-electric)] px-6 py-2 rounded-xl text-white font-bold mt-4 w-full hover:bg-[var(--color-coral)] transition-all duration-200"
+                aria-label="Contact Me"
+                tabIndex={0}
+                type="button"
               >
-                {link.label}
+                Contact Me
               </button>
-            ))}
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setModalOpen(true);
-              }}
-              className="bg-[var(--color-electric)] px-6 py-2 rounded-xl text-white font-bold mt-4 w-full"
-              aria-label="Contact Me"
-            >
-              Contact Me
-            </button>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main navbar */}
       <motion.nav
@@ -162,14 +190,11 @@ export default function Navbar() {
             AP
           </Link>
 
-          {/* Hamburger menu on mobile only */}
-          <button
-            className="md:hidden text-3xl text-[var(--color-electric)]"
-            aria-label="Open menu"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            ☰
-          </button>
+          {/* Hamburger menu on mobile only - animated */}
+          <HamburgerIcon
+            open={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((v) => !v)}
+          />
 
           {/* Desktop nav links (hidden on mobile) */}
           <div ref={navContainerRef} className="hidden md:flex relative items-center gap-10">
@@ -188,6 +213,8 @@ export default function Navbar() {
                 `}
                 style={{ background: "none", border: "none" }}
                 aria-label={link.label}
+                tabIndex={0}
+                type="button"
               >
                 {link.label}
               </button>
@@ -219,6 +246,8 @@ export default function Navbar() {
               }
             `}
             aria-label="Contact Me"
+            tabIndex={0}
+            type="button"
           >
             Contact Me
           </button>
