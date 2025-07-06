@@ -65,7 +65,7 @@ export default function Navbar() {
 
   function handleNavClick(link: any) {
     if (link.id === "resume") {
-      window.open("/resume.pdf", "_blank");
+      window.open("/Anoopchandra_resume.pdf", "_blank");
     } else {
       scrollToSection(link.id);
     }
