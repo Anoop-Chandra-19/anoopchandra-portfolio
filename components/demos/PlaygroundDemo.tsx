@@ -253,7 +253,7 @@ export default function PlaygroundDemo() {
                 aria-label="Switch point class"
                 disabled={running}
               ></button>
-              <span className="text-white/60 text-xs">Click to change</span>
+              <span className="text-white/60 text-xs">Click the icon to change class</span>
             </div>
           )}
         </div>
