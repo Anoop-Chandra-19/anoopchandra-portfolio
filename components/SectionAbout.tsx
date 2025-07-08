@@ -77,12 +77,13 @@ export default function SectionAbout({ id }: { id: string }) {
             viewport={{ once: true }}
           >
             <Image
-              src="/anoopchandra.jpg"
+              src="/anoopchandra.webp"
               alt="Anoop Chandra Parampalli"
               width={176}
               height={176}
               className="object-cover w-full h-full"
               priority
+              placeholder="blur"
             />
           </motion.div>
           {/* Card */}

@@ -119,12 +119,13 @@ export default function SectionHero({ id }: { id: string }) {
             👋 Hi!
           </motion.div>
           <Image
-            src="/anoopchandra.jpg"
+            src="/anoopchandra.webp"
             alt="Anoopchandra Parampalli portrait"
             width={360}
             height={360}
             className="rounded-full border-4 border-[var(--color-electric)] shadow-xl object-cover transition-all duration-300"
             priority
+            placeholder="blur"
           />
         </motion.div>
       </div>
