@@ -30,30 +30,23 @@ const CARDS = [
 ];
 
 export default function Now() {
-  // Static date — picked at design time so the page is consistent in SSR and client.
-  const meta = "week of apr 29, 2026";
   return (
     <section id="sec-now" className="section">
-      <SectionHeader num="01" title="Now" meta={meta} />
+      <SectionHeader num="01" title="Now" meta="week of apr 29, 2026" />
       <div
-        style={{
-          background: "color-mix(in oklab, var(--coral) 8%, var(--paper-2))",
-          padding: 40,
-          borderRadius: 8,
-        }}
+        className="p-10 rounded-lg"
+        style={{ background: "color-mix(in oklab, var(--color-coral) 8%, var(--color-paper-2))" }}
       >
-        <div className="row" style={{ alignItems: "stretch", gap: 24 }}>
+        <div className="row items-stretch gap-6">
           {CARDS.map((c) => (
             <div
               key={c.h}
-              className="sketch-box"
-              style={{ flex: 1, transform: `rotate(${c.rot}deg)`, background: "var(--paper)" }}
+              className="sketch-box flex-1 bg-paper"
+              style={{ transform: `rotate(${c.rot}deg)` }}
             >
-              <div className="mono faint" style={{ fontSize: 11, marginBottom: 6 }}>
-                {c.tag}
-              </div>
+              <div className="mono faint text-[11px] mb-1.5">{c.tag}</div>
               <h4>{c.h}</h4>
-              <ul style={{ paddingLeft: 18, margin: "8px 0 0", fontSize: 15, lineHeight: 1.65 }}>
+              <ul className="pl-[18px] mt-2 text-[15px] leading-[1.65]">
                 {c.items.map((i) => (
                   <li key={i}>{i}</li>
                 ))}
@@ -61,7 +54,7 @@ export default function Now() {
             </div>
           ))}
         </div>
-        <div className="mono faint" style={{ marginTop: 18, fontSize: 11, textAlign: "right" }}>
+        <div className="mono faint mt-[18px] text-[11px] text-right">
           ↻ updates every couple of weeks
         </div>
       </div>

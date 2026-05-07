@@ -94,21 +94,21 @@ function fallbackContent(): NoteContent {
   };
 }
 
-const tagColor = (c: TagColor) => (c ? `var(--${c})` : "var(--ink-soft)");
+const tagColor = (c: TagColor) => (c ? `var(--color-${c})` : "var(--color-ink-soft)");
 const pad = (n: number) => String(n).padStart(3, "0");
 
 function NoteBlock({ block }: { block: Block }) {
   if (block.type === "p") {
-    return <p style={{ fontSize: 16, lineHeight: 1.7, margin: "0 0 14px" }}>{block.t}</p>;
+    return <p className="text-base leading-[1.7] mt-0 mb-3.5">{block.t}</p>;
   }
   if (block.type === "h") {
-    return <h4 style={{ fontSize: 24, marginTop: 22, marginBottom: 8, color: "var(--ink)" }}>{block.t}</h4>;
+    return <h4 className="text-2xl mt-[22px] mb-2 text-ink">{block.t}</h4>;
   }
   if (block.type === "list") {
     return (
-      <ul style={{ paddingLeft: 20, margin: "6px 0 16px", fontSize: 15, lineHeight: 1.75 }}>
+      <ul className="pl-5 my-1.5 mb-4 text-[15px] leading-[1.75]">
         {block.items.map((it, i) => (
-          <li key={i} style={{ marginBottom: 4 }}>
+          <li key={i} className="mb-1">
             {it}
           </li>
         ))}
@@ -117,18 +117,7 @@ function NoteBlock({ block }: { block: Block }) {
   }
   if (block.type === "quote") {
     return (
-      <blockquote
-        className="hand"
-        style={{
-          margin: "18px 0",
-          padding: "8px 18px",
-          borderLeft: "3px solid var(--electric)",
-          fontSize: 24,
-          lineHeight: 1.35,
-          color: "var(--ink)",
-          fontStyle: "normal",
-        }}
-      >
+      <blockquote className="hand my-[18px] py-2 px-[18px] border-l-[3px] border-electric text-2xl leading-[1.35] text-ink not-italic">
         “{block.t}”
       </blockquote>
     );
@@ -136,18 +125,8 @@ function NoteBlock({ block }: { block: Block }) {
   if (block.type === "code") {
     return (
       <pre
-        className="mono"
-        style={{
-          margin: "12px 0 18px",
-          padding: "14px 16px",
-          background: "color-mix(in oklab, var(--ink) 7%, var(--paper-2))",
-          border: "1.5px solid var(--ink)",
-          borderRadius: 4,
-          fontSize: 12,
-          lineHeight: 1.6,
-          whiteSpace: "pre-wrap",
-          overflow: "auto",
-        }}
+        className="mono my-3 mb-[18px] py-3.5 px-4 border-[1.5px] border-ink rounded text-xs leading-[1.6] whitespace-pre-wrap overflow-auto"
+        style={{ background: "color-mix(in oklab, var(--color-ink) 7%, var(--color-paper-2))" }}
       >
         {block.t}
       </pre>
@@ -157,28 +136,16 @@ function NoteBlock({ block }: { block: Block }) {
   const c = block.c ?? "electric";
   return (
     <div
+      className="my-4 py-3 px-4 rounded text-xl leading-[1.35] text-ink"
       style={{
-        margin: "16px 0",
-        padding: "12px 16px",
-        background: `color-mix(in oklab, var(--${c}) 12%, var(--paper))`,
-        border: `1.5px dashed var(--${c})`,
-        borderRadius: 4,
+        background: `color-mix(in oklab, var(--color-${c}) 12%, var(--color-paper))`,
+        border: `1.5px dashed var(--color-${c})`,
         fontFamily: "var(--font-hand)",
-        fontSize: 20,
-        lineHeight: 1.35,
-        color: "var(--ink)",
       }}
     >
       <span
-        className="mono"
-        style={{
-          fontSize: 9,
-          letterSpacing: 2,
-          textTransform: "uppercase",
-          color: `var(--${c})`,
-          display: "block",
-          marginBottom: 4,
-        }}
+        className="mono text-[9px] tracking-[2px] uppercase block mb-1"
+        style={{ color: `var(--color-${c})` }}
       >
         ✎ margin note
       </span>
@@ -217,7 +184,7 @@ function NoteSpread({
   };
   const dirClass = dir === 1 ? "turn-fwd" : dir === -1 ? "turn-back" : "turn-first";
   const tagC = tagColor(c);
-  const tagBg = c ? `color-mix(in oklab, var(--${c}) 14%, var(--paper))` : "var(--paper-2)";
+  const tagBg = c ? `color-mix(in oklab, var(--color-${c}) 14%, var(--color-paper))` : "var(--color-paper-2)";
   const content = NOTES_CONTENT[t] ?? fallbackContent();
 
   const prev = openIdx > 0 ? posts[openIdx - 1] : null;
@@ -237,10 +204,8 @@ function NoteSpread({
         aria-label={`Note: ${t}`}
       >
         <button className="note-spread-close" onClick={onClose} aria-label="Close note">
-          <span className="mono" style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}>
-            esc
-          </span>
-          <span style={{ fontSize: 22, lineHeight: 1, marginLeft: 6 }}>×</span>
+          <span className="mono text-[11px] tracking-[2px] uppercase">esc</span>
+          <span className="text-[22px] leading-none ml-1.5">×</span>
         </button>
 
         <span aria-hidden="true" className="note-spread-binding" />
@@ -251,43 +216,21 @@ function NoteSpread({
             ✎ p. {pad(pg)} — {t.toLowerCase()}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+          <div className="flex items-center gap-3 mb-3.5 flex-wrap">
             <span
-              className="mono"
-              style={{
-                fontSize: 10,
-                letterSpacing: 2,
-                textTransform: "uppercase",
-                color: tagC,
-                background: tagBg,
-                border: `1.2px solid ${tagC}`,
-                borderRadius: 3,
-                padding: "3px 10px",
-              }}
+              className="mono text-[10px] tracking-[2px] uppercase rounded-sm py-[3px] px-2.5"
+              style={{ color: tagC, background: tagBg, border: `1.2px solid ${tagC}` }}
             >
               {tag}
             </span>
-            <span className="mono faint" style={{ fontSize: 11 }}>
-              {d}
-            </span>
-            <span className="mono faint" style={{ fontSize: 11 }}>
-              · {r} read
-            </span>
+            <span className="mono faint text-[11px]">{d}</span>
+            <span className="mono faint text-[11px]">· {r} read</span>
           </div>
 
-          <h2 style={{ fontSize: 56, lineHeight: 0.98, margin: "0 0 14px" }}>{t}</h2>
+          <h2 className="text-[56px] leading-[0.98] m-0 mb-3.5">{t}</h2>
 
           {content.dek && (
-            <p
-              className="hand"
-              style={{
-                fontSize: 24,
-                lineHeight: 1.3,
-                color: "var(--ink-soft)",
-                margin: "0 0 22px",
-                maxWidth: 540,
-              }}
-            >
+            <p className="hand text-2xl leading-[1.3] text-ink-soft m-0 mb-[22px] max-w-[540px]">
               {content.dek}
             </p>
           )}
@@ -298,12 +241,12 @@ function NoteSpread({
             width="160"
             height="8"
             aria-hidden="true"
-            style={{ display: "block", marginBottom: 18 }}
+            className="block mb-[18px]"
           >
             <path
               d="M 2 4 Q 24 1, 48 4 T 96 4 T 144 4 T 198 4"
               fill="none"
-              stroke="var(--ink)"
+              stroke="var(--color-ink)"
               strokeWidth="1.4"
               strokeLinecap="round"
             />
@@ -316,14 +259,8 @@ function NoteSpread({
           </div>
 
           <div
-            className="hand"
-            style={{
-              marginTop: 28,
-              fontSize: 22,
-              color: "var(--ink-soft)",
-              transform: "rotate(-1.5deg)",
-              display: "inline-block",
-            }}
+            className="hand mt-7 text-[22px] text-ink-soft inline-block"
+            style={{ transform: "rotate(-1.5deg)" }}
           >
             — Anoop ✎
           </div>
@@ -332,43 +269,16 @@ function NoteSpread({
         </div>
 
         <div className={`note-spread-page note-spread-right ${dirClass}`} key={`R-${openIdx}`}>
-          <div
-            className="mono faint"
-            style={{ fontSize: 9, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}
-          >
-            ✎ margin
-          </div>
+          <div className="mono faint text-[9px] tracking-[3px] uppercase mb-3.5">✎ margin</div>
 
           <div
-            className="sketch-box"
-            style={{
-              background: tagBg,
-              padding: 18,
-              marginBottom: 22,
-              transform: "rotate(-0.6deg)",
-            }}
+            className="sketch-box p-[18px] mb-[22px]"
+            style={{ background: tagBg, transform: "rotate(-0.6deg)" }}
           >
-            <div
-              className="mono faint"
-              style={{
-                fontSize: 9,
-                letterSpacing: 2,
-                textTransform: "uppercase",
-                marginBottom: 10,
-              }}
-            >
+            <div className="mono faint text-[9px] tracking-[2px] uppercase mb-2.5">
               entry no. {pad(pg)}
             </div>
-            <div
-              className="mono"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "auto 1fr",
-                columnGap: 14,
-                rowGap: 6,
-                fontSize: 13,
-              }}
-            >
+            <div className="mono grid grid-cols-[auto_1fr] gap-x-3.5 gap-y-1.5 text-[13px]">
               <span className="faint">filed</span>
               <span>{d}</span>
               <span className="faint">tag</span>
@@ -382,18 +292,10 @@ function NoteSpread({
 
           {relatedPosts.length > 0 && (
             <>
-              <div
-                className="mono faint"
-                style={{
-                  fontSize: 9,
-                  letterSpacing: 3,
-                  textTransform: "uppercase",
-                  marginBottom: 10,
-                }}
-              >
+              <div className="mono faint text-[9px] tracking-[3px] uppercase mb-2.5">
                 see also ↘
               </div>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 22px" }}>
+              <ul className="list-none p-0 m-0 mb-[22px]">
                 {relatedPosts.map((rp) => {
                   const rIdx = posts.indexOf(rp);
                   const [, rt, , rtag, rc, rpg] = rp;
@@ -401,11 +303,8 @@ function NoteSpread({
                   return (
                     <li
                       key={rt}
-                      style={{
-                        padding: "10px 0",
-                        borderBottom: "1px dashed var(--ink-faint)",
-                        cursor: "pointer",
-                      }}
+                      className="py-2.5 cursor-pointer"
+                      style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
                       onClick={() => navigate(rIdx)}
                       role="button"
                       tabIndex={0}
@@ -413,16 +312,8 @@ function NoteSpread({
                         if (e.key === "Enter") navigate(rIdx);
                       }}
                     >
-                      <div
-                        className="hand"
-                        style={{ fontSize: 18, lineHeight: 1.2, color: "var(--ink)" }}
-                      >
-                        {rt}
-                      </div>
-                      <div
-                        className="mono faint"
-                        style={{ fontSize: 10, marginTop: 3, display: "flex", gap: 10 }}
-                      >
+                      <div className="hand text-[18px] leading-[1.2] text-ink">{rt}</div>
+                      <div className="mono faint text-[10px] mt-[3px] flex gap-2.5">
                         <span style={{ color: rTagColor }}>{rtag}</span>
                         <span>·</span>
                         <span>p.{pad(rpg)}</span>
@@ -434,19 +325,8 @@ function NoteSpread({
             </>
           )}
 
-          <div
-            className="mono faint"
-            style={{ fontSize: 9, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}
-          >
-            scribble
-          </div>
-          <svg
-            viewBox="0 0 220 60"
-            width="220"
-            height="60"
-            aria-hidden="true"
-            style={{ marginBottom: 18 }}
-          >
+          <div className="mono faint text-[9px] tracking-[3px] uppercase mb-1.5">scribble</div>
+          <svg viewBox="0 0 220 60" width="220" height="60" aria-hidden="true" className="mb-[18px]">
             <path
               d="M 6 30 C 40 6, 80 50, 120 28 S 200 32, 214 18"
               fill="none"
@@ -461,13 +341,7 @@ function NoteSpread({
               strokeWidth="1.6"
               strokeLinecap="round"
             />
-            <text
-              x="10"
-              y="52"
-              fontFamily="Caveat, cursive"
-              fontSize="16"
-              fill="var(--ink-soft)"
-            >
+            <text x="10" y="52" fontFamily="Caveat, cursive" fontSize="16" fill="var(--color-ink-soft)">
               {tag === "linux"
                 ? "rabbit-hole, started here"
                 : tag === "ai/ml"
@@ -478,7 +352,7 @@ function NoteSpread({
             </text>
           </svg>
 
-          <div style={{ flex: 1 }} />
+          <div className="flex-1" />
 
           <div className="note-spread-nav">
             <button
@@ -487,19 +361,11 @@ function NoteSpread({
               disabled={!prev}
               aria-label="Previous (newer) note"
             >
+              <span className="mono faint text-[9px] tracking-[2px] uppercase">← newer</span>
               <span
-                className="mono faint"
-                style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase" }}
-              >
-                ← newer
-              </span>
-              <span
-                className="hand"
-                style={{
-                  fontSize: 17,
-                  lineHeight: 1.1,
-                  color: prev ? "var(--ink)" : "var(--ink-faint)",
-                }}
+                className={`hand text-[17px] leading-[1.1] ${
+                  prev ? "text-ink" : "text-ink-faint"
+                }`}
               >
                 {prev ? prev[1] : "— end —"}
               </span>
@@ -510,20 +376,11 @@ function NoteSpread({
               disabled={!next}
               aria-label="Next (older) note"
             >
+              <span className="mono faint text-[9px] tracking-[2px] uppercase">older →</span>
               <span
-                className="mono faint"
-                style={{ fontSize: 9, letterSpacing: 2, textTransform: "uppercase" }}
-              >
-                older →
-              </span>
-              <span
-                className="hand"
-                style={{
-                  fontSize: 17,
-                  lineHeight: 1.1,
-                  color: next ? "var(--ink)" : "var(--ink-faint)",
-                  textAlign: "right",
-                }}
+                className={`hand text-[17px] leading-[1.1] text-right ${
+                  next ? "text-ink" : "text-ink-faint"
+                }`}
               >
                 {next ? next[1] : "— end —"}
               </span>
@@ -560,87 +417,47 @@ export default function Notes() {
   return (
     <section id="sec-notes" className="section">
       <SectionHeader num="05" title="Notes & Stories" meta={`${posts.length} entries · index`} />
-      <p className="faint" style={{ maxWidth: 720, marginBottom: 24, fontSize: 16 }}>
+      <p className="faint max-w-[720px] mb-6 text-base">
         Working journal — bug stories, hot takes, things I figured out the hard way.
       </p>
 
-      <div style={{ position: "relative" }}>
-        <div
-          style={{
-            background: "var(--paper)",
-            border: "2px solid var(--ink)",
-            borderRadius: 6,
-            padding: "28px 24px 18px 64px",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
+      <div className="relative">
+        <div className="bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
+          {/* Red margin rule */}
           <span
             aria-hidden="true"
-            style={{
-              position: "absolute",
-              left: 48,
-              top: 0,
-              bottom: 0,
-              width: 1.2,
-              background: "color-mix(in oklab, var(--coral) 70%, transparent)",
-              opacity: 0.6,
-            }}
+            className="absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
+            style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
           />
+          {/* Rotated INDEX label */}
           <div
-            className="mono faint"
-            style={{
-              position: "absolute",
-              left: 8,
-              top: 28,
-              fontSize: 9,
-              letterSpacing: 3,
-              textTransform: "uppercase",
-              transform: "rotate(-90deg)",
-              transformOrigin: "left top",
-              whiteSpace: "nowrap",
-            }}
+            className="mono faint absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
+            style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
           >
             ✎ index — pp. 018 — 142
           </div>
 
           <div
-            className="mono faint notes-header"
+            className="mono faint notes-header grid gap-3.5 pt-0 pr-[90px] pb-3 pl-1.5 text-[9px] tracking-[2px] uppercase mb-1.5"
             style={{
-              display: "grid",
               gridTemplateColumns: "44px 1fr 90px 64px",
-              gap: 14,
-              padding: "0 90px 12px 6px",
-              fontSize: 9,
-              letterSpacing: 2,
-              textTransform: "uppercase",
-              borderBottom: "1px dashed var(--ink-faint)",
-              marginBottom: 6,
+              borderBottom: "1px dashed var(--color-ink-faint)",
             }}
           >
-            <span style={{ textAlign: "right" }}>pg.</span>
+            <span className="text-right">pg.</span>
             <span>title</span>
-            <span style={{ textAlign: "right" }}>read</span>
-            <span style={{ textAlign: "right" }}>date</span>
+            <span className="text-right">read</span>
+            <span className="text-right">date</span>
           </div>
 
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          <ul className="list-none p-0 m-0">
             {posts.map((post, i) => {
               const [d, t, r, tag, c, pg] = post;
               return (
                 <li
                   key={t}
-                  className="notes-row"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "44px 1fr 90px 64px",
-                    gap: 14,
-                    alignItems: "baseline",
-                    padding: "12px 90px 12px 6px",
-                    position: "relative",
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                  }}
+                  className="notes-row grid gap-3.5 items-baseline py-3 pr-[90px] pl-1.5 relative cursor-pointer transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
+                  style={{ gridTemplateColumns: "44px 1fr 90px 64px" }}
                   tabIndex={0}
                   role="button"
                   aria-label={`Open note: ${t}`}
@@ -651,92 +468,36 @@ export default function Notes() {
                       setOpenIdx(i);
                     }
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background =
-                      "color-mix(in oklab, var(--paper-2) 60%, transparent)")
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
-                  <span
-                    className="mono faint notes-date"
-                    style={{ fontSize: 11, textAlign: "right", color: "var(--ink-soft)" }}
-                  >
+                  <span className="mono faint notes-date text-[11px] text-right text-ink-soft">
                     p.{pad(pg)}
                   </span>
 
-                  <span
-                    className="notes-title"
-                    style={{
-                      display: "flex",
-                      alignItems: "baseline",
-                      minWidth: 0,
-                      gap: 8,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <span
-                      className="hand"
-                      style={{
-                        fontSize: 22,
-                        lineHeight: 1.1,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        flex: "0 1 auto",
-                        color: "var(--ink)",
-                      }}
-                    >
+                  <span className="notes-title flex items-baseline min-w-0 gap-2 overflow-hidden">
+                    <span className="hand text-[22px] leading-[1.1] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
                       {t}
                     </span>
                     <span
                       aria-hidden="true"
-                      style={{
-                        flex: 1,
-                        height: 0,
-                        borderBottom: "1.5px dotted var(--ink-faint)",
-                        transform: "translateY(-4px)",
-                        minWidth: 24,
-                      }}
+                      className="flex-1 h-0 min-w-6 -translate-y-1"
+                      style={{ borderBottom: "1.5px dotted var(--color-ink-faint)" }}
                     />
                   </span>
 
-                  <span
-                    className="mono faint notes-meta"
-                    style={{ fontSize: 11, textAlign: "right", color: "var(--ink-soft)" }}
-                  >
-                    {r}
-                  </span>
+                  <span className="mono faint notes-meta text-[11px] text-right text-ink-soft">{r}</span>
 
-                  <span
-                    className="mono notes-meta"
-                    style={{ fontSize: 11, textAlign: "right", color: "var(--ink-soft)" }}
-                  >
-                    {d}
-                  </span>
+                  <span className="mono notes-meta text-[11px] text-right text-ink-soft">{d}</span>
 
                   <span
                     aria-hidden="true"
-                    className="notes-edge-tab"
+                    className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-2.5 pr-2"
                     style={{
-                      position: "absolute",
-                      right: -2,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background:
-                        "color-mix(in oklab, " + tagColor(c) + " 18%, var(--paper))",
-                      border: "1.2px solid " + tagColor(c),
+                      fontFamily: "var(--font-mono)",
+                      background: `color-mix(in oklab, ${tagColor(c)} 18%, var(--color-paper))`,
+                      border: `1.2px solid ${tagColor(c)}`,
                       borderRight: "none",
                       borderRadius: "3px 0 0 3px",
-                      padding: "3px 8px 3px 10px",
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 10,
-                      letterSpacing: 1,
                       color: tagColor(c),
-                      minWidth: 70,
-                      textAlign: "center",
                     }}
                   >
                     {tag}
@@ -747,24 +508,13 @@ export default function Notes() {
           </ul>
 
           <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: 14,
-              paddingTop: 12,
-              borderTop: "1px dashed var(--ink-faint)",
-            }}
+            className="flex justify-between items-center mt-3.5 pt-3"
+            style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
           >
-            <span className="mono faint" style={{ fontSize: 11 }}>
+            <span className="mono faint text-[11px]">
               {posts.length} entries · pp. {pad(posts[posts.length - 1][5])}–{pad(posts[0][5])}
             </span>
-            <span
-              className="hand"
-              style={{ fontSize: 20, color: "var(--electric)", cursor: "pointer" }}
-            >
-              see all notes →
-            </span>
+            <span className="hand text-xl text-electric cursor-pointer">see all notes →</span>
           </div>
         </div>
       </div>

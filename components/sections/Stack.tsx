@@ -11,45 +11,25 @@ function Tally({ n }: { n: number }) {
     <span
       aria-label={`${n} year${n === 1 ? "" : "s"}`}
       title={`${n} yr`}
-      style={{ display: "inline-flex", gap: 6, alignItems: "center" }}
+      className="inline-flex gap-1.5 items-center"
     >
       {groups.map((g, gi) => (
         <span
           key={gi}
-          style={{
-            position: "relative",
-            display: "inline-block",
-            width: g >= 5 ? 22 : g * 4,
-            height: 14,
-          }}
+          className="relative inline-block h-3.5"
+          style={{ width: g >= 5 ? 22 : g * 4 }}
         >
           {Array.from({ length: Math.min(g, 4) }).map((_, i) => (
             <span
               key={i}
-              style={{
-                position: "absolute",
-                left: i * 4,
-                top: 0,
-                width: 1.5,
-                height: 14,
-                background: "var(--ink-soft)",
-                transform: `rotate(${-2 + i}deg)`,
-                transformOrigin: "top center",
-              }}
+              className="absolute top-0 w-[1.5px] h-3.5 bg-ink-soft origin-top"
+              style={{ left: i * 4, transform: `rotate(${-2 + i}deg)` }}
             />
           ))}
           {g === 5 && (
             <span
-              style={{
-                position: "absolute",
-                left: -2,
-                top: 6,
-                width: 22,
-                height: 1.5,
-                background: "var(--ink-soft)",
-                transform: "rotate(-18deg)",
-                transformOrigin: "left center",
-              }}
+              className="absolute -left-0.5 top-1.5 w-[22px] h-[1.5px] bg-ink-soft origin-left"
+              style={{ transform: "rotate(-18deg)" }}
             />
           )}
         </span>
@@ -64,14 +44,8 @@ function CircleMark({ color }: { color: string }) {
       viewBox="0 0 200 60"
       preserveAspectRatio="none"
       aria-hidden="true"
-      style={{
-        position: "absolute",
-        inset: "-6px -10px",
-        width: "calc(100% + 20px)",
-        height: "calc(100% + 12px)",
-        pointerEvents: "none",
-        overflow: "visible",
-      }}
+      className="absolute -inset-x-2.5 -inset-y-1.5 pointer-events-none overflow-visible"
+      style={{ width: "calc(100% + 20px)", height: "calc(100% + 12px)" }}
     >
       <ellipse
         cx="100"
@@ -110,7 +84,7 @@ const COLS: ReadonlyArray<{
 }> = [
   {
     h: "at work",
-    c: "var(--electric)",
+    c: "var(--color-electric)",
     note: "shipping product, paid in PRs",
     items: [
       ["TypeScript", 4],
@@ -127,7 +101,7 @@ const COLS: ReadonlyArray<{
   },
   {
     h: "in the lab",
-    c: "var(--teal)",
+    c: "var(--color-teal)",
     note: "MS in applied ML, still hacking",
     items: [
       ["Python", 6],
@@ -143,7 +117,7 @@ const COLS: ReadonlyArray<{
   },
   {
     h: "at home",
-    c: "var(--coral)",
+    c: "var(--color-coral)",
     note: "linux daily, windows for games",
     items: [
       ["Arch / Hyprland", 2, true],
@@ -161,60 +135,31 @@ export default function Stack() {
   return (
     <section id="sec-stack" className="section">
       <SectionHeader num="04" title="Stack" meta="grouped by where I use it" />
-      <div
-        className="mono faint"
-        style={{ fontSize: 11, marginBottom: 18, display: "flex", gap: 18, flexWrap: "wrap" }}
-      >
+      <div className="mono faint text-[11px] mb-[18px] flex gap-[18px] flex-wrap">
         <span>tally marks = rough years of use</span>
         <span>·</span>
         <span>circled = current obsession</span>
       </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: 24,
-        }}
-      >
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
         {COLS.map((col) => (
           <div
             key={col.h}
-            className="sketch-box"
-            style={{ borderTop: "5px solid", borderTopColor: col.c, paddingRight: 22 }}
+            className="sketch-box pr-[22px]"
+            style={{ borderTop: "5px solid", borderTopColor: col.c }}
           >
             <h4 style={{ color: col.c }}>{col.h}</h4>
-            <div className="mono faint" style={{ fontSize: 11, marginTop: 2 }}>
-              {col.note}
-            </div>
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: "16px 0 0",
-                fontSize: 15,
-                lineHeight: 1.4,
-              }}
-            >
+            <div className="mono faint text-[11px] mt-0.5">{col.note}</div>
+            <ul className="list-none p-0 mt-4 text-[15px] leading-[1.4]">
               {col.items.map(([name, years, obsession]) => (
                 <li
                   key={name}
+                  className="grid grid-cols-[1fr_auto] items-center gap-x-2.5 py-[7px]"
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr auto",
-                    alignItems: "center",
-                    columnGap: 10,
-                    padding: "7px 0",
                     borderBottom:
-                      "1px dashed color-mix(in oklab, var(--ink) 12%, transparent)",
+                      "1px dashed color-mix(in oklab, var(--color-ink) 12%, transparent)",
                   }}
                 >
-                  <span
-                    style={{
-                      position: "relative",
-                      display: "inline-block",
-                      width: "fit-content",
-                    }}
-                  >
+                  <span className="relative inline-block w-fit">
                     {name}
                     {obsession && <CircleMark color={col.c} />}
                   </span>

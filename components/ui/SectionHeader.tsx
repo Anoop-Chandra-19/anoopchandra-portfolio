@@ -26,39 +26,32 @@ export function SectionHeaderArrow({
   meta: string;
 }) {
   return (
-    <div
-      style={{
-        position: "relative",
-        marginBottom: 32,
-        paddingBottom: 12,
-        borderBottom: "2px dashed var(--ink)",
-      }}
-    >
+    <div className="relative mb-8 pb-3 border-b-2 border-dashed border-ink">
       <svg
         viewBox="0 0 220 90"
         width="180"
         height="74"
         aria-hidden="true"
-        style={{ position: "absolute", top: -28, left: -10, pointerEvents: "none", overflow: "visible" }}
+        className="absolute -top-7 -left-2.5 pointer-events-none overflow-visible"
       >
         <path
           d="M 8 14 C 60 4, 110 38, 150 62"
           fill="none"
-          stroke="var(--electric)"
+          stroke="var(--color-electric)"
           strokeWidth="2.2"
           strokeLinecap="round"
         />
         <path
           d="M 150 62 L 140 50 M 150 62 L 138 64"
           fill="none"
-          stroke="var(--electric)"
+          stroke="var(--color-electric)"
           strokeWidth="2.2"
           strokeLinecap="round"
         />
         <text
           x="14"
           y="10"
-          fill="var(--electric)"
+          fill="var(--color-electric)"
           fontFamily="Caveat, cursive"
           fontSize="20"
           transform="rotate(-6 14 10)"
@@ -66,14 +59,10 @@ export function SectionHeaderArrow({
           the work ↘
         </text>
       </svg>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 18, paddingLeft: 170 }}>
-        <span className="mono" style={{ fontSize: 14, color: "var(--ink-soft)" }}>
-          {num}.
-        </span>
-        <h2 style={{ flex: 1, margin: 0 }}>{title}</h2>
-        <span className="mono" style={{ fontSize: 12, color: "var(--ink-soft)", textAlign: "right" }}>
-          {meta}
-        </span>
+      <div className="flex items-baseline gap-[18px] pl-[170px]">
+        <span className="mono text-sm text-ink-soft">{num}.</span>
+        <h2 className="flex-1 m-0">{title}</h2>
+        <span className="mono text-xs text-ink-soft text-right">{meta}</span>
       </div>
     </div>
   );
@@ -89,60 +78,30 @@ export function SectionHeaderStamp({
   meta: string;
 }) {
   return (
-    <div
-      style={{
-        position: "relative",
-        marginBottom: 32,
-        paddingBottom: 12,
-        borderBottom: "2px dashed var(--ink)",
-        display: "flex",
-        alignItems: "center",
-        gap: 22,
-        flexWrap: "wrap",
-      }}
-    >
+    <div className="relative mb-8 pb-3 border-b-2 border-dashed border-ink flex items-center gap-[22px] flex-wrap">
       <div
+        className="relative border-2 border-ink rounded-[3px] px-[22px] pt-2 pb-2.5"
         style={{
-          position: "relative",
-          border: "2px solid var(--ink)",
-          background: "color-mix(in oklab, var(--coral) 12%, var(--paper))",
-          padding: "8px 22px 10px",
-          borderRadius: 3,
+          background: "color-mix(in oklab, var(--color-coral) 12%, var(--color-paper))",
           transform: "rotate(-1.2deg)",
         }}
       >
         <span
           aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 4,
-            border: "1px dashed color-mix(in oklab, var(--ink) 50%, transparent)",
-            borderRadius: 1,
-            pointerEvents: "none",
-          }}
+          className="absolute inset-1 rounded-[1px] pointer-events-none"
+          style={{ border: "1px dashed color-mix(in oklab, var(--color-ink) 50%, transparent)" }}
         />
-        <div
-          className="mono"
-          style={{
-            fontSize: 10,
-            letterSpacing: 3,
-            textTransform: "uppercase",
-            color: "var(--ink-soft)",
-            marginBottom: -2,
-          }}
-        >
+        <div className="mono text-[10px] tracking-[3px] uppercase text-ink-soft -mb-0.5">
           § {num} · postage paid
         </div>
-        <h2 style={{ margin: 0, fontSize: 56, lineHeight: 1 }}>{title}</h2>
+        <h2 className="m-0 text-[56px] leading-none">{title}</h2>
       </div>
-      <svg viewBox="0 0 200 40" width="180" height="36" aria-hidden="true" style={{ flexShrink: 0 }}>
-        <line x1="2" y1="12" x2="198" y2="12" stroke="var(--electric)" strokeWidth="1.4" opacity="0.9" />
-        <line x1="2" y1="20" x2="198" y2="20" stroke="var(--electric)" strokeWidth="1.4" opacity="0.9" />
-        <line x1="2" y1="28" x2="198" y2="28" stroke="var(--electric)" strokeWidth="1.4" opacity="0.9" />
+      <svg viewBox="0 0 200 40" width="180" height="36" aria-hidden="true" className="shrink-0">
+        <line x1="2" y1="12" x2="198" y2="12" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
+        <line x1="2" y1="20" x2="198" y2="20" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
+        <line x1="2" y1="28" x2="198" y2="28" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
       </svg>
-      <span className="mono" style={{ fontSize: 12, color: "var(--ink-soft)", marginLeft: "auto" }}>
-        {meta}
-      </span>
+      <span className="mono text-xs text-ink-soft ml-auto">{meta}</span>
     </div>
   );
 }

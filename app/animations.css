@@ -1,0 +1,114 @@
+/* ============================================================ */
+/* ---- Entrance animation (hand-drawn, plays once on mount) ---- */
+/* ============================================================ */
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+@keyframes swipeIn {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes fadeRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes stampIn {
+  0%   { opacity: 0; transform: scale(0.7) rotate(-3deg); }
+  60%  { opacity: 1; transform: scale(1.04) rotate(0.5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes markerPaint {
+  from { background-size: 0% 100%; }
+  to   { background-size: 100% 100%; }
+}
+@keyframes railRowIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes portraitDraw {
+  from { stroke-dashoffset: 1131; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes portraitImgIn {
+  from { opacity: 0; transform: scale(1.04); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shadowIn {
+  from { opacity: 0; transform: translate(-4px, -4px); }
+  to   { opacity: 1; transform: translate(0, 0); }
+}
+
+body:not(.hydrated) .anim-swipe   { clip-path: inset(0 100% 0 0); }
+body:not(.hydrated) .anim-rise    { opacity: 0; transform: translateY(14px); }
+body:not(.hydrated) .anim-stamp   { opacity: 0; transform: scale(0.7); }
+body:not(.hydrated) .anim-rail    { opacity: 0; transform: translateX(-6px); }
+body:not(.hydrated) .anim-portrait-outline { stroke-dashoffset: 1131; }
+body:not(.hydrated) .anim-portrait-img { opacity: 0; }
+body:not(.hydrated) .anim-portrait-shadow { opacity: 0; }
+body:not(.hydrated) .marker-highlight { background-size: 0% 100%; background-repeat: no-repeat; }
+
+body.hydrated .anim-swipe { animation: swipeIn 0.45s cubic-bezier(.2,.7,.2,1) both; }
+body.hydrated .anim-rise  { animation: fadeRise 0.4s cubic-bezier(.2,.7,.2,1) both; }
+body.hydrated .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; }
+body.hydrated .anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; }
+body.hydrated .marker-highlight {
+  background-repeat: no-repeat;
+  animation: markerPaint 0.35s cubic-bezier(.4,0,.6,1) both;
+}
+body.hydrated .anim-portrait-outline {
+  animation: portraitDraw 0.7s cubic-bezier(.4,0,.2,1) both;
+  animation-delay: 0.20s;
+}
+body.hydrated .anim-portrait-img {
+  animation: portraitImgIn 0.4s cubic-bezier(.2,.7,.2,1) both;
+  animation-delay: 0.85s;
+}
+body.hydrated .anim-portrait-shadow {
+  animation: shadowIn 0.4s cubic-bezier(.2,.7,.2,1) both;
+  animation-delay: 1.00s;
+}
+
+.d-hello   { animation-delay: 0.00s; }
+.d-name1   { animation-delay: 0.40s; }
+.d-name2   { animation-delay: 0.55s; }
+.d-subtle  { animation-delay: 0.70s; }
+.d-body    { animation-delay: 0.90s; }
+.d-marker1 { animation-delay: 1.40s; }
+.d-marker2 { animation-delay: 1.50s; }
+.d-marker3 { animation-delay: 1.60s; }
+.d-chip1   { animation-delay: 1.70s; }
+.d-chip2   { animation-delay: 1.78s; }
+.d-chip3   { animation-delay: 1.86s; }
+.d-meta    { animation-delay: 2.10s; }
+.d-portrait{ animation-delay: 0.20s; }
+.d-annot1  { animation-delay: 1.10s; }
+.d-annot2  { animation-delay: 1.20s; }
+.d-rail-h  { animation-delay: 1.85s; }
+.d-rail-0  { animation-delay: 1.90s; }
+.d-rail-1  { animation-delay: 1.96s; }
+.d-rail-2  { animation-delay: 2.02s; }
+.d-rail-3  { animation-delay: 2.08s; }
+.d-rail-4  { animation-delay: 2.14s; }
+.d-rail-5  { animation-delay: 2.20s; }
+.d-rail-6  { animation-delay: 2.26s; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.hydrated .anim-swipe,
+  body.hydrated .anim-rise,
+  body.hydrated .anim-stamp,
+  body.hydrated .anim-rail,
+  body.hydrated .anim-portrait-outline,
+  body.hydrated .anim-portrait-img,
+  body.hydrated .anim-portrait-shadow,
+  body.hydrated .marker-highlight {
+    animation: none;
+  }
+  body:not(.hydrated) .anim-swipe { clip-path: none; }
+  body:not(.hydrated) .anim-rise,
+  body:not(.hydrated) .anim-stamp,
+  body:not(.hydrated) .anim-rail { opacity: 1; transform: none; }
+  body:not(.hydrated) .anim-portrait-img,
+  body:not(.hydrated) .anim-portrait-shadow { opacity: 1; transform: none; }
+  body:not(.hydrated) .anim-portrait-outline { stroke-dashoffset: 0; }
+  body:not(.hydrated) .marker-highlight { background-size: 100% 100%; }
+}

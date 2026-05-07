@@ -112,61 +112,45 @@ const PROJECTS: Project[] = [
   },
 ];
 
+function TagPill({ t }: { t: string }) {
+  return (
+    <span
+      className="mono text-[11px] py-[3px] px-2.5 rounded-full text-ink-soft"
+      style={{ border: "1.2px solid var(--color-ink-soft)" }}
+    >
+      {t}
+    </span>
+  );
+}
+
 function ExperienceCard({ p, i }: { p: Experience; i: number }) {
   return (
     <article
-      className={`sketch-box ${i % 2 ? "tilt-r" : "tilt-l"}`}
-      style={{
-        padding: 24,
-        display: "grid",
-        gridTemplateColumns: "minmax(180px, 220px) 1fr",
-        gap: 22,
-        alignItems: "start",
-      }}
+      className={`sketch-box ${i % 2 ? "tilt-r" : "tilt-l"} p-6 grid gap-[22px] items-start grid-cols-[minmax(180px,220px)_1fr]`}
     >
       <div>
-        <div
-          className="hand"
-          style={{ fontSize: 24, color: `var(--${p.k})`, lineHeight: 1.05 }}
-        >
+        <div className="hand text-2xl leading-[1.05]" style={{ color: `var(--color-${p.k})` }}>
           @ {p.org}
         </div>
-        <div className="mono faint" style={{ fontSize: 11, marginTop: 8, lineHeight: 1.7 }}>
+        <div className="mono faint text-[11px] mt-2 leading-[1.7]">
           <div>role&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;{p.role}</div>
           <div>year&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;{p.period}</div>
         </div>
       </div>
-      <div style={{ minWidth: 0 }}>
-        <h3 style={{ marginTop: 0, marginBottom: 10, fontSize: 28, lineHeight: 1.1 }}>{p.t}</h3>
-        <p style={{ marginTop: 0, fontSize: 15, lineHeight: 1.6, marginBottom: 12 }}>
-          {p.summary}
-        </p>
-        <ul style={{ paddingLeft: 18, marginTop: 0, fontSize: 14, lineHeight: 1.7 }}>
+      <div className="min-w-0">
+        <h3 className="mt-0 mb-2.5 text-[28px] leading-[1.1]">{p.t}</h3>
+        <p className="mt-0 text-[15px] leading-[1.6] mb-3">{p.summary}</p>
+        <ul className="pl-[18px] mt-0 text-sm leading-[1.7]">
           {p.contributions.map((b) => (
             <li key={b}>{b}</li>
           ))}
         </ul>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 14 }}>
+        <div className="flex gap-1.5 flex-wrap mt-3.5">
           {p.tags.map((t) => (
-            <span
-              key={t}
-              className="mono"
-              style={{
-                fontSize: 11,
-                padding: "3px 10px",
-                border: "1.2px solid var(--ink-soft)",
-                borderRadius: 999,
-                color: "var(--ink-soft)",
-              }}
-            >
-              {t}
-            </span>
+            <TagPill key={t} t={t} />
           ))}
         </div>
-        <div
-          className="mono faint"
-          style={{ fontSize: 11, marginTop: 14, fontStyle: "italic" }}
-        >
+        <div className="mono faint text-[11px] mt-3.5 italic">
           ✎ ask me about it — happy to walk through what I did
         </div>
       </div>
@@ -177,44 +161,22 @@ function ExperienceCard({ p, i }: { p: Experience; i: number }) {
 function ProjectImage({ p }: { p: Project }) {
   if (p.img) {
     return (
-      <div
-        style={{
-          background: "var(--paper-2)",
-          borderLeft: "2px solid var(--ink)",
-          borderRight: "2px solid var(--ink)",
-          position: "relative",
-          minHeight: 280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 20,
-        }}
-      >
+      <div className="bg-paper-2 border-x-2 border-ink relative min-h-[280px] flex items-center justify-center p-5">
         <Image
           src={p.img}
           alt={p.t}
           width={520}
           height={280}
-          style={{
-            width: "100%",
-            maxHeight: 280,
-            objectFit: "contain",
-            borderRadius: 4,
-            height: "auto",
-          }}
+          className="w-full max-h-[280px] object-contain rounded h-auto"
         />
       </div>
     );
   }
   return (
-    <div className="ph" style={{ borderRadius: 0, border: "none", borderLeft: "2px solid var(--ink)", minHeight: 280 }}>
-      <div style={{ textAlign: "center", padding: 20 }}>
-        <div className="hand" style={{ fontSize: 22, color: "var(--ink)", marginBottom: 6 }}>
-          diagram coming
-        </div>
-        <div className="mono faint" style={{ fontSize: 11, lineHeight: 1.5 }}>
-          {p.imgLabel}
-        </div>
+    <div className="ph border-0 border-l-2 border-ink rounded-none min-h-[280px]">
+      <div className="text-center p-5">
+        <div className="hand text-[22px] text-ink mb-1.5">diagram coming</div>
+        <div className="mono faint text-[11px] leading-[1.5]">{p.imgLabel}</div>
       </div>
     </div>
   );
@@ -224,48 +186,28 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
   const flip = i % 2 === 1;
   return (
     <article
-      className="sketch-box project-slab"
+      className="sketch-box project-slab p-0 overflow-hidden grid"
       data-flip={flip ? "1" : "0"}
-      style={{
-        padding: 0,
-        overflow: "hidden",
-        display: "grid",
-        gridTemplateColumns: flip ? "1fr 1.4fr" : "1.4fr 1fr",
-      }}
+      style={{ gridTemplateColumns: flip ? "1fr 1.4fr" : "1.4fr 1fr" }}
     >
       {!flip && <ProjectImage p={p} />}
-      <div className="project-content" style={{ padding: 32 }}>
-        <div
-          className="mono faint"
-          style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}
-        >
-          {p.cat} · <span style={{ color: `var(--${p.k})` }}>{p.org}</span>
+      <div className="project-content p-8">
+        <div className="mono faint text-[11px] tracking-[2px] uppercase">
+          {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
         </div>
-        <h3 style={{ marginTop: 8, marginBottom: 14, fontSize: 30, lineHeight: 1.12 }}>{p.t}</h3>
-        <p style={{ marginTop: 0, fontSize: 16, maxWidth: 520, marginBottom: 16 }}>{p.d}</p>
-        <ul style={{ paddingLeft: 18, marginTop: 0, fontSize: 14, lineHeight: 1.7 }}>
+        <h3 className="mt-2 mb-3.5 text-[30px] leading-[1.12]">{p.t}</h3>
+        <p className="mt-0 text-base max-w-[520px] mb-4">{p.d}</p>
+        <ul className="pl-[18px] mt-0 text-sm leading-[1.7]">
           {p.bullets.map((b) => (
             <li key={b}>{b}</li>
           ))}
         </ul>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 16 }}>
+        <div className="flex gap-1.5 flex-wrap mt-4">
           {p.tags.map((t) => (
-            <span
-              key={t}
-              className="mono"
-              style={{
-                fontSize: 11,
-                padding: "3px 10px",
-                border: "1.2px solid var(--ink-soft)",
-                borderRadius: 999,
-                color: "var(--ink-soft)",
-              }}
-            >
-              {t}
-            </span>
+            <TagPill key={t} t={t} />
           ))}
         </div>
-        <div style={{ marginTop: 18 }}>
+        <div className="mt-[18px]">
           <Chip kind={p.k}>{p.cta}</Chip>
         </div>
       </div>
@@ -276,114 +218,70 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
 
 function FeaturedSlab({ p }: { p: Project }) {
   return (
-    <article
-      className="sketch-box featured-slab"
-      style={{ padding: 0, overflow: "hidden", position: "relative" }}
-    >
-      <div
-        className="mono"
-        style={{
-          position: "absolute",
-          top: -1,
-          left: 24,
-          zIndex: 3,
-          background: "var(--ink)",
-          color: "var(--paper)",
-          fontSize: 10,
-          letterSpacing: 3,
-          textTransform: "uppercase",
-          padding: "5px 12px 6px",
-          borderRadius: "0 0 4px 4px",
-        }}
-      >
+    <article className="sketch-box featured-slab p-0 overflow-hidden relative">
+      <div className="mono absolute -top-px left-6 z-[3] bg-ink text-paper text-[10px] tracking-[3px] uppercase pt-[5px] pb-1.5 px-3 rounded-b">
         ★ featured project
       </div>
 
-      <div
-        style={{
-          background: "var(--paper-2)",
-          borderBottom: "2px solid var(--ink)",
-          position: "relative",
-          minHeight: 320,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
-      >
+      <div className="bg-paper-2 border-b-2 border-ink relative min-h-[320px] flex items-center justify-center overflow-hidden">
         {p.img ? (
           <Image
             src={p.img}
             alt={p.t}
             width={1200}
             height={360}
-            style={{
-              width: "100%",
-              height: "100%",
-              maxHeight: 360,
-              objectFit: "cover",
-              display: "block",
-            }}
+            className="w-full h-full max-h-[360px] object-cover block"
           />
         ) : null}
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(220px, 280px) 1fr",
-          gap: 36,
-          padding: "36px 40px",
-        }}
-        className="featured-body"
-      >
+      <div className="featured-body grid gap-9 p-9 px-10 grid-cols-[minmax(220px,280px)_1fr]">
         <div>
-          <div
-            className="mono faint"
-            style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase" }}
-          >
-            {p.cat}
-          </div>
-          <h3 style={{ marginTop: 8, marginBottom: 14, fontSize: 38, lineHeight: 1.05 }}>{p.t}</h3>
-          <div className="hand" style={{ fontSize: 20, color: `var(--${p.k})` }}>
+          <div className="mono faint text-[11px] tracking-[2px] uppercase">{p.cat}</div>
+          <h3 className="mt-2 mb-3.5 text-[38px] leading-[1.05]">{p.t}</h3>
+          <div className="hand text-xl" style={{ color: `var(--color-${p.k})` }}>
             @ {p.org}
           </div>
-          <div className="mono faint" style={{ fontSize: 11, marginTop: 14, lineHeight: 1.7 }}>
+          <div className="mono faint text-[11px] mt-3.5 leading-[1.7]">
             <div>scope&nbsp;&nbsp;·&nbsp;&nbsp;full-stack lead</div>
             <div>year&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;2025 — now</div>
             <div>status·&nbsp;&nbsp;shipping</div>
           </div>
         </div>
         <div>
-          <p style={{ marginTop: 0, fontSize: 17, lineHeight: 1.6, marginBottom: 18 }}>{p.d}</p>
-          <ul style={{ paddingLeft: 18, marginTop: 0, fontSize: 15, lineHeight: 1.75 }}>
+          <p className="mt-0 text-[17px] leading-[1.6] mb-[18px]">{p.d}</p>
+          <ul className="pl-[18px] mt-0 text-[15px] leading-[1.75]">
             {p.bullets.map((b) => (
               <li key={b}>{b}</li>
             ))}
           </ul>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 18 }}>
+          <div className="flex gap-1.5 flex-wrap mt-[18px]">
             {p.tags.map((t) => (
-              <span
-                key={t}
-                className="mono"
-                style={{
-                  fontSize: 11,
-                  padding: "3px 10px",
-                  border: "1.2px solid var(--ink-soft)",
-                  borderRadius: 999,
-                  color: "var(--ink-soft)",
-                }}
-              >
-                {t}
-              </span>
+              <TagPill key={t} t={t} />
             ))}
           </div>
-          <div style={{ marginTop: 22 }}>
+          <div className="mt-[22px]">
             <Chip kind={p.k}>{p.cta}</Chip>
           </div>
         </div>
       </div>
     </article>
+  );
+}
+
+function GroupRule({
+  label,
+  count,
+}: {
+  label: string;
+  count: string;
+}) {
+  return (
+    <div className="flex items-center gap-[18px]">
+      <span className="mono faint text-[11px] tracking-[3px] uppercase">{label}</span>
+      <span className="flex-1 h-px" style={{ borderTop: "1.5px dashed var(--color-ink-faint)" }} />
+      <span className="mono faint text-[11px]">{count}</span>
+    </div>
   );
 }
 
@@ -397,57 +295,30 @@ export default function Work() {
         title="Work"
         meta={`${EXPERIENCE.length + PROJECTS.length} entries · 2024 — now`}
       />
-      <p className="faint" style={{ maxWidth: 720, marginBottom: 28, fontSize: 16 }}>
+      <p className="faint max-w-[720px] mb-7 text-base">
         Day-job experience at <span className="marker-highlight">Panacea Financial</span>, plus
         AI/ML case studies from my MS at Northeastern and on the side.
       </p>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 18, margin: "0 0 20px" }}>
-        <span
-          className="mono faint"
-          style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase" }}
-        >
-          shipped at work
-        </span>
-        <span style={{ flex: 1, height: 1, borderTop: "1.5px dashed var(--ink-faint)" }} />
-        <span className="mono faint" style={{ fontSize: 11 }}>
-          {EXPERIENCE.length} roles
-        </span>
+      <div className="mb-5">
+        <GroupRule label="shipped at work" count={`${EXPERIENCE.length} roles`} />
       </div>
-      <div className="col" style={{ gap: 18 }}>
+      <div className="col gap-[18px]">
         {EXPERIENCE.map((p, i) => (
           <ExperienceCard key={p.t} p={p} i={i} />
         ))}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 18, margin: "44px 0 24px" }}>
-        <span
-          className="mono faint"
-          style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase" }}
-        >
-          personal & academic — case studies
-        </span>
-        <span style={{ flex: 1, height: 1, borderTop: "1.5px dashed var(--ink-faint)" }} />
-        <span className="mono faint" style={{ fontSize: 11 }}>
-          {PROJECTS.length} projects
-        </span>
+      <div className="mt-11 mb-6">
+        <GroupRule label="personal & academic — case studies" count={`${PROJECTS.length} projects`} />
       </div>
 
       <FeaturedSlab p={featured} />
 
-      <div style={{ display: "flex", alignItems: "center", gap: 18, margin: "32px 0 22px" }}>
-        <span
-          className="mono faint"
-          style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase" }}
-        >
-          also worth a look
-        </span>
-        <span style={{ flex: 1, height: 1, borderTop: "1.5px dashed var(--ink-faint)" }} />
-        <span className="mono faint" style={{ fontSize: 11 }}>
-          {rest.length} more
-        </span>
+      <div className="mt-8 mb-[22px]">
+        <GroupRule label="also worth a look" count={`${rest.length} more`} />
       </div>
-      <div className="col" style={{ gap: 22 }}>
+      <div className="col gap-[22px]">
         {rest.map((p, i) => (
           <ProjectSlab key={p.t} p={p} i={i} />
         ))}

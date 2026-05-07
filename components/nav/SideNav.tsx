@@ -58,30 +58,10 @@ export default function SideNav() {
     <>
       {/* Desktop: vertical left rail */}
       <nav
-        className="side-nav-desktop"
-        style={{
-          position: "fixed",
-          left: 28,
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 100,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          padding: "14px 10px 14px 14px",
-        }}
+        className="side-nav-desktop fixed left-7 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-0.5 py-3.5 pr-2.5 pl-3.5"
         aria-label="Section navigation"
       >
-        <div
-          className="mono faint anim-rail d-rail-h"
-          style={{
-            fontSize: 9,
-            letterSpacing: 3,
-            textTransform: "uppercase",
-            marginBottom: 10,
-            paddingLeft: 2,
-          }}
-        >
+        <div className="mono faint anim-rail d-rail-h text-[9px] tracking-[3px] uppercase mb-2.5 pl-0.5">
           index
         </div>
         {ITEMS.map(([id, num, label], idx) => {
@@ -90,58 +70,30 @@ export default function SideNav() {
             <a
               key={id}
               href={`#sec-${id}`}
-              className={`anim-rail d-rail-${idx}`}
+              className={`anim-rail d-rail-${idx} flex items-center gap-2.5 no-underline text-ink py-[5px] px-1.5 rounded transition-opacity duration-[180ms] ${
+                isActive ? "opacity-100" : "opacity-55 hover:opacity-100"
+              }`}
               onClick={(e) => {
                 e.preventDefault();
                 jumpTo(id);
               }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                textDecoration: "none",
-                color: "var(--ink)",
-                padding: "5px 6px",
-                borderRadius: 4,
-                transition: "opacity 0.18s",
-                opacity: isActive ? 1 : 0.55,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "1";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = isActive ? "1" : "0.55";
-              }}
             >
               <span
-                className="mono"
-                style={{
-                  fontSize: 10,
-                  color: isActive ? "var(--electric)" : "var(--ink-faint)",
-                  minWidth: 18,
-                }}
+                className={`mono text-[10px] min-w-[18px] ${
+                  isActive ? "text-electric" : "text-ink-faint"
+                }`}
               >
                 {num}
               </span>
               <span
-                style={{
-                  position: "relative",
-                  width: isActive ? 28 : 10,
-                  height: 2,
-                  background: isActive ? "var(--electric)" : "var(--ink)",
-                  transition: "width 0.2s",
-                  overflow: "hidden",
-                }}
+                className={`relative h-0.5 transition-[width] duration-200 overflow-hidden ${
+                  isActive ? "w-7 bg-electric" : "w-2.5 bg-ink"
+                }`}
               />
               <span
-                className="hand"
-                style={{
-                  fontSize: 17,
-                  color: isActive ? "var(--electric)" : "var(--ink)",
-                  transform: isActive ? "translateX(0)" : "translateX(-2px)",
-                  transition: "all 0.18s",
-                  whiteSpace: "nowrap",
-                }}
+                className={`hand text-[17px] whitespace-nowrap transition-all duration-[180ms] ${
+                  isActive ? "text-electric translate-x-0" : "text-ink -translate-x-0.5"
+                }`}
               >
                 {label}
               </span>
@@ -152,29 +104,13 @@ export default function SideNav() {
 
       {/* Mobile: bottom horizontal dock */}
       <nav
-        className="side-nav-mobile"
+        className="side-nav-mobile fixed inset-x-0 bottom-0 z-[100] backdrop-blur border-t-2 border-ink shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
+        style={{ background: "color-mix(in oklab, var(--color-paper) 92%, transparent)" }}
         aria-label="Section navigation"
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 100,
-          background: "color-mix(in oklab, var(--paper) 92%, transparent)",
-          backdropFilter: "blur(6px)",
-          borderTop: "2px solid var(--ink)",
-          boxShadow: "0 -4px 20px rgba(0,0,0,0.06)",
-        }}
       >
         <div
-          style={{
-            display: "flex",
-            gap: 4,
-            overflowX: "auto",
-            padding: "10px 14px 12px",
-            scrollbarWidth: "none",
-            WebkitOverflowScrolling: "touch",
-          }}
+          className="flex gap-1 overflow-x-auto pt-2.5 px-3.5 pb-3 [scrollbar-width:none]"
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
           {ITEMS.map(([id, num, label]) => {
             const isActive = active === id;
@@ -182,46 +118,28 @@ export default function SideNav() {
               <a
                 key={id}
                 href={`#sec-${id}`}
-                className="dock-item"
+                className={`dock-item flex flex-col items-center gap-0.5 py-1 px-2.5 no-underline rounded-md shrink-0 transition-colors duration-150 ${
+                  isActive ? "bg-ink text-paper" : "text-ink"
+                }`}
                 data-id={id}
                 onClick={(e) => {
                   e.preventDefault();
                   jumpTo(id);
                 }}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 2,
-                  padding: "4px 10px",
-                  textDecoration: "none",
-                  color: "var(--ink)",
-                  borderRadius: 6,
-                  background: isActive ? "var(--ink)" : "transparent",
-                  flexShrink: 0,
-                  transition: "background 0.15s",
-                }}
               >
                 <span
-                  className="mono"
-                  style={{
-                    fontSize: 9,
-                    color: isActive
-                      ? "color-mix(in oklab, var(--electric) 60%, white)"
-                      : "var(--ink-faint)",
-                    letterSpacing: 1,
-                  }}
+                  className={`mono text-[9px] tracking-[1px] ${
+                    isActive
+                      ? "text-[color-mix(in_oklab,var(--color-electric)_60%,white)]"
+                      : "text-ink-faint"
+                  }`}
                 >
                   {num}
                 </span>
                 <span
-                  className="hand"
-                  style={{
-                    fontSize: 18,
-                    color: isActive ? "var(--paper)" : "var(--ink)",
-                    lineHeight: 1,
-                    whiteSpace: "nowrap",
-                  }}
+                  className={`hand text-[18px] leading-none whitespace-nowrap ${
+                    isActive ? "text-paper" : "text-ink"
+                  }`}
                 >
                   {label}
                 </span>
