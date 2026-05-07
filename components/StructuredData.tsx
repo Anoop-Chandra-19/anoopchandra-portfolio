@@ -6,7 +6,7 @@ export default function StructuredData() {
     "jobTitle": "AI/ML Engineer",
     "description": "AI/ML engineer and full-stack developer specializing in PyTorch, React, FastAPI, and AWS cloud solutions.",
     "url": "https://anoopchandra.dev",
-    "image": "https://anoopchandra.dev/anoopchandra.jpg",
+    "image": "https://anoopchandra.dev/anoopchandra.webp",
     "sameAs": [
       "https://github.com/Anoop-Chandra-19",
       "https://linkedin.com/in/anoopchandra-parampalli"
