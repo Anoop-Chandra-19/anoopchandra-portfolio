@@ -92,6 +92,20 @@ body.hydrated .anim-portrait-shadow {
 .d-rail-5  { animation-delay: 2.20s; }
 .d-rail-6  { animation-delay: 2.26s; }
 
+/* Suppress the entrance sequence on pages pushed after an ink transition —
+   the class is added by InkTransitionProvider and stays on for the session
+   (removing it would restart the suppressed animations). */
+body.ink-no-anim .anim-swipe,
+body.ink-no-anim .anim-rise,
+body.ink-no-anim .anim-stamp,
+body.ink-no-anim .anim-rail,
+body.ink-no-anim .anim-portrait-outline,
+body.ink-no-anim .anim-portrait-img,
+body.ink-no-anim .anim-portrait-shadow,
+body.ink-no-anim .marker-highlight {
+  animation: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   body.hydrated .anim-swipe,
   body.hydrated .anim-rise,

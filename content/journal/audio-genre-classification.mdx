@@ -1,0 +1,25 @@
+---
+title: "Audio Genre Classification"
+kind: case
+date: 2026-02-14
+tag: case study
+color: navy
+page: 11
+dek: "PyTorch transformer trained on FMA/GTZAN-style audio for music genre recognition. Mel-spectrogram → 8 classes, 85% test acc."
+sub: "self · 2024"
+hero: /projects/audio-genres.png
+heroAlt: "Audio genre classifier demo — mel-spectrogram input and predicted genre probabilities"
+related: [stock-prediction-llm-benchmark, shipping-llms-at-a-startup]
+---
+
+I wanted to learn transformers properly, and 'image classification with cats' felt over-done. Audio felt harder — a mel-spectrogram is image-shaped but the structure inside it is wildly different.
+
+## Architecture
+
+Mel-spectrogram input (128 mel bins × ~1300 frames for a 30s clip), patch embedding, 6-layer transformer encoder, classification head over 8 genres. Trained on a GTZAN-style split for ~40 epochs on a single 4090.
+
+<Callout color="navy">Top-1 accuracy on a held-out split: 85.4%. Reasonable. The misclassifications are interesting — 'blues' and 'jazz' eat each other; nothing wants to be 'reggae'.</Callout>
+
+## Deployment
+
+FastAPI inference microservice on AWS. A tiny React frontend lets you drag-drop a wav file and get a prediction in ~300ms. The live demo handled 100+ daily requests for a couple of months before I retired it.

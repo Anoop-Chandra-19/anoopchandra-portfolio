@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import { Caveat, Kalam, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "./animations.css";
-import "./note-spread.css";
+import "./journal.css";
+import "./ink-transition.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import StructuredData from "@/components/StructuredData";
 import HydrationTrigger from "@/components/HydrationTrigger";
+import { LenisProvider } from "@/components/LenisProvider";
+import InkTransitionProvider from "@/components/transition/InkTransitionProvider";
+import { getEntryMetas } from "@/lib/journal";
 
 const caveat = Caveat({
   variable: "--font-hand",
@@ -87,14 +91,15 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
-        <link rel="canonical" href="https://anoopchandra.dev" />
         <StructuredData />
       </head>
       <body
         className={`${caveat.variable} ${kalam.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <HydrationTrigger />
-        {children}
+        <LenisProvider>
+          <InkTransitionProvider entries={getEntryMetas()}>{children}</InkTransitionProvider>
+        </LenisProvider>
         <Analytics />
         <SpeedInsights />
       </body>

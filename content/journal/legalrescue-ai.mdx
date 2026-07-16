@@ -1,0 +1,32 @@
+---
+title: "LegalRescue.ai"
+kind: case
+date: 2026-04-30
+tag: case study
+color: coral
+page: 4
+dek: "Designed and shipped a scalable LLM backend for a legal-AI startup — voice intake, classification, async workflows."
+sub: "MS capstone · client under NDA"
+hero: /projects/legalrescue-nda.png
+heroAlt: "LegalRescue.ai system architecture sketch — voice intake pipeline into LLM classification"
+related: [shipping-llms-at-a-startup, notes-on-rag-eval-harnesses]
+---
+
+Two months in, the prototype was a Notion doc and a Loom. Six months later, we were running classification on real customer audio at sub-2s P95 latency. This is what changed in between.
+
+## The shape of the problem
+
+Walk-in clients calling a legal aid line don't fill out intake forms — they tell their story. Sometimes for forty minutes. The product turns that voice memo into a structured case record a paralegal can act on in under two minutes.
+
+- Whisper-large-v3 for STT, with a fallback to v2 on cold-start
+- GPT-4.1-mini for classification + summarization (price/perf sweet spot)
+- FastAPI on AWS EKS, Celery + Redis for async workflows, Postgres for session state
+- A custom prompt eval harness to keep regressions out of prod
+
+<Callout color="coral">The hardest part wasn't the LLM. It was the orchestration around it — making async workflows feel synchronous to the end user.</Callout>
+
+## What I'd do differently
+
+Build the eval harness first. We bolted ours on three months in and immediately wished we'd had it from week one — it would have caught two prompt regressions that shipped to prod.
+
+Pick a vector DB on day one, not day ninety. We bounced between three before settling, and each migration cost a sprint.

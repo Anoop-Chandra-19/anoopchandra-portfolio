@@ -1,0 +1,25 @@
+---
+title: "Shipping LLMs at a startup"
+kind: note
+date: 2026-03-28
+tag: ai/ml
+color: electric
+page: 109
+dek: "Notes from building a production LLM pipeline that actually has to make money."
+related: [notes-on-rag-eval-harnesses, nestjs-vs-express-in-2026]
+---
+
+Shipping LLMs in research is one thing. Shipping them at a startup, where the wrong answer costs the company a customer, is different.
+
+## Things I underestimated
+
+- Eval is the hardest part. Not the model.
+- Latency budgets get eaten by retrieval, not inference.
+- Customers will paste the entire 40-page PDF into a 'short question' field.
+- Streaming responses change the UX more than any prompt tweak.
+
+> The model is 5% of the work. The other 95% is everything around it.
+
+## Things I'd do again
+
+Async-first architecture. Celery + Redis + Postgres for state. A boring stack around a non-boring model. The boring parts are what made the product reliable.

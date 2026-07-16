@@ -1,0 +1,28 @@
+---
+title: "Stock Prediction LLM Benchmark"
+kind: case
+date: 2025-11-02
+tag: case study
+color: electric
+page: 17
+dek: "Benchmarking 11 LLMs on stock-movement prediction with CoT prompting, MongoDB time-series storage, and a structured-trade eval harness."
+sub: "research · 2024"
+hero: /projects/stock-pred.png
+heroAlt: "Stock prediction benchmark dashboard — model leaderboard and cumulative returns chart"
+related: [notes-on-rag-eval-harnesses, shipping-llms-at-a-startup]
+---
+
+Can a language model trade stocks? Probably not. Can it do better than a coin flip with the right prompt scaffolding? Surprisingly yes — sometimes.
+
+## Setup
+
+- 11 models: gpt-4o, gemini-2.0, deepseek-r1, llama-3.3, mistral-large, phi-4, + others
+- S&P 500 universe, 6-month rolling window, daily decisions
+- Chain-of-thought prompting with structured trade output (BUY / HOLD / SELL + confidence)
+- MongoDB time-series for prices + decisions; eval framework scores against next-day return
+
+<Callout color="electric">TL;DR — reasoning models (r1, o1-style) outperformed pure scale. gpt-4o was top-3; deepseek-r1 was #1 on risk-adjusted returns.</Callout>
+
+## Big caveat
+
+Past performance, etc. The point of this wasn't to make a trading bot — it was to build the harness. The harness is the artifact.

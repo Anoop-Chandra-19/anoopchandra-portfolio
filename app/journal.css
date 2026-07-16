@@ -1,0 +1,198 @@
+/* ============================================================ */
+/* ---- Journal (/journal + /journal/[slug]) ----               */
+/* ============================================================ */
+
+/* Journal routes have no SideNav, so drop its 140px body gutter */
+body:has([data-journal-root]) {
+  padding-left: 0;
+}
+
+/* ---- Cover banner ---- */
+.journal-cover {
+  position: relative;
+  background: var(--color-paper-2);
+  border: 2px solid var(--color-ink);
+  border-radius: 7px;
+  padding: 28px 32px;
+  margin-bottom: 36px;
+}
+.journal-cover h1 {
+  line-height: 0.95;
+}
+
+/* ---- Filter rail ---- */
+.journal-filter-btn {
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 3px 12px;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.journal-filter-btn.is-active {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* ---- Notebook TOC ---- */
+.journal-toc-header,
+.journal-toc-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 90px 90px;
+  gap: 14px;
+}
+.journal-toc-header {
+  padding: 0 110px 12px 6px;
+}
+.journal-toc-row {
+  padding: 14px 110px 14px 6px;
+}
+.journal-toc-row:hover {
+  background: color-mix(in oklab, var(--color-paper-2) 60%, transparent);
+}
+
+@media (max-width: 720px) {
+  .journal-toc-header {
+    grid-template-columns: 44px 1fr;
+    padding: 0 16px 8px 0;
+  }
+  .journal-toc-header > :nth-child(3),
+  .journal-toc-header > :nth-child(4) {
+    display: none;
+  }
+  .journal-toc-row {
+    grid-template-columns: 44px 1fr;
+    grid-template-areas:
+      "page title"
+      "page meta";
+    row-gap: 4px;
+    padding: 12px 16px 12px 0;
+  }
+  .journal-toc-page {
+    grid-area: page;
+    align-self: start;
+  }
+  .journal-toc-title {
+    grid-area: title;
+    flex-wrap: wrap;
+  }
+  .journal-toc-title > .hand {
+    white-space: normal;
+    font-size: 17px;
+    flex: 0 1 100%;
+  }
+  .journal-toc-leader {
+    display: none;
+  }
+  .journal-toc-row .journal-toc-meta {
+    grid-area: meta;
+    text-align: left;
+  }
+  .journal-toc-row .journal-toc-meta + .journal-toc-meta {
+    display: none;
+  }
+  .journal-edge-tab {
+    display: none;
+  }
+  /* the rotated corner stamp collides with the kicker text on small covers */
+  .journal-cover .journal-cover-stamp {
+    position: static;
+    display: inline-block;
+    margin-top: 14px;
+  }
+}
+
+/* ---- Article spread ---- */
+.journal-spread {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+}
+.journal-binding {
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: calc(60.7% - 1px);
+  width: 2px;
+  background: var(--color-ink);
+  opacity: 0.35;
+  z-index: 3;
+  pointer-events: none;
+}
+.journal-spread-left {
+  padding: 48px 56px 56px 92px;
+  box-shadow: inset -18px 0 24px -18px rgba(0, 0, 0, 0.18);
+}
+.journal-spread-rule {
+  left: 72px;
+}
+.journal-spread-label {
+  left: 26px;
+  top: 56px;
+}
+.journal-spread-right {
+  padding: 48px 44px 56px;
+  background: color-mix(in oklab, var(--color-paper-2) 60%, var(--color-paper));
+  box-shadow: inset 18px 0 24px -18px rgba(0, 0, 0, 0.18);
+}
+.journal-title {
+  font-size: 64px;
+}
+
+@media (max-width: 900px) {
+  .journal-spread {
+    grid-template-columns: 1fr;
+  }
+  .journal-binding {
+    display: none;
+  }
+  .journal-spread-left {
+    padding: 32px 24px 40px 56px;
+    box-shadow: none;
+    border-bottom: 2px solid var(--color-ink);
+  }
+  .journal-spread-rule {
+    left: 40px;
+  }
+  .journal-spread-label {
+    left: 14px;
+    top: 36px;
+  }
+  .journal-spread-right {
+    padding: 28px 24px 36px;
+    box-shadow: none;
+  }
+  .journal-title {
+    font-size: 42px;
+  }
+}
+
+/* ---- Article body (MDX) ---- */
+.journal-quote p {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+.journal-quote p:first-child::before {
+  content: "\201C";
+}
+.journal-quote p:last-child::after {
+  content: "\201D";
+}
+.journal-body :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: color-mix(in oklab, var(--color-ink) 7%, var(--color-paper-2));
+  border: 1px solid var(--color-ink-faint);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+.journal-pre code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+}

@@ -42,6 +42,35 @@ body {
   body { padding-left: 0; padding-bottom: 80px; }
 }
 
+/* ---- Scrollbar (notebook edge-tab) ---- */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+  border-left: 1px dashed var(--color-ink-faint);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-paper-2);
+  border: 1.5px solid var(--color-ink);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--color-electric) 14%, var(--color-paper));
+  border-color: var(--color-electric);
+}
+::-webkit-scrollbar-corner {
+  background: var(--color-paper);
+}
+/* Firefox has no scrollbar parts API — thin ink thumb on paper track */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ink) var(--color-paper-2);
+  }
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-hand);
   font-weight: 700;
