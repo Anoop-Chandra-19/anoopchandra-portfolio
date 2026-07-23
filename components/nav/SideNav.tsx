@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useLenisInstance } from "@/components/LenisProvider";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 const ITEMS: ReadonlyArray<readonly [string, string, string]> = [
   ["home", "00", "cover"],
@@ -15,6 +16,7 @@ const ITEMS: ReadonlyArray<readonly [string, string, string]> = [
 export default function SideNav() {
   const [active, setActive] = useState("home");
   const lenis = useLenisInstance();
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const onScroll = () => {
@@ -48,9 +50,16 @@ export default function SideNav() {
     const target = document.getElementById(`sec-${id}`);
     if (!target) return;
     if (lenis) {
-      lenis.scrollTo(target, { offset: 0, duration: 1.1, lerp: 0.1 });
+      lenis.scrollTo(target, {
+        immediate: shouldReduceMotion,
+        lerp: shouldReduceMotion ? undefined : 0.1,
+        offset: 0,
+      });
     } else {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({
+        behavior: shouldReduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
     }
   }
 

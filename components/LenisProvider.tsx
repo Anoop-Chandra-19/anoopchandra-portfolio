@@ -1,35 +1,29 @@
 "use client";
-import { createContext, useContext, useRef, useEffect } from "react";
-import Lenis from "@studio-freight/lenis";
 
-const LenisContext = createContext<Lenis | null>(null);
+import type { ReactNode } from "react";
+import type { LenisOptions } from "lenis";
+import { ReactLenis } from "lenis/react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-export function LenisProvider({ children }: { children: React.ReactNode }) {
-  const lenisRef = useRef<Lenis | null>(null);
+export { useLenis as useLenisInstance } from "lenis/react";
 
-  useEffect(() => {
-    const lenis = new Lenis({
-      gestureOrientation: "vertical",
-      touchMultiplier: 1.2,
-    });
-    lenisRef.current = lenis;
+type Props = {
+  children: ReactNode;
+};
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    return () => lenis.destroy();
-  }, []);
+export function LenisProvider({ children }: Props) {
+  const shouldReduceMotion = useReducedMotion();
+  const options: LenisOptions = {
+    autoRaf: true,
+    gestureOrientation: "vertical",
+    smoothWheel: !shouldReduceMotion,
+    stopInertiaOnNavigate: true,
+    touchMultiplier: 1.2,
+  };
 
   return (
-    <LenisContext.Provider value={lenisRef.current}>
+    <ReactLenis root options={options}>
       {children}
-    </LenisContext.Provider>
+    </ReactLenis>
   );
-}
-
-export function useLenisInstance() {
-  return useContext(LenisContext);
 }
