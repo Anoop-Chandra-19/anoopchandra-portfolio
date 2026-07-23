@@ -71,6 +71,18 @@ body {
   }
 }
 
+/* Lenis scroll-lock (ink transition): the package css sets
+   `.lenis-stopped { overflow: clip }`, which removes the scrollbar mid-flight —
+   the viewport widens by the 14px scrollbar and centered layouts jump sideways.
+   Keep the scrollbar rendered while locked (lenis already blocks wheel/touch
+   itself) and reserve the gutter as a general guard against overflow toggles. */
+html {
+  scrollbar-gutter: stable;
+}
+html.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow-y: scroll;
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-hand);
   font-weight: 700;

@@ -102,12 +102,20 @@ body.hydrated .anim-portrait-shadow {
 body.ink-no-anim .anim-swipe,
 body.ink-no-anim .anim-rise,
 body.ink-no-anim .anim-stamp,
-body.ink-no-anim .anim-rail,
 body.ink-no-anim .anim-portrait-outline,
 body.ink-no-anim .anim-portrait-img,
 body.ink-no-anim .anim-portrait-shadow,
 body.ink-no-anim .marker-highlight {
   animation: none;
+}
+
+/* …except the SideNav rail: the overlay's home preview (HomeContent) excludes
+   fixed elements, so the rail was never on screen during the transition and
+   would otherwise pop in statically at handoff. Replay its stagger on ink
+   arrivals with the hero-ceremony lead-in (1.75s) subtracted — same rhythm,
+   starting as the overlay lifts. */
+body.ink-no-anim .anim-rail {
+  animation-delay: calc(var(--d, 1.85s) - 1.75s);
 }
 
 @media (prefers-reduced-motion: reduce) {
