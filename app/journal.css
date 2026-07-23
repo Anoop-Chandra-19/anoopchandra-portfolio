@@ -116,7 +116,11 @@ body:has([data-journal-root]) {
 
 .je{font-family:var(--font-serif);color:var(--color-ink)}
 .je-plate{counter-increment:plate}
-.je-plate-tab.auto::before{content:"plate " counter(plate,decimal-leading-zero)}
+/* decimal-leading-zero only pads to 2 digits (01, 02…10…) — the hero plate
+   is hardcoded "plate 000" (3 digits), so inline plates need their own
+   3-digit style to match instead of drifting to "plate 01". */
+@counter-style plate-pad{system:extends decimal;pad:3 "0"}
+.je-plate-tab.auto::before{content:"plate " counter(plate,plate-pad)}
 
 .je-progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--color-coral);transform-origin:0 50%;transform:scaleX(0);z-index:50}
 .je-inner{position:relative;width:960px;max-width:100%;margin:0 auto;padding:44px 40px 100px}
