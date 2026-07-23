@@ -8,6 +8,7 @@ import {
   BACK_MS,
   FWD_MS,
   INK,
+  JITTER,
   SPATTERS,
   SPATTER_BIRTHS,
   blobClip,
@@ -25,6 +26,13 @@ import {
 } from "@/lib/ink-bleed";
 
 const EMPTY_CLIP = "polygon(0px 0px, 0px 0px, 0px 0px)";
+
+/** Halo texture radius at scale 1 — the div is 2·HALO_R square and gets
+    transform-scaled to the current bleed radius (no per-frame repaint). */
+const HALO_R = 512;
+
+/** Half-size of a spatter's clipped box: max radius + jitter headroom */
+const spatterHalf = (rMax: number) => Math.ceil(rMax * (1 + JITTER)) + 6;
 
 /** Non-interactive copy of the journal index, on its own paper background */
 function JournalLayer({ entries }: { entries: JournalEntryMeta[] }) {
@@ -74,13 +82,13 @@ export default function InkBleedOverlay({
     };
   }, []);
 
-  // Single rAF loop writing clip-paths/gradients via refs — no per-frame setState.
+  // Single rAF loop writing clip-paths/transforms via refs — no per-frame setState.
   useEffect(() => {
-    const start = performance.now();
     const duration = effect === "bleed" ? FWD_MS : BACK_MS;
     const maxR = maxRadius(cx, cy, vw, vh);
     const scale = spatterScale(vw, vh);
     const maxK = peelMaxK(vw, vh);
+    let start = 0;
     let raf = 0;
 
     const frame = (now: number) => {
@@ -99,8 +107,9 @@ export default function InkBleedOverlay({
           if (!el || local < SPATTER_BIRTHS[i]) return;
           const localS = Math.min(1, (local - SPATTER_BIRTHS[i]) / 0.22);
           const r = s.r * scale * easeOutCubic(localS);
+          const half = spatterHalf(s.r * scale);
           el.style.visibility = "visible";
-          el.style.clipPath = spatterClip(cx + s.dx * scale, cy + s.dy * scale, r, s.seed);
+          el.style.clipPath = spatterClip(half, half, r, s.seed);
         });
         // Phase 3 — main bleed + halo rim
         const mainLocal = Math.max(0, (local - 0.04) / 0.96);
@@ -112,10 +121,7 @@ export default function InkBleedOverlay({
         if (haloRef.current) {
           if (mainR > 4 && local < 1) {
             haloRef.current.style.visibility = "visible";
-            haloRef.current.style.background = `radial-gradient(circle at ${cx}px ${cy}px, ${hexA(
-              INK,
-              0.5
-            )} ${Math.max(0, mainR - 30)}px, ${hexA(INK, 0)} ${mainR + 24}px)`;
+            haloRef.current.style.transform = `scale(${(mainR + 24) / HALO_R})`;
             haloRef.current.style.opacity =
               mainLocal < 0.9 ? "1" : String(1 - (mainLocal - 0.9) / 0.1);
           } else {
@@ -164,7 +170,15 @@ export default function InkBleedOverlay({
       raf = requestAnimationFrame(frame);
     };
 
-    raf = requestAnimationFrame(frame);
+    // Everything is still hidden on mount. Give the browser two frames to
+    // style/layout/rasterize the freshly mounted page copies before the clock
+    // starts — otherwise that initial paint eats the drop/spatter phase.
+    raf = requestAnimationFrame(() => {
+      raf = requestAnimationFrame((now) => {
+        start = now;
+        frame(now);
+      });
+    });
     return () => cancelAnimationFrame(raf);
   }, [effect, cx, cy, vw, vh]);
 
@@ -174,19 +188,50 @@ export default function InkBleedOverlay({
     <div className="ink-overlay">
       {effect === "bleed" ? (
         <>
-          {SPATTERS.map((s, i) => (
-            <div
-              key={i}
-              ref={(el) => {
-                spatterRefs.current[i] = el;
-              }}
-              className="ink-layer"
-              style={{ clipPath: EMPTY_CLIP }}
-            >
-              <JournalLayer entries={entries} />
-            </div>
-          ))}
-          <div ref={haloRef} className="ink-halo" />
+          {SPATTERS.map((s, i) => {
+            const scale = spatterScale(vw, vh);
+            const half = spatterHalf(s.r * scale);
+            const sx = cx + s.dx * scale;
+            const sy = cy + s.dy * scale;
+            return (
+              <div
+                key={i}
+                ref={(el) => {
+                  spatterRefs.current[i] = el;
+                }}
+                className="ink-spatter"
+                style={{
+                  left: sx - half,
+                  top: sy - half,
+                  width: half * 2,
+                  height: half * 2,
+                  clipPath: EMPTY_CLIP,
+                }}
+              >
+                {/* full page copy shifted so the spatter's centre lines up with the box centre */}
+                <div
+                  className="ink-spatter-inner"
+                  style={{ left: half - sx, top: half - sy, width: vw, height: vh }}
+                >
+                  <JournalLayer entries={entries} />
+                </div>
+              </div>
+            );
+          })}
+          <div
+            ref={haloRef}
+            className="ink-halo"
+            style={{
+              left: cx - HALO_R,
+              top: cy - HALO_R,
+              width: HALO_R * 2,
+              height: HALO_R * 2,
+              background: `radial-gradient(circle, ${hexA(INK, 0.5)} ${HALO_R - 54}px, ${hexA(
+                INK,
+                0
+              )} ${HALO_R}px)`,
+            }}
+          />
           <div ref={mainRef} className="ink-layer" style={{ clipPath: EMPTY_CLIP }}>
             <JournalLayer entries={entries} />
           </div>

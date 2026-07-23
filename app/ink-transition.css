@@ -49,9 +49,27 @@
   visibility: hidden;
 }
 
+/* Small clipped window onto a full page copy — one per spatter satellite.
+   Sized to the spatter's max radius so only ~100px gets rasterized, not the
+   whole viewport. Position/size are set inline per spatter. */
+.ink-spatter {
+  position: fixed;
+  overflow: hidden;
+  will-change: clip-path;
+  contain: paint;
+  visibility: hidden;
+}
+
+.ink-spatter-inner {
+  position: absolute;
+}
+
+/* Pre-rendered rim gradient (2·HALO_R square, sized/positioned inline), scaled
+   to the current bleed radius via transform — compositor-only per frame. */
 .ink-halo {
   position: fixed;
-  inset: 0;
+  transform: scale(0);
+  will-change: transform, opacity;
   pointer-events: none;
   mix-blend-mode: multiply;
   visibility: hidden;

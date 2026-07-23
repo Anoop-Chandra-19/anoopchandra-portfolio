@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Chip from "@/components/ui/Chip";
 import Annotation from "@/components/ui/Annotation";
+import ScrollLink from "@/components/ui/ScrollLink";
 
 export default function Hero() {
   return (
@@ -26,12 +27,12 @@ export default function Hero() {
             person, not just the specs.
           </div>
           <div className="mt-[26px] flex gap-2.5 flex-wrap">
-            <a href="#sec-contact" className="no-underline anim-stamp d-chip1">
+            <ScrollLink href="#sec-contact" className="no-underline anim-stamp d-chip1">
               <Chip kind="electric">say hi →</Chip>
-            </a>
-            <a href="#sec-lab" className="no-underline anim-stamp d-chip2">
+            </ScrollLink>
+            <ScrollLink href="#sec-lab" className="no-underline anim-stamp d-chip2">
               <Chip>see the lab ↓</Chip>
-            </a>
+            </ScrollLink>
             <a
               href="/Anoopchandra_resume.pdf"
               target="_blank"

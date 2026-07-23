@@ -47,13 +47,17 @@ body:not(.hydrated) .anim-portrait-img { opacity: 0; }
 body:not(.hydrated) .anim-portrait-shadow { opacity: 0; }
 body:not(.hydrated) .marker-highlight { background-size: 0% 100%; background-repeat: no-repeat; }
 
-body.hydrated .anim-swipe { animation: swipeIn 0.45s cubic-bezier(.2,.7,.2,1) both; }
-body.hydrated .anim-rise  { animation: fadeRise 0.4s cubic-bezier(.2,.7,.2,1) both; }
-body.hydrated .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; }
-body.hydrated .anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; }
+/* The `animation` shorthand resets animation-delay, and these rules out-rank
+   the single-class .d-* rules — so the stagger delays must come in through a
+   custom property consumed here, not a competing animation-delay declaration. */
+body.hydrated .anim-swipe { animation: swipeIn 0.45s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
+body.hydrated .anim-rise  { animation: fadeRise 0.4s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
+body.hydrated .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
+body.hydrated .anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
 body.hydrated .marker-highlight {
   background-repeat: no-repeat;
   animation: markerPaint 0.35s cubic-bezier(.4,0,.6,1) both;
+  animation-delay: var(--d, 0s);
 }
 body.hydrated .anim-portrait-outline {
   animation: portraitDraw 0.7s cubic-bezier(.4,0,.2,1) both;
@@ -68,29 +72,29 @@ body.hydrated .anim-portrait-shadow {
   animation-delay: 1.00s;
 }
 
-.d-hello   { animation-delay: 0.00s; }
-.d-name1   { animation-delay: 0.40s; }
-.d-name2   { animation-delay: 0.55s; }
-.d-subtle  { animation-delay: 0.70s; }
-.d-body    { animation-delay: 0.90s; }
-.d-marker1 { animation-delay: 1.40s; }
-.d-marker2 { animation-delay: 1.50s; }
-.d-marker3 { animation-delay: 1.60s; }
-.d-chip1   { animation-delay: 1.70s; }
-.d-chip2   { animation-delay: 1.78s; }
-.d-chip3   { animation-delay: 1.86s; }
-.d-meta    { animation-delay: 2.10s; }
-.d-portrait{ animation-delay: 0.20s; }
-.d-annot1  { animation-delay: 1.10s; }
-.d-annot2  { animation-delay: 1.20s; }
-.d-rail-h  { animation-delay: 1.85s; }
-.d-rail-0  { animation-delay: 1.90s; }
-.d-rail-1  { animation-delay: 1.96s; }
-.d-rail-2  { animation-delay: 2.02s; }
-.d-rail-3  { animation-delay: 2.08s; }
-.d-rail-4  { animation-delay: 2.14s; }
-.d-rail-5  { animation-delay: 2.20s; }
-.d-rail-6  { animation-delay: 2.26s; }
+.d-hello   { --d: 0.00s; }
+.d-name1   { --d: 0.40s; }
+.d-name2   { --d: 0.55s; }
+.d-subtle  { --d: 0.70s; }
+.d-body    { --d: 0.90s; }
+.d-marker1 { --d: 1.40s; }
+.d-marker2 { --d: 1.50s; }
+.d-marker3 { --d: 1.60s; }
+.d-chip1   { --d: 1.70s; }
+.d-chip2   { --d: 1.78s; }
+.d-chip3   { --d: 1.86s; }
+.d-meta    { --d: 2.10s; }
+.d-portrait{ --d: 0.20s; }
+.d-annot1  { --d: 1.10s; }
+.d-annot2  { --d: 1.20s; }
+.d-rail-h  { --d: 1.85s; }
+.d-rail-0  { --d: 1.90s; }
+.d-rail-1  { --d: 1.96s; }
+.d-rail-2  { --d: 2.02s; }
+.d-rail-3  { --d: 2.08s; }
+.d-rail-4  { --d: 2.14s; }
+.d-rail-5  { --d: 2.20s; }
+.d-rail-6  { --d: 2.26s; }
 
 /* Suppress the entrance sequence on pages pushed after an ink transition —
    the class is added by InkTransitionProvider and stays on for the session
