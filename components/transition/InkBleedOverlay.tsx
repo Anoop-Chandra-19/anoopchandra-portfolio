@@ -50,7 +50,7 @@ export default function InkBleedOverlay({
   vw,
   vh,
   entries,
-  onComplete,
+  onCompleteAction,
 }: {
   effect: InkEffect;
   cx: number;
@@ -58,7 +58,7 @@ export default function InkBleedOverlay({
   vw: number;
   vh: number;
   entries: JournalEntryMeta[];
-  onComplete: () => void;
+  onCompleteAction: () => void;
 }) {
   const dropRef = useRef<HTMLDivElement>(null);
   const haloRef = useRef<HTMLDivElement>(null);
@@ -67,8 +67,11 @@ export default function InkBleedOverlay({
   const homeRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
   const dimRef = useRef<HTMLDivElement>(null);
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+  const onCompleteActionRef = useRef(onCompleteAction);
+
+  useEffect(() => {
+    onCompleteActionRef.current = onCompleteAction;
+  }, [onCompleteAction]);
 
   // Block scrolling underneath the overlay for the duration (Lenis is stopped
   // separately, but native wheel/touch would still move the origin page).
@@ -164,7 +167,7 @@ export default function InkBleedOverlay({
       }
 
       if (local >= 1) {
-        onCompleteRef.current();
+        onCompleteActionRef.current();
         return;
       }
       raf = requestAnimationFrame(frame);

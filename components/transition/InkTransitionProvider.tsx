@@ -121,7 +121,7 @@ export default function InkTransitionProvider({
           vw={transition.vw}
           vh={transition.vh}
           entries={entries}
-          onComplete={handleComplete}
+          onCompleteAction={handleComplete}
         />
       )}
     </InkTransitionContext.Provider>
