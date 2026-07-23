@@ -105,94 +105,130 @@ body:has([data-journal-root]) {
   }
 }
 
-/* ---- Article spread ---- */
-.journal-spread {
-  display: grid;
-  grid-template-columns: 1.55fr 1fr;
-}
-.journal-binding {
-  position: absolute;
-  top: 18px;
-  bottom: 18px;
-  left: calc(60.7% - 1px);
-  width: 2px;
-  background: var(--color-ink);
-  opacity: 0.35;
-  z-index: 3;
-  pointer-events: none;
-}
-.journal-spread-left {
-  padding: 48px 56px 56px 92px;
-  box-shadow: inset -18px 0 24px -18px rgba(0, 0, 0, 0.18);
-}
-.journal-spread-rule {
-  left: 72px;
-}
-.journal-spread-label {
-  left: 26px;
-  top: 56px;
-}
-.journal-spread-right {
-  padding: 48px 44px 56px;
-  background: color-mix(in oklab, var(--color-paper-2) 60%, var(--color-paper));
-  box-shadow: inset 18px 0 24px -18px rgba(0, 0, 0, 0.18);
-}
-.journal-title {
-  font-size: 64px;
-}
+/* ============================================================ */
+/* ---- Journal entry — "The Annotated Manuscript" ----          */
+/* ============================================================ */
+/* Serif reading column on the ruled paper; personality lives in
+   the chrome (ledger header, stamps, marker highlights, hand
+   section-numbers, taped plates). Section numbers (✎ §NN) and
+   plate numbers auto-increment via CSS counters — authors never
+   number by hand. Hero is plate 000, set in ArticleEntry. */
 
-@media (max-width: 900px) {
-  .journal-spread {
-    grid-template-columns: 1fr;
-  }
-  .journal-binding {
-    display: none;
-  }
-  .journal-spread-left {
-    padding: 32px 24px 40px 56px;
-    box-shadow: none;
-    border-bottom: 2px solid var(--color-ink);
-  }
-  .journal-spread-rule {
-    left: 40px;
-  }
-  .journal-spread-label {
-    left: 14px;
-    top: 36px;
-  }
-  .journal-spread-right {
-    padding: 28px 24px 36px;
-    box-shadow: none;
-  }
-  .journal-title {
-    font-size: 42px;
-  }
-}
+.je{font-family:var(--font-serif);color:var(--color-ink)}
+.je-plate{counter-increment:plate}
+.je-plate-tab.auto::before{content:"plate " counter(plate,decimal-leading-zero)}
 
-/* ---- Article body (MDX) ---- */
-.journal-quote p {
-  margin: 0;
-  font-size: inherit;
-  line-height: inherit;
+.je-progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--color-coral);transform-origin:0 50%;transform:scaleX(0);z-index:50}
+.je-inner{position:relative;width:960px;max-width:100%;margin:0 auto;padding:44px 40px 100px}
+
+/* top nav */
+.je-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:16px;border-bottom:1.5px dashed var(--color-ink-faint);margin-bottom:38px}
+.je-back{font-family:var(--font-mono);font-size:12px;letter-spacing:.4px;color:var(--color-ink);text-decoration:none;border:1.5px solid var(--color-ink);border-radius:999px;padding:6px 14px;background:var(--color-paper)}
+.je-back:hover{background:var(--color-ink);color:var(--color-paper)}
+.je-topmeta{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint)}
+
+/* masthead */
+.je-mast{max-width:860px;margin-bottom:36px}
+.je-ledger{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);padding:8px 0;border-top:2px solid var(--color-ink);border-bottom:1px solid var(--color-ink);margin-bottom:22px}
+.je-ledger .dash{flex:0 0 auto;width:16px;height:1px;background:var(--color-ink-faint)}
+.je-chips{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+.je-chip{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--color-ink-soft);border:1.4px solid var(--color-ink);border-radius:999px;padding:4px 12px;background:var(--color-paper)}
+.je-chip.is-kind{background:color-mix(in oklab,var(--color-coral) 14%,var(--color-paper));border-color:var(--color-coral);color:color-mix(in oklab,var(--color-coral) 78%,var(--color-ink));text-transform:uppercase;letter-spacing:1.5px}
+.je-stamp{margin-left:4px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--color-coral);border:1.6px solid var(--color-coral);border-radius:4px;padding:4px 10px;transform:rotate(-3deg)}
+.je-title{font-family:var(--font-serif);font-weight:600;font-size:72px;line-height:1;letter-spacing:-1.4px;margin:0 0 18px;color:var(--color-ink);text-wrap:balance}
+.je-dek{font-family:var(--font-serif);font-style:italic;font-size:24px;line-height:1.42;color:var(--color-ink-soft);margin:0 0 24px;max-width:680px;text-wrap:pretty}
+.je-byline{display:flex;align-items:center;gap:11px;font-family:var(--font-mono);font-size:11px;letter-spacing:.6px;color:var(--color-ink-faint);padding:13px 0;border-top:1px solid var(--color-ink-faint);border-bottom:1px solid var(--color-ink-faint)}
+.je-byline b{color:var(--color-ink);font-weight:500}
+.je-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-ink);background:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,0,0,.09) 3px 4px);flex:0 0 auto}
+.je-bsub{color:var(--color-ink-soft)}
+.je-grow{flex:1}
+.je-htag{color:var(--color-coral)}
+
+/* plates (hero + figures) */
+.je-plate{position:relative;background:#fffdf7;border:1px solid var(--color-ink);box-shadow:0 8px 22px rgba(0,0,0,.12);padding:14px 14px 12px;margin:0 0 40px;max-width:820px}
+.je-hero{margin-bottom:46px}
+.je-plate img{display:block;width:100%;max-height:420px;object-fit:contain;background:var(--color-paper-2)}
+.je-plate-tab{position:absolute;top:-11px;left:18px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-paper);background:var(--color-ink);padding:3px 9px;border-radius:3px}
+.je-plate figcaption{font-family:var(--font-mono);font-size:11px;line-height:1.55;color:var(--color-ink-faint);margin-top:11px;padding-left:14px;border-left:2px solid var(--color-coral)}
+.je-tape{position:absolute;top:-12px;right:26px;width:74px;height:24px;background:rgba(216,182,120,.5);border:1px solid rgba(0,0,0,.06);transform:rotate(17deg)}
+
+/* body — reading column + red margin rule */
+.je-body{position:relative;width:100%;padding-left:58px;counter-reset:sec plate}
+.je-rule{position:absolute;left:28px;top:-4px;bottom:60px;width:1.4px;background:color-mix(in oklab,var(--color-coral) 72%,transparent);opacity:.65}
+.je-body p{font-family:var(--font-serif);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:600px;color:var(--color-ink);text-wrap:pretty}
+.je-ic{font-family:var(--font-mono);font-size:.8em;background:color-mix(in oklab,var(--color-ink) 7%,var(--color-paper-2));border:1px solid var(--color-ink-faint);border-radius:3px;padding:1px 5px}
+.je-body strong{font-weight:600}
+.je-body a{color:var(--color-electric);text-decoration:none;border-bottom:1.5px dotted color-mix(in oklab,var(--color-electric) 55%,transparent)}
+.je-body a:hover{color:var(--color-ink);border-bottom-color:var(--color-ink)}
+.je-hl{background:linear-gradient(180deg,transparent 58%,color-mix(in oklab,var(--color-coral) 58%,#fff) 58%,color-mix(in oklab,var(--color-coral) 58%,#fff) 94%,transparent 94%);color:inherit;padding:0 3px}
+
+.je-h2{margin:44px 0 16px;max-width:640px;counter-increment:sec}
+.je-secn{display:block;font-family:var(--font-hand);font-size:20px;color:var(--color-coral);line-height:1;margin-bottom:2px}
+.je-secn::before{content:"\270E \A7" counter(sec,decimal-leading-zero)}
+.je-h2 h2{font-family:var(--font-serif);font-weight:600;font-size:33px;line-height:1.12;margin:0;color:var(--color-ink);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:color-mix(in oklab,var(--color-coral) 55%,transparent);text-decoration-thickness:1.6px;text-underline-offset:9px}
+.je-body h3{font-family:var(--font-serif);font-weight:600;font-size:24px;line-height:1.2;margin:28px 0 10px;max-width:600px;color:var(--color-ink)}
+
+.je-ul{list-style:none;padding:0;margin:6px 0 24px;max-width:600px}
+.je-ul li{position:relative;padding-left:28px;font-family:var(--font-serif);font-size:19px;line-height:1.6;margin-bottom:11px}
+.je-ul li::before{content:"";position:absolute;left:2px;top:11px;width:8px;height:8px;border:1.6px solid var(--color-coral);border-radius:2px;transform:rotate(45deg)}
+.je-ol{padding-left:26px;margin:6px 0 24px;max-width:600px;font-family:var(--font-serif);font-size:19px;line-height:1.6}
+.je-ol li{margin-bottom:9px}
+.je-ol li::marker{font-family:var(--font-mono);font-size:13px;color:var(--color-coral)}
+
+/* boxed callout: lives inline in the reading column */
+.je-callout{max-width:560px;margin:24px 0;font-family:var(--font-hand);font-size:23px;line-height:1.32;color:var(--color-ink);background:color-mix(in oklab,var(--color-coral) 10%,var(--color-paper));border:1.5px dashed var(--color-coral);border-radius:7px;padding:16px 18px}
+.je-callout .lbl{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-coral);margin-bottom:6px}
+
+/* code */
+.je-code{margin:26px 0;max-width:640px;border:1.5px solid var(--color-ink);border-radius:7px;overflow:hidden}
+.je-code .bar{display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1.5px solid var(--color-ink);background:var(--color-paper)}
+.je-code .prompt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-coral);letter-spacing:-1px}
+.je-code .fn{font-family:var(--font-mono);font-size:11px;color:var(--color-ink-soft)}
+.je-code pre{margin:0;padding:15px 17px;font-family:var(--font-mono);font-size:13px;line-height:1.7;white-space:pre-wrap;background:color-mix(in oklab,var(--color-ink) 5%,var(--color-paper-2));color:var(--color-ink)}
+.je-code pre code{font-family:inherit;font-size:inherit;background:none;border:none;padding:0}
+
+/* pull quote */
+.je-quote{position:relative;margin:36px 0 36px -8px;max-width:600px;padding:6px 0 6px 26px;border-left:3px solid var(--color-coral)}
+.je-quote p{font-family:var(--font-hand);font-size:36px;line-height:1.22;color:var(--color-ink);margin:0}
+.je-quote cite{display:block;font-family:var(--font-mono);font-style:normal;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);margin-top:12px}
+
+/* MDX wraps block JSX children in <p>; undo the .je-body p serif styling
+   inside chrome blocks that set their own voice (hand callout, mono caption) */
+.je-callout p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0 0 8px;max-width:none}
+.je-callout p:last-child{margin-bottom:0}
+.je-plate figcaption p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
+
+.je-end{display:flex;justify-content:space-between;max-width:600px;font-family:var(--font-mono);font-size:11px;color:var(--color-ink-faint);margin-top:34px;padding-top:14px;border-top:1px dashed var(--color-ink-faint)}
+
+/* footer / prev-next */
+.je-foot{margin-top:52px;padding-top:24px;border-top:2px solid var(--color-ink)}
+.je-navlbl{font-family:var(--font-hand);font-size:22px;color:var(--color-ink-faint);margin-bottom:14px}
+.je-nav{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.je-navcard{border:1.5px solid var(--color-ink);border-radius:8px;padding:18px 20px;text-decoration:none;color:var(--color-ink);background:var(--color-paper);transition:background .15s,transform .15s}
+.je-navcard:hover{background:var(--color-paper-2);transform:translateY(-3px)}
+.je-navcard .d{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint)}
+.je-navcard .t{font-family:var(--font-serif);font-weight:600;font-size:25px;line-height:1.08;margin-top:8px}
+.je-navcard .m{font-family:var(--font-mono);font-size:10px;color:var(--color-ink-faint);margin-top:9px}
+.je-navcard.older{text-align:right}
+.je-colophon{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--color-ink-faint);text-align:center;margin-top:34px}
+
+@media (max-width:1000px){
+  .je-inner{width:100%;padding:32px 26px 80px}
+  .je-title{font-size:54px}
+  .je-callout{max-width:100%}
+  .je-body p,.je-ul,.je-ol,.je-h2,.je-body h3,.je-code,.je-quote,.je-end{max-width:100%}
 }
-.journal-quote p:first-child::before {
-  content: "\201C";
-}
-.journal-quote p:last-child::after {
-  content: "\201D";
-}
-.journal-body :not(pre) > code {
-  font-family: var(--font-mono);
-  font-size: 0.85em;
-  background: color-mix(in oklab, var(--color-ink) 7%, var(--color-paper-2));
-  border: 1px solid var(--color-ink-faint);
-  border-radius: 3px;
-  padding: 1px 5px;
-}
-.journal-pre code {
-  font-family: inherit;
-  font-size: inherit;
-  background: none;
-  border: none;
-  padding: 0;
+@media (max-width:640px){
+  .je-inner{padding:24px 18px 72px}
+  .je-title{font-size:40px;letter-spacing:-.8px}
+  .je-dek{font-size:20px}
+  .je-plate{padding:10px 10px 10px}
+  .je-tape{display:none}
+  .je-body{padding-left:34px}
+  .je-rule{left:12px}
+  .je-body p{font-size:18px}
+  .je-ul li{font-size:17px}
+  .je-quote p{font-size:29px}
+  .je-nav{grid-template-columns:1fr}
+  .je-navcard.older{text-align:left}
 }

@@ -21,6 +21,8 @@ export type JournalEntryMeta = {
   sub: string | null;
   hero: string | null;
   heroAlt: string | null;
+  /** mono caption under the hero plate */
+  heroCaption: string | null;
   status: "published" | "draft";
   /** slugs of related entries */
   related: string[];

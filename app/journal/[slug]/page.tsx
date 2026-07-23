@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAdjacent, getEntries, getEntryBySlug, getRelated } from "@/lib/journal";
-import ArticleSpread from "@/components/journal/ArticleSpread";
+import { getAdjacent, getEntries, getEntryBySlug } from "@/lib/journal";
+import ArticleEntry from "@/components/journal/ArticleEntry";
 
 // Every valid slug is known at build time (slug = filename in content/journal),
 // so unknown URLs 404 at the routing layer without invoking any server code.
@@ -45,7 +45,7 @@ export default async function ArticlePage({
   const { prev, next } = getAdjacent(slug);
   return (
     <div data-journal-root>
-      <ArticleSpread entry={entry} related={getRelated(entry)} prev={prev} next={next} />
+      <ArticleEntry entry={entry} prev={prev} next={next} />
     </div>
   );
 }

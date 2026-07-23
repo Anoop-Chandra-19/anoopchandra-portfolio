@@ -2,31 +2,68 @@
 title: "LegalRescue.ai"
 kind: case
 date: 2026-04-30
-tag: case study
+tag: legal-ai
 color: coral
 page: 4
-dek: "Designed and shipped a scalable LLM backend for a legal-AI startup — voice intake, classification, async workflows."
+dek: "Designing and shipping a scalable LLM backend for a legal-aid startup — voice intake, classification, and async workflows that had to make money."
 sub: "MS capstone · client under NDA"
 hero: /projects/legalrescue-nda.png
-heroAlt: "LegalRescue.ai system architecture sketch — voice intake pipeline into LLM classification"
+heroAlt: "LegalRescue.ai system architecture — voice intake pipeline into LLM classification"
+heroCaption: "The intake pipeline — a forty-minute voice memo becomes a structured case record in under two minutes."
+status: published
 related: [shipping-llms-at-a-startup, notes-on-rag-eval-harnesses]
 ---
 
-Two months in, the prototype was a Notion doc and a Loom. Six months later, we were running classification on real customer audio at sub-2s P95 latency. This is what changed in between.
+Two months in, the prototype was a Notion doc and a Loom. Six months later we
+were running classification on real customer audio at <Hl>sub-2s P95 latency</Hl>.
+This is what changed in between.
 
 ## The shape of the problem
 
-Walk-in clients calling a legal aid line don't fill out intake forms — they tell their story. Sometimes for forty minutes. The product turns that voice memo into a structured case record a paralegal can act on in under two minutes.
+Walk-in clients calling a legal-aid line don't fill out intake forms — **they
+tell their story**. Sometimes for forty minutes. The product turns that voice
+memo into a structured case record a paralegal can act on in under two minutes.
 
-- Whisper-large-v3 for STT, with a fallback to v2 on cold-start
-- GPT-4.1-mini for classification + summarization (price/perf sweet spot)
+<Figure src="/projects/stock-pred.png" alt="Review console">
+The review console — a paralegal confirms the model's classification before it
+commits to the case file. Humans stay in the loop where it counts.
+</Figure>
+
+The stack that got us there was deliberately boring around one non-boring model:
+
+- `Whisper-large-v3` for speech-to-text, falling back to `v2` on cold-start
+- `GPT-4.1-mini` for classification + summarization — the price/perf sweet spot
 - FastAPI on AWS EKS, Celery + Redis for async workflows, Postgres for session state
-- A custom prompt eval harness to keep regressions out of prod
+- A custom prompt-eval harness to keep regressions out of prod
 
-<Callout color="coral">The hardest part wasn't the LLM. It was the orchestration around it — making async workflows feel synchronous to the end user.</Callout>
+<Callout>
+The hardest part wasn't the LLM. It was the orchestration around it — making
+async workflows feel synchronous to the person on the phone.
+</Callout>
+
+## Making async feel synchronous
+
+Every request fans out into a queue the moment audio lands. The client holds a
+lightweight job handle and polls; the UI streams partial state so the wait
+<Hl>never reads as a dead spinner</Hl>.
+
+```py title="intake.py"
+@app.post("/intake")
+async def intake(audio: UploadFile):
+    job = await queue.enqueue(transcribe, audio)
+    # client polls this handle; UI streams partial state
+    return {"job_id": job.id, "status": "processing"}
+```
+
+<Quote cite="field notes, week 14">
+The model is 5% of the work. The other 95% is everything around it.
+</Quote>
 
 ## What I'd do differently
 
-Build the eval harness first. We bolted ours on three months in and immediately wished we'd had it from week one — it would have caught two prompt regressions that shipped to prod.
+Build the eval harness *first*. We bolted ours on three months in and immediately
+wished we'd had it from week one — it would have caught two prompt regressions
+that shipped to prod.
 
-Pick a vector DB on day one, not day ninety. We bounced between three before settling, and each migration cost a sprint.
+And pick a vector DB on day one, not day ninety. We bounced between three before
+settling, and [each migration cost a sprint](#).

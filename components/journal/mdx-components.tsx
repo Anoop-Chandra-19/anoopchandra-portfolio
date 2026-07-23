@@ -1,72 +1,92 @@
-import type { ComponentPropsWithoutRef } from "react";
+// Maps MDX → the "Annotated Manuscript" entry blocks. All server-safe
+// (works with next-mdx-remote/rsc). Section numbers (✎ §NN) and plate
+// numbers auto-increment via CSS counters defined in journal.css —
+// authors never number by hand.
+import Image from "next/image";
+import type { ComponentPropsWithoutRef, ReactElement } from "react";
 import type { MDXComponents } from "mdx/types";
-import type { TagColor } from "@/lib/journal-meta";
 
-// Maps markdown → the notebook design's article blocks
-// (ported from the old NoteBlock renderer in Notes.tsx).
+/* ---- custom blocks authored directly in MDX ---- */
 
-function Callout({
-  color = "electric",
-  children,
-}: {
-  color?: TagColor;
-  children: React.ReactNode;
-}) {
+// <Callout label="note">…</Callout> — boxed emphasis, inline in the column.
+function Callout({ label = "note", children }: { label?: string; children: React.ReactNode }) {
   return (
-    <div
-      className="my-[18px] py-3.5 px-[18px] rounded text-[22px] leading-[1.35] text-ink"
-      style={{
-        background: `color-mix(in oklab, var(--color-${color}) 12%, var(--color-paper))`,
-        border: `1.5px dashed var(--color-${color})`,
-        fontFamily: "var(--font-hand)",
-      }}
-    >
-      <span
-        className="mono text-[9px] tracking-[2px] uppercase block mb-1"
-        style={{ color: `var(--color-${color})` }}
-      >
-        ✎ margin note
-      </span>
+    <aside className="je-callout">
+      <span className="lbl">✎ {label}</span>
       {children}
+    </aside>
+  );
+}
+
+// <Hl>phrase</Hl> — coral marker highlight on an inline phrase.
+function Hl({ children }: { children: React.ReactNode }) {
+  return <mark className="je-hl">{children}</mark>;
+}
+
+// <Figure src alt>caption…</Figure> — a taped "plate". The tab text
+// ("plate 00N") is filled by the CSS counter, so don't number it.
+function Figure({ src, alt, children }: { src: string; alt: string; children?: React.ReactNode }) {
+  return (
+    <figure className="je-plate">
+      <span className="je-tape" aria-hidden="true" />
+      <span className="je-plate-tab auto" aria-hidden="true" />
+      <Image src={src} alt={alt} width={1100} height={620} />
+      {children ? <figcaption>{children}</figcaption> : null}
+    </figure>
+  );
+}
+
+// <Quote cite="field notes, week 14">…</Quote> — hand pull-quote.
+// MDX already wraps block JSX children in <p>, so render children directly —
+// adding our own <p> would nest <p><p> and break hydration.
+function Quote({ cite, children }: { cite?: string; children: React.ReactNode }) {
+  return (
+    <blockquote className="je-quote">
+      {children}
+      {cite ? <cite>— {cite}</cite> : null}
+    </blockquote>
+  );
+}
+
+/* ---- native markdown element overrides ---- */
+
+// ``` fenced code ``` → notebook code card. The bar label prefers a
+// title="intake.py" fence prop (via rehype-mdx-code-props), then the
+// fence language (```py).
+function Pre({ title, children, ...rest }: ComponentPropsWithoutRef<"pre">) {
+  const code = children as ReactElement<{ className?: string }> | undefined;
+  const cls = code?.props?.className ?? "";
+  const lang = cls.replace(/language-/, "") || "code";
+  return (
+    <div className="je-code">
+      <div className="bar">
+        <span className="prompt">&gt;_</span>
+        <span className="fn">{title ?? lang}</span>
+      </div>
+      <pre {...rest}>{children}</pre>
     </div>
   );
 }
 
 export const mdxComponents: MDXComponents = {
-  p: (props: ComponentPropsWithoutRef<"p">) => (
-    <p className="text-[17px] leading-[1.7] mt-0 mb-3.5" {...props} />
+  p: (p) => <p {...p} />,
+  // ## → hand section-number + wavy-underlined serif heading
+  h2: ({ children, ...rest }: ComponentPropsWithoutRef<"h2">) => (
+    <div className="je-h2">
+      <span className="je-secn" aria-hidden="true" />
+      <h2 {...rest}>{children}</h2>
+    </div>
   ),
-  h2: (props: ComponentPropsWithoutRef<"h2">) => (
-    <h3 className="text-[28px] mt-[26px] mb-2.5 text-ink" {...props} />
-  ),
-  h3: (props: ComponentPropsWithoutRef<"h3">) => (
-    <h4 className="text-[22px] mt-5 mb-2 text-ink" {...props} />
-  ),
-  ul: (props: ComponentPropsWithoutRef<"ul">) => (
-    <ul className="list-disc pl-[22px] mt-1.5 mb-[18px] text-[16px] leading-[1.75]" {...props} />
-  ),
-  ol: (props: ComponentPropsWithoutRef<"ol">) => (
-    <ol className="list-decimal pl-[22px] mt-1.5 mb-[18px] text-[16px] leading-[1.75]" {...props} />
-  ),
-  li: (props: ComponentPropsWithoutRef<"li">) => <li className="mb-1" {...props} />,
-  blockquote: (props: ComponentPropsWithoutRef<"blockquote">) => (
-    <blockquote
-      className="journal-quote hand my-5 py-2 px-5 border-l-[3px] border-electric text-[26px] leading-[1.35] text-ink not-italic"
-      {...props}
-    />
-  ),
-  pre: (props: ComponentPropsWithoutRef<"pre">) => (
-    <pre
-      className="journal-pre mono mt-3.5 mb-5 py-3.5 px-4 border-[1.5px] border-ink rounded text-xs leading-[1.6] whitespace-pre-wrap overflow-auto"
-      style={{ background: "color-mix(in oklab, var(--color-ink) 7%, var(--color-paper-2))" }}
-      {...props}
-    />
-  ),
-  a: (props: ComponentPropsWithoutRef<"a">) => (
-    <a
-      className="text-ink underline decoration-dotted underline-offset-4 decoration-electric"
-      {...props}
-    />
-  ),
+  h3: (p: ComponentPropsWithoutRef<"h3">) => <h3 {...p} />,
+  ul: (p: ComponentPropsWithoutRef<"ul">) => <ul className="je-ul" {...p} />,
+  ol: (p: ComponentPropsWithoutRef<"ol">) => <ol className="je-ol" {...p} />,
+  li: (p: ComponentPropsWithoutRef<"li">) => <li {...p} />,
+  blockquote: (p: ComponentPropsWithoutRef<"blockquote">) => <blockquote className="je-quote" {...p} />,
+  pre: Pre,
+  code: (p: ComponentPropsWithoutRef<"code">) => <code className="je-ic" {...p} />,
+  a: (p: ComponentPropsWithoutRef<"a">) => <a {...p} />,
   Callout,
+  Hl,
+  Figure,
+  Quote,
 };

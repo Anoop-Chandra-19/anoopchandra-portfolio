@@ -86,6 +86,7 @@ function parseEntry(file: string): JournalEntry {
     sub: data.sub ? String(data.sub) : null,
     hero: data.hero ? String(data.hero) : null,
     heroAlt: data.heroAlt ? String(data.heroAlt) : null,
+    heroCaption: data.heroCaption ? String(data.heroCaption) : null,
     status: (data.status as "published" | "draft" | undefined) ?? "published",
     related: (data.related as string[] | undefined)?.map(String) ?? [],
     body: content,

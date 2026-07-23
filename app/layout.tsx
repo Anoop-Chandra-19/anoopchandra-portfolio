@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Caveat, Kalam, JetBrains_Mono } from "next/font/google";
+import { Caveat, Kalam, JetBrains_Mono, Newsreader } from "next/font/google";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 import "./animations.css";
@@ -31,6 +31,14 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
   weight: ["400", "500"],
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -95,7 +103,7 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body
-        className={`${caveat.variable} ${kalam.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${caveat.variable} ${kalam.variable} ${jetbrainsMono.variable} ${newsreader.variable} antialiased`}
       >
         <HydrationTrigger />
         <LenisProvider>
