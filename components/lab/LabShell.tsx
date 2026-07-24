@@ -5,12 +5,12 @@ import { useInkTransition } from "@/components/transition/InkTransitionProvider"
 import { LAB_EXPS, type LabExp } from "@/lib/lab-meta";
 import DoodleLab from "@/components/lab/DoodleLab";
 import SentimentLab from "@/components/lab/SentimentLab";
-import KMeansLab from "@/components/lab/KMeansLab";
+import ClusterClassifyLab from "@/components/lab/ClusterClassifyLab";
 
 const DEMOS = {
   doodle: DoodleLab,
   sentiment: SentimentLab,
-  kmeans: KMeansLab,
+  kmeans: ClusterClassifyLab,
 } as const;
 
 export default function LabShell({ exp }: { exp: LabExp }) {

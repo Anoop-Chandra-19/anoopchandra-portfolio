@@ -38,13 +38,13 @@ export const LAB_EXPS: LabExp[] = [
   {
     slug: "kmeans",
     num: "exp-003",
-    title: "K-Means Playground",
+    title: "Cluster & Classify",
     accent: "coral",
-    tag: "clustering",
+    tag: "clustering · perceptron",
     blurb:
-      "Drop points, pick k, and watch the centroids walk to the middle of their clusters.",
+      "Two toy learners on one grid — group unlabelled points with K-Means, or label them and watch a perceptron find the dividing line.",
     foot:
-      "This is the real K-Means algorithm running live — assign each point to its nearest centroid, move each centroid to the mean of its members, repeat until nothing moves. No model to download; the math is the whole demo.",
+      "Both algorithms are the real thing, running live in the page. K-Means: assign each point to the nearest centroid, move each centroid to the mean of its members, repeat until nothing moves. Classifier: a single-layer perceptron nudges its weights point by point (lr 0.13) until the line separates the two colours — or proves it can't.",
   },
 ];
 
