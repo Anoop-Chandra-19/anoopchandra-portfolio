@@ -81,7 +81,7 @@ matching how the codebase already handles breakpoints):
 
 ## Workstream B — The Lab
 
-### B1. Routes + layout (desktop design: `lab-desktop.jsx`/`.css` in Hi-Fi v2)
+### B1. Routes + layout — SHIPPED (2026-07-24, with B3 as PR 2)
 - `app/lab/[slug]/page.tsx` with slugs `doodle`, `sentiment`, `kmeans`
   (statically generated; `generateStaticParams`). Each renders the shared
   experiment shell + its demo. Direct URL loads work without the transition.
@@ -132,7 +132,16 @@ partial destination copies made the article body "just appear" at handoff:
   `▸ open experiment` run affordance + active-press styles. `← home` on the
   experiment page peels back (`effect: "peel"` to `/`), same as journal.
 
-### B3. Experiment components (`components/lab/`) — real models, design UI
+### B3. Experiment components (`components/lab/`) — SHIPPED (2026-07-24)
+Landed as planned. Implementation notes: `lib/lab-meta.ts` (exp metadata incl.
+rewritten asides), `lib/lab-models.ts` (module-level cache + IndexedDB
+persist + real onProgress + shader warm-up; tfjs dynamically imported so no
+page bundle carries it), `components/lab/{LabShell,BenchBoot,LabButton,
+DoodleLab,SentimentLab,KMeansLab}.tsx`, `app/lab.css` (`.lx-*`).
+`word_index.min.json` pruned by `scripts/prune-word-index.mjs`
+(2.1MB → 145KB, 9,999 entries kept); `/models/*` get immutable cache headers
+via next.config.ts. Top-4 guesses; boot transcript shows `(cached)` on
+IndexedDB hits. Cards in §03 bleed from the click point; `← home`/Esc peel.
 The trained TF.js models already live in `public/models/` (they shipped on the
 old site), and `main` has working implementations to pull from:
 `hooks/useDoodleModel.ts`, `hooks/useSentimentModel.ts`,
