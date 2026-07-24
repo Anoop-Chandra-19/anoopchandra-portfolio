@@ -1,17 +1,13 @@
 "use client";
-import { useEffect, useRef } from "react";
-import type { JournalEntryMeta } from "@/lib/journal-meta";
-import JournalIndex from "@/components/journal/JournalIndex";
-import HomeContent from "@/components/HomeContent";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { InkEffect } from "@/components/transition/InkTransitionProvider";
 import {
   BACK_MS,
   FWD_MS,
   INK,
-  JITTER,
   SPATTERS,
   SPATTER_BIRTHS,
-  blobClip,
+  blobPath,
   easeInOutCubic,
   easeOutCubic,
   easeOutQuart,
@@ -21,7 +17,7 @@ import {
   peelClipComplement,
   peelMaxK,
   peelShadowGeom,
-  spatterClip,
+  spatterPath,
   spatterScale,
 } from "@/lib/ink-bleed";
 
@@ -31,25 +27,25 @@ const EMPTY_CLIP = "polygon(0px 0px, 0px 0px, 0px 0px)";
     transform-scaled to the current bleed radius (no per-frame repaint). */
 const HALO_R = 512;
 
-/** Half-size of a spatter's clipped box: max radius + jitter headroom */
-const spatterHalf = (rMax: number) => Math.ceil(rMax * (1 + JITTER)) + 6;
-
-/** Non-interactive copy of the journal index, on its own paper background */
-function JournalLayer({ entries }: { entries: JournalEntryMeta[] }) {
-  return (
-    <div className="ink-layer-paper" aria-hidden="true">
-      <JournalIndex entries={entries} inert />
-    </div>
-  );
-}
-
+/**
+ * Both effects reveal the REAL destination route — no partial page copies.
+ *
+ * bleed: the destination is already committed and rendering underneath; this
+ * overlay holds an inert copy of the origin (home) on top and cuts the ink
+ * blobs through it as growing holes (SVG mask — union of blobs), so the whole
+ * destination page is under the animation from the first frame.
+ *
+ * peel: the live origin page stays underneath; the home copy is revealed on
+ * top along the diagonal cut, and the route commits when it covers.
+ */
 export default function InkBleedOverlay({
   effect,
   cx,
   cy,
   vw,
   vh,
-  entries,
+  pageCopy,
+  start,
   onCompleteAction,
 }: {
   effect: InkEffect;
@@ -57,14 +53,18 @@ export default function InkBleedOverlay({
   cy: number;
   vw: number;
   vh: number;
-  entries: JournalEntryMeta[];
+  /** inert full-document home copy (see layers.tsx) */
+  pageCopy: ReactNode;
+  /** bleed holds (origin copy covering, no holes) until the destination has
+      rendered underneath; peel starts immediately */
+  start: boolean;
   onCompleteAction: () => void;
 }) {
   const dropRef = useRef<HTMLDivElement>(null);
   const haloRef = useRef<HTMLDivElement>(null);
-  const mainRef = useRef<HTMLDivElement>(null);
-  const spatterRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const homeRef = useRef<HTMLDivElement>(null);
+  const mainHoleRef = useRef<SVGPathElement>(null);
+  const spatterRefs = useRef<Array<SVGPathElement | null>>([]);
+  const peelRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
   const dimRef = useRef<HTMLDivElement>(null);
   const onCompleteActionRef = useRef(onCompleteAction);
@@ -74,7 +74,7 @@ export default function InkBleedOverlay({
   }, [onCompleteAction]);
 
   // Block scrolling underneath the overlay for the duration (Lenis is stopped
-  // separately, but native wheel/touch would still move the origin page).
+  // separately, but native wheel/touch would still move the page beneath).
   useEffect(() => {
     const prevent = (e: Event) => e.preventDefault();
     window.addEventListener("wheel", prevent, { passive: false });
@@ -85,17 +85,19 @@ export default function InkBleedOverlay({
     };
   }, []);
 
-  // Single rAF loop writing clip-paths/transforms via refs — no per-frame setState.
+  // Single rAF loop writing mask paths/clip-paths/transforms via refs — no
+  // per-frame setState.
   useEffect(() => {
+    if (!start) return;
     const duration = effect === "bleed" ? FWD_MS : BACK_MS;
     const maxR = maxRadius(cx, cy, vw, vh);
     const scale = spatterScale(vw, vh);
     const maxK = peelMaxK(vw, vh);
-    let start = 0;
+    let startTs = 0;
     let raf = 0;
 
     const frame = (now: number) => {
-      const local = Math.min(1, (now - start) / duration);
+      const local = Math.min(1, (now - startTs) / duration);
 
       if (effect === "bleed") {
         // Phase 1 — the falling drop (first ~5%)
@@ -104,22 +106,19 @@ export default function InkBleedOverlay({
           dropRef.current.style.visibility = dropProgress < 1 ? "visible" : "hidden";
           dropRef.current.style.transform = `scale(${0.3 + dropProgress})`;
         }
-        // Phase 2 — spatter satellites
+        // Phase 2 — spatter satellites, holes eaten around the drop point
         SPATTERS.forEach((s, i) => {
           const el = spatterRefs.current[i];
           if (!el || local < SPATTER_BIRTHS[i]) return;
           const localS = Math.min(1, (local - SPATTER_BIRTHS[i]) / 0.22);
           const r = s.r * scale * easeOutCubic(localS);
-          const half = spatterHalf(s.r * scale);
-          el.style.visibility = "visible";
-          el.style.clipPath = spatterClip(half, half, r, s.seed);
+          el.setAttribute("d", spatterPath(cx + s.dx * scale, cy + s.dy * scale, r, s.seed));
         });
-        // Phase 3 — main bleed + halo rim
+        // Phase 3 — main bleed hole + halo rim
         const mainLocal = Math.max(0, (local - 0.04) / 0.96);
         const mainR = maxR * easeOutQuart(mainLocal);
-        if (mainRef.current && mainR > 4) {
-          mainRef.current.style.visibility = "visible";
-          mainRef.current.style.clipPath = blobClip(cx, cy, mainR);
+        if (mainHoleRef.current && mainR > 4) {
+          mainHoleRef.current.setAttribute("d", blobPath(cx, cy, mainR));
         }
         if (haloRef.current) {
           if (mainR > 4 && local < 1) {
@@ -131,16 +130,13 @@ export default function InkBleedOverlay({
             haloRef.current.style.visibility = "hidden";
           }
         }
-        if (local >= 1 && mainRef.current) {
-          mainRef.current.style.clipPath = "none";
-        }
       } else {
         // Corner peel — destination revealed in the half-plane x + y ≤ k
         const eased = easeInOutCubic(local);
         const k = maxK * eased;
-        if (homeRef.current) {
-          homeRef.current.style.visibility = "visible";
-          homeRef.current.style.clipPath = local >= 1 ? "none" : peelClipComplement(k, vw, vh);
+        if (peelRef.current) {
+          peelRef.current.style.visibility = "visible";
+          peelRef.current.style.clipPath = local >= 1 ? "none" : peelClipComplement(k, vw, vh);
         }
         const geom = eased > 0.03 && eased < 0.97 ? peelShadowGeom(k, vw, vh) : null;
         if (shadowRef.current) {
@@ -173,70 +169,57 @@ export default function InkBleedOverlay({
       raf = requestAnimationFrame(frame);
     };
 
-    // Everything is still hidden on mount. Give the browser two frames to
-    // style/layout/rasterize the freshly mounted page copies before the clock
-    // starts — otherwise that initial paint eats the drop/spatter phase.
+    // Give the browser two frames to style/layout/rasterize the freshly
+    // rendered page (destination beneath for bleed, home copy for peel) before
+    // the clock starts — otherwise that paint eats the drop/spatter phase.
     raf = requestAnimationFrame(() => {
       raf = requestAnimationFrame((now) => {
-        start = now;
+        startTs = now;
         frame(now);
       });
     });
     return () => cancelAnimationFrame(raf);
-  }, [effect, cx, cy, vw, vh]);
-
-  const notes = entries.filter((e) => e.kind === "note");
+  }, [start, effect, cx, cy, vw, vh]);
 
   return (
     <div className="ink-overlay">
       {effect === "bleed" ? (
         <>
-          {SPATTERS.map((s, i) => {
-            const scale = spatterScale(vw, vh);
-            const half = spatterHalf(s.r * scale);
-            const sx = cx + s.dx * scale;
-            const sy = cy + s.dy * scale;
-            return (
-              <div
-                key={i}
-                ref={(el) => {
-                  spatterRefs.current[i] = el;
-                }}
-                className="ink-spatter"
-                style={{
-                  left: sx - half,
-                  top: sy - half,
-                  width: half * 2,
-                  height: half * 2,
-                  clipPath: EMPTY_CLIP,
-                }}
-              >
-                {/* full page copy shifted so the spatter's centre lines up with the box centre */}
-                <div
-                  className="ink-spatter-inner"
-                  style={{ left: half - sx, top: half - sy, width: vw, height: vh }}
-                >
-                  <JournalLayer entries={entries} />
-                </div>
-              </div>
-            );
-          })}
-          <div
-            ref={haloRef}
-            className="ink-halo"
-            style={{
-              left: cx - HALO_R,
-              top: cy - HALO_R,
-              width: HALO_R * 2,
-              height: HALO_R * 2,
-              background: `radial-gradient(circle, ${hexA(INK, 0.5)} ${HALO_R - 54}px, ${hexA(
-                INK,
-                0
-              )} ${HALO_R}px)`,
-            }}
-          />
-          <div ref={mainRef} className="ink-layer" style={{ clipPath: EMPTY_CLIP }}>
-            <JournalLayer entries={entries} />
+          <svg width="0" height="0" aria-hidden="true">
+            <defs>
+              <mask id="ink-hole-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={vw} height={vh}>
+                {/* white keeps the origin copy; black paths are the ink holes */}
+                <rect x="0" y="0" width={vw} height={vh} fill="#fff" />
+                <path ref={mainHoleRef} fill="#000" />
+                {SPATTERS.map((_, i) => (
+                  <path
+                    key={i}
+                    ref={(el) => {
+                      spatterRefs.current[i] = el;
+                    }}
+                    fill="#000"
+                  />
+                ))}
+              </mask>
+            </defs>
+          </svg>
+          <div className="ink-layer ink-origin">
+            {pageCopy}
+            {/* inside the masked layer → the rim only shows on the un-inked paper */}
+            <div
+              ref={haloRef}
+              className="ink-halo"
+              style={{
+                left: cx - HALO_R,
+                top: cy - HALO_R,
+                width: HALO_R * 2,
+                height: HALO_R * 2,
+                background: `radial-gradient(circle, ${hexA(INK, 0.5)} ${HALO_R - 54}px, ${hexA(
+                  INK,
+                  0
+                )} ${HALO_R}px)`,
+              }}
+            />
           </div>
           <div
             ref={dropRef}
@@ -251,12 +234,8 @@ export default function InkBleedOverlay({
         </>
       ) : (
         <>
-          <div ref={homeRef} className="ink-layer" style={{ clipPath: EMPTY_CLIP }}>
-            <div className="ink-layer-paper ink-layer-home" aria-hidden="true">
-              <div className="page" inert>
-                <HomeContent journalEntries={notes} />
-              </div>
-            </div>
+          <div ref={peelRef} className="ink-layer" style={{ clipPath: EMPTY_CLIP }}>
+            {pageCopy}
             {/* inherits the layer's clip → the band only shows on the revealed side of the cut */}
             <div ref={shadowRef} className="ink-peel-shadow" />
           </div>

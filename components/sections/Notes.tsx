@@ -52,6 +52,18 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                   className="notes-row grid gap-3.5 items-baseline py-3 pr-[90px] pl-1.5 relative no-underline transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
                   style={{ gridTemplateColumns: "44px 1fr 90px 64px" }}
                   aria-label={`Open note: ${e.title}`}
+                  onClick={(ev) => {
+                    // keep native behavior for new-tab/window clicks
+                    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+                    ev.preventDefault();
+                    // the row spans the page — bleed from the click point, not the
+                    // row center (ev.detail === 0 → keyboard activation, no coords)
+                    const originRect =
+                      ev.detail === 0
+                        ? ev.currentTarget.getBoundingClientRect()
+                        : new DOMRect(ev.clientX, ev.clientY, 0, 0);
+                    navigate(`/journal/${e.slug}`, { effect: "bleed", originRect });
+                  }}
                 >
                   <span className="mono faint notes-date text-[11px] text-right text-ink-soft">
                     p.{pad(e.page)}

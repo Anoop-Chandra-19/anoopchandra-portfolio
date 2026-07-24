@@ -13,38 +13,52 @@ const ITEMS: ReadonlyArray<readonly [string, string, string]> = [
   ["contact", "06", "say hi"],
 ];
 
-export default function SideNav() {
-  const [active, setActive] = useState("home");
+/** Which section the rail should mark at a given scroll offset. Reads the live
+    document, so callers must be mounted after the home sections. */
+function activeSectionAt(scrollY: number): string {
+  const nearBottom = window.innerHeight + scrollY >= document.body.offsetHeight - 80;
+  if (nearBottom) return "contact";
+  const y = scrollY + window.innerHeight * 0.35;
+  let cur = "home";
+  for (const [id] of ITEMS) {
+    const el = document.getElementById(`sec-${id}`);
+    if (el && el.offsetTop <= y) cur = id;
+  }
+  return cur;
+}
+
+export default function SideNav({
+  frozenAt,
+}: {
+  /** Render as a static snapshot inside a transition page copy: compute the
+      active section once as if scrolled to this offset, never track scroll. */
+  frozenAt?: number;
+}) {
+  const frozen = frozenAt !== undefined;
+  // Frozen copies mount while the live page is still in the DOM — compute the
+  // marker synchronously so the copy's first painted frame already matches
+  // (an effect would flash the "cover" default for a frame first).
+  const [active, setActive] = useState(() =>
+    frozen ? activeSectionAt(frozenAt) : "home"
+  );
   const lenis = useLenisInstance();
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const onScroll = () => {
-      const nearBottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 80;
-      if (nearBottom) {
-        setActive("contact");
-        return;
-      }
-      const y = window.scrollY + window.innerHeight * 0.35;
-      let cur = "home";
-      for (const [id] of ITEMS) {
-        const el = document.getElementById(`sec-${id}`);
-        if (el && el.offsetTop <= y) cur = id;
-      }
-      setActive(cur);
-    };
+    if (frozen) return;
+    const onScroll = () => setActive(activeSectionAt(window.scrollY));
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [frozen]);
 
   useEffect(() => {
+    if (frozen) return;
     const el = document.querySelector<HTMLElement>(`.dock-item[data-id="${active}"]`);
     if (el && el.parentElement) {
       el.parentElement.scrollTo({ left: el.offsetLeft - 40, behavior: "smooth" });
     }
-  }, [active]);
+  }, [active, frozen]);
 
   function jumpTo(id: string) {
     const target = document.getElementById(`sec-${id}`);

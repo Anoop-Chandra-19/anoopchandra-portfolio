@@ -40,6 +40,28 @@
   }
 }
 
+/* Full-document page copy offset to the origin scroll position. The paper
+   background rides on the document (like the real body's) so the ruled lines
+   stay aligned with the content at any scroll offset — keep in sync with body
+   in globals.css. */
+.ink-doc {
+  min-height: 100vh;
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 113, 91, 0.05), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(30, 168, 150, 0.04), transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0, 0, 0, 0.018) 28px, rgba(0, 0, 0, 0.018) 29px);
+}
+
+/* Bleed origin copy: sits over the already-committed destination route from
+   frame one; the ink blobs are holes cut through it by the SVG mask below. */
+.ink-origin {
+  visibility: visible;
+  will-change: mask;
+  -webkit-mask: url(#ink-hole-mask);
+  mask: url(#ink-hole-mask);
+}
+
 .ink-drop {
   position: fixed;
   width: 28px;

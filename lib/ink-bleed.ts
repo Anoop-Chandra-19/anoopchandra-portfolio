@@ -53,37 +53,39 @@ export function makeBleedSeeds(seed = 0xdeadbeef, n = 64): number[] {
 
 export const BLEED_SEEDS = makeBleedSeeds();
 
-/** Main-bleed blob. Jitter scales with radius — a fresh drop is round,
-    irregularity grows as the ink soaks into more paper. */
-export function blobClip(cx: number, cy: number, r: number, jitter = JITTER): string {
+/** Shared blob outline as SVG path data. The bleed layers are cut as holes in
+    an origin-page copy via one SVG mask (white rect + black blob paths), so
+    overlapping blobs union naturally — something polygon() clip-paths can't do. */
+function noisyBlobPath(cx: number, cy: number, r: number, eff: number, seedOffset: number): string {
   const n = BLEED_SEEDS.length;
-  const eff = jitter * Math.min(1, Math.max(0, (r - 20) / 180));
-  const parts: string[] = [];
+  const cmds: string[] = [];
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2;
-    const rr = Math.max(0, r * (1 + BLEED_SEEDS[i] * eff));
-    parts.push(`${(cx + Math.cos(a) * rr).toFixed(1)}px ${(cy + Math.sin(a) * rr).toFixed(1)}px`);
+    const rr = Math.max(0, r * (1 + BLEED_SEEDS[(i + seedOffset) % n] * eff));
+    cmds.push(
+      `${i === 0 ? "M" : "L"}${(cx + Math.cos(a) * rr).toFixed(1)} ${(cy + Math.sin(a) * rr).toFixed(1)}`
+    );
   }
-  return `polygon(${parts.join(", ")})`;
+  return cmds.join("") + "Z";
+}
+
+/** Main-bleed blob. Jitter scales with radius — a fresh drop is round,
+    irregularity grows as the ink soaks into more paper. */
+export function blobPath(cx: number, cy: number, r: number, jitter = JITTER): string {
+  const eff = jitter * Math.min(1, Math.max(0, (r - 20) / 180));
+  return noisyBlobPath(cx, cy, r, eff, 0);
 }
 
 /** Spatter blob — same noise, rotated per-spatter, tighter jitter window */
-export function spatterClip(
+export function spatterPath(
   cx: number,
   cy: number,
   r: number,
   seedOffset: number,
   jitter = JITTER
 ): string {
-  const n = BLEED_SEEDS.length;
   const eff = jitter * Math.min(1, Math.max(0, (r - 6) / 28));
-  const parts: string[] = [];
-  for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2;
-    const rr = Math.max(0, r * (1 + BLEED_SEEDS[(i + seedOffset) % n] * eff));
-    parts.push(`${(cx + Math.cos(a) * rr).toFixed(1)}px ${(cy + Math.sin(a) * rr).toFixed(1)}px`);
-  }
-  return `polygon(${parts.join(", ")})`;
+  return noisyBlobPath(cx, cy, r, eff, seedOffset);
 }
 
 /** Bleed radius needed to cover the whole viewport from (cx, cy) */

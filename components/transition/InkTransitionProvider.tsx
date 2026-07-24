@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLenisInstance } from "@/components/LenisProvider";
 import type { JournalEntryMeta } from "@/lib/journal-meta";
 import InkBleedOverlay from "@/components/transition/InkBleedOverlay";
+import HomeLayer from "@/components/transition/layers";
 
 export type InkEffect = "bleed" | "peel";
 
@@ -27,6 +28,8 @@ type Transition = {
   cy: number;
   vw: number;
   vh: number;
+  /** origin scroll offset at navigate time — the bleed's home copy renders at it */
+  scrollY: number;
 };
 
 const InkTransitionContext = createContext<{
@@ -68,22 +71,40 @@ export default function InkTransitionProvider({
       // stays on for the rest of the session (removing it would restart the
       // suppressed CSS animations).
       document.body.classList.add("ink-no-anim");
-      setTransition({ href, effect: opts.effect, cx, cy, vw, vh });
+      setTransition({ href, effect: opts.effect, cx, cy, vw, vh, scrollY: window.scrollY });
+      // Bleed reveals the real destination: commit the route up front — the
+      // overlay's home copy covers the swap, and the animation holds until the
+      // destination has rendered underneath.
+      if (opts.effect === "bleed") {
+        committingRef.current = true;
+        router.push(href);
+      }
     },
     [transition, pathname, router, lenis]
   );
 
-  // Overlay finished animating (clips at full cover) → commit the route change.
+  // Overlay finished animating.
   const handleComplete = useCallback(() => {
-    if (!transition || committingRef.current) return;
+    if (!transition) return;
+    if (transition.effect === "bleed") {
+      // Route committed at navigate time; the last frame's hole covers the
+      // viewport, so the fully-rendered destination is already what's visible.
+      committingRef.current = false;
+      setTransition(null);
+      lenis?.start();
+      return;
+    }
+    // Peel: the home copy covers everything — commit the route now.
+    if (committingRef.current) return;
     committingRef.current = true;
     router.push(transition.href);
-  }, [transition, router]);
+  }, [transition, router, lenis]);
 
-  // Once the destination route has actually rendered underneath the overlay,
+  // Peel teardown: once home has actually rendered underneath the overlay,
   // wait two frames (paint settled) and unmount it — no handoff flash.
   useEffect(() => {
-    if (!committingRef.current || !transition || pathname !== transition.href) return;
+    if (!transition || transition.effect !== "peel") return;
+    if (!committingRef.current || pathname !== transition.href) return;
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
@@ -120,7 +141,13 @@ export default function InkTransitionProvider({
           cy={transition.cy}
           vw={transition.vw}
           vh={transition.vh}
-          entries={entries}
+          pageCopy={
+            <HomeLayer
+              entries={entries}
+              scrollY={transition.effect === "bleed" ? transition.scrollY : 0}
+            />
+          }
+          start={transition.effect === "peel" || pathname === transition.href}
           onCompleteAction={handleComplete}
         />
       )}
