@@ -6,6 +6,7 @@
 import type { JournalEntryMeta } from "@/lib/journal-meta";
 import HomeContent from "@/components/HomeContent";
 import SideNav from "@/components/nav/SideNav";
+import MobileIndexNav from "@/components/nav/MobileIndexNav";
 
 /** Inert full-document copy of home.
     scrollY: the origin scroll offset at navigate time (bleed leaves home from
@@ -30,8 +31,9 @@ export default function HomeLayer({
           <HomeContent journalEntries={notes} />
         </div>
       </div>
-      {/* outside the transformed doc — stays viewport-fixed like the real rail */}
+      {/* outside the transformed doc — stays viewport-fixed like the real chrome */}
       <SideNav frozenAt={scrollY} />
+      <MobileIndexNav frozenAt={scrollY} />
     </div>
   );
 }
