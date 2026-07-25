@@ -103,7 +103,12 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" type="image/png" />
         <StructuredData />
       </head>
+      {/* Extensions (Grammarly, password managers) stamp attributes onto <body>
+          before React hydrates, which React reports as a mismatch. This
+          suppresses only this element's own attributes — mismatches in the tree
+          below still surface. */}
       <body
+        suppressHydrationWarning
         className={`${caveat.variable} ${kalam.variable} ${jetbrainsMono.variable} ${newsreader.variable} antialiased`}
       >
         <HydrationTrigger />

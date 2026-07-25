@@ -26,13 +26,13 @@ export function SectionHeaderArrow({
   meta: string;
 }) {
   return (
-    <div className="relative mb-8 pb-3 border-b-2 border-dashed border-ink">
+    <div className="sh-arrow relative mb-8 pb-3 border-b-2 border-dashed border-ink">
       <svg
         viewBox="0 0 220 90"
         width="180"
         height="74"
         aria-hidden="true"
-        className="absolute -top-7 -left-2.5 pointer-events-none overflow-visible"
+        className="sh-arrow-svg absolute -top-7 -left-2.5 pointer-events-none overflow-visible"
       >
         <path
           d="M 8 14 C 60 4, 110 38, 150 62"
@@ -59,10 +59,10 @@ export function SectionHeaderArrow({
           the work ↘
         </text>
       </svg>
-      <div className="flex items-baseline gap-[18px] pl-[170px]">
-        <span className="mono text-sm text-ink-soft">{num}.</span>
+      <div className="sh-arrow-row flex items-baseline gap-[18px] pl-[170px]">
+        <span className="sh-num mono text-sm text-ink-soft">{num}.</span>
         <h2 className="flex-1 m-0">{title}</h2>
-        <span className="mono text-xs text-ink-soft text-right">{meta}</span>
+        <span className="sh-meta mono text-xs text-ink-soft text-right">{meta}</span>
       </div>
     </div>
   );
@@ -78,9 +78,9 @@ export function SectionHeaderStamp({
   meta: string;
 }) {
   return (
-    <div className="relative mb-8 pb-3 border-b-2 border-dashed border-ink flex items-center gap-[22px] flex-wrap">
+    <div className="sh-stamp relative mb-8 pb-3 border-b-2 border-dashed border-ink flex items-center gap-[22px] flex-wrap">
       <div
-        className="relative border-2 border-ink rounded-[3px] px-[22px] pt-2 pb-2.5"
+        className="sh-stamp-box relative border-2 border-ink rounded-[3px] px-[22px] pt-2 pb-2.5"
         style={{
           background: "color-mix(in oklab, var(--color-coral) 12%, var(--color-paper))",
           transform: "rotate(-1.2deg)",
@@ -96,12 +96,18 @@ export function SectionHeaderStamp({
         </div>
         <h2 className="m-0 text-[56px] leading-none">{title}</h2>
       </div>
-      <svg viewBox="0 0 200 40" width="180" height="36" aria-hidden="true" className="shrink-0">
+      <svg
+        viewBox="0 0 200 40"
+        width="180"
+        height="36"
+        aria-hidden="true"
+        className="sh-stamp-rule shrink-0"
+      >
         <line x1="2" y1="12" x2="198" y2="12" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
         <line x1="2" y1="20" x2="198" y2="20" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
         <line x1="2" y1="28" x2="198" y2="28" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
       </svg>
-      <span className="mono text-xs text-ink-soft ml-auto">{meta}</span>
+      <span className="sh-meta mono text-xs text-ink-soft ml-auto">{meta}</span>
     </div>
   );
 }

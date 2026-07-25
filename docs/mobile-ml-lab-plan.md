@@ -38,7 +38,7 @@ models in `public/models/` + the k-means from `main` · bottom dock nav removed.
 
 ## Workstream A — Mobile pass
 
-### A1. Mobile nav: index chip + full-screen overlay (replaces bottom dock)
+### A1. Mobile nav: index chip + full-screen overlay (replaces bottom dock) — SHIPPED (2026-07-24, as PR 3)
 - New `components/nav/MobileIndexNav.tsx`: floating "index" chip (hamburger
   lines + mono label, `≤900px` only) opening a full-screen notebook-ruled
   overlay — numbered list, hand-font labels, dotted leader, `← here` marker on
@@ -48,7 +48,7 @@ models in `public/models/` + the k-means from `main` · bottom dock nav removed.
 - Chip hides while overlay is open; overlay animates in (`navIn` 280ms).
 - A11y: overlay traps focus, `Esc` closes, chip gets `aria-expanded`.
 
-### A2. Section-level mobile treatments (≤720px unless noted)
+### A2. Section-level mobile treatments (≤720px unless noted) — SHIPPED (2026-07-24, with A3 as PR 4)
 The prototype's 393px phone frame is a **design canvas, not a target width**.
 Everything is built fluid: relative units, `clamp()` type sizes, intrinsic
 grids — must hold from ~320px (SE) through ~430px+ (Pro Max) and the tablet
@@ -75,7 +75,7 @@ matching how the codebase already handles breakpoints):
 - **Inline asides:** `m-aside` pattern (dashed accent border, `✎ note` mark)
   as the mobile home for floating margin notes that currently hide/overlap.
 
-### A3. Motion
+### A3. Motion — SHIPPED (2026-07-24, with A2 as PR 4)
 - Scale ink transition durations on small viewports (~1050ms fwd / 820ms back
   under 720px) — declarative, computed once at navigate time.
 

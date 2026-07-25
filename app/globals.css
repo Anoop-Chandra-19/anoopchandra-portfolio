@@ -243,9 +243,39 @@ a { color: var(--color-ink); }
   font-size: 18px;
 }
 
+/* ---- Section pieces with a desktop-only flourish ---- */
+/* These live in CSS (rather than inline styles) so the mobile pass can undo
+   them declaratively. Per-instance values ride custom properties. */
+
+/* §01 — each Now card sits at its own slight angle */
+.now-card { transform: rotate(var(--rot, 0deg)); }
+
+/* §02 — project slabs alternate which side the image sits on */
+.project-slab { grid-template-columns: var(--slab-cols, 1.4fr 1fr); }
+
+/* §05 — the index reads as a ledger: page no. / title / read / date */
+.notes-header,
+.notes-row { grid-template-columns: 44px 1fr 90px 64px; }
+
+/* §05 — the tag reads as a notebook edge tab: open on the right, tucked into
+   the page edge. Only its colour is set inline. */
+.notes-edge-tab {
+  font-family: var(--font-mono);
+  border: 1.2px solid;
+  border-right: none;
+  border-radius: 3px 0 0 3px;
+}
+
+/* §06 — the postcard lies slightly askew on the desk */
+.postcard { transform: rotate(-0.6deg); }
+
 /* ============================================================ */
-/* ---- Mobile / responsive (primitives only) ----              */
+/* ---- Mobile / responsive ----                                */
 /* ============================================================ */
+/* The design's phone frame is 393px wide, but that's a canvas, not a target:
+   everything below is fluid and verified from ~320px through the tablet range.
+   Section treatments are ported from the design's `m-*` classes onto the
+   existing desktop markup — same components, one code path. */
 
 @media (max-width: 1100px) {
   h1 { font-size: 80px; }
@@ -255,44 +285,223 @@ a { color: var(--color-ink); }
   .section { margin: 64px 0; }
 }
 
+/* ---- Tablet: the two-up project slabs run out of room first ---- */
+@media (max-width: 820px) {
+  .project-slab { grid-template-columns: 1fr; }
+  /* Image on top for every slab, whichever side it takes at desktop. The
+     slab's side borders become a single rule between image and copy. */
+  .project-media {
+    order: 1;
+    border: none;
+    border-bottom: 2px solid var(--color-ink);
+    min-height: 220px;
+  }
+  .project-content { order: 2; padding: 24px; }
+  .project-content h3 { font-size: 26px; }
+}
+
 @media (max-width: 720px) {
-  html, body { font-size: 16px; }
+  /* ---- type scale + shell ---- */
+  html, body { font-size: 15px; }
 
-  h1 { font-size: 56px; line-height: 0.98; letter-spacing: 0.3px; }
-  h2 { font-size: 36px; }
-  h3 { font-size: 24px; line-height: 1.15; }
-  h4 { font-size: 20px; }
+  h1 { font-size: clamp(42px, 13.5vw, 58px); line-height: 0.94; letter-spacing: 0.3px; }
+  h2 { font-size: clamp(26px, 7.6vw, 34px); line-height: 1; }
+  h3 { font-size: clamp(19px, 5.4vw, 22px); line-height: 1.12; }
+  h4 { font-size: 18px; }
 
-  .page { padding: 28px 18px 96px; max-width: 100%; }
-  .section { margin: 48px 0; position: relative; }
+  .page { padding: 26px 18px 88px; max-width: 100%; }
+  .section { margin: 44px 0; position: relative; }
+  .divider { margin: 44px 0; }
 
-  .section-header { flex-wrap: wrap; gap: 8px 14px; margin-bottom: 20px; padding-bottom: 6px; border-bottom-width: 1.5px; }
-  .section-header .num { order: 1; }
-  .section-header .meta { order: 2; margin-left: auto; text-align: right; }
-  .section-header h2 { order: 3; flex: 1 0 100%; margin: 4px 0 0; }
+  .row { flex-direction: column; gap: 14px; }
+  .col { gap: 14px; }
+  .marker-highlight { padding: 0 3px; }
+  .note { font-size: 20px; }
 
-  .row { flex-direction: column; gap: 16px; }
-
-  .sketch-box { padding: 16px; border-radius: 5px; }
+  /* No chaotic tilts on a narrow screen — they cost horizontal room and read
+     as misalignment rather than personality at this size. */
+  .sketch-box { padding: 16px; border-radius: 6px; }
   .sketch-box.tilt-l, .sketch-box.tilt-r { transform: none; }
+  .chip, .chip + .chip { transform: none; }
+  /* …but the edge-to-edge cards keep their zero padding */
+  .project-slab,
+  .featured-slab,
+  .lab-card-btn .sketch-box { padding: 0; }
+
+  /* Section intro paragraph under each header */
+  .section > p.faint { font-size: 14px; margin-bottom: 16px; }
+
+  /* ---- section headers: number + meta on one baseline row, title below ---- */
+  .section-header { flex-wrap: wrap; gap: 6px 14px; margin-bottom: 20px; padding-bottom: 8px; }
+  .section-header .num { order: 1; font-size: 12px; }
+  .section-header .meta { order: 2; margin-left: auto; text-align: right; }
+  .section-header h2 { order: 3; flex: 1 0 100%; margin: 6px 0 0; }
+
+  /* §02's hand-drawn arrow and §06's postmark rule are desktop flourishes that
+     need horizontal room the phone doesn't have. Drop them and fall back to
+     the same number/meta/title stack. */
+  .sh-arrow { margin-bottom: 20px; padding-bottom: 8px; }
+  .sh-arrow-svg { display: none; }
+  .sh-arrow-row { flex-wrap: wrap; gap: 6px 14px; padding-left: 0; }
+  .sh-arrow-row .sh-num { order: 1; }
+  .sh-arrow-row .sh-meta { order: 2; margin-left: auto; }
+  .sh-arrow-row h2 { order: 3; flex: 1 0 100%; margin: 6px 0 0; }
+
+  .sh-stamp { gap: 12px; margin-bottom: 20px; }
+  .sh-stamp-rule { display: none; }
+  .sh-stamp-box { padding: 6px 16px 8px; }
+  .sh-stamp-box h2 { font-size: clamp(30px, 9vw, 40px); }
+
+  /* ---- 00 hero: kicker, portrait, then the type stack ---- */
+  /* Desktop is a two-column grid with the portrait beside the copy; on a phone
+     the design leads with the portrait, so the columns dissolve (display:
+     contents) into one ordered flex stack. */
+  /* The hero owns the landing screen: it fills the viewport minus the page's own
+     top padding, and the stack centres in whatever height is left over. svh (not
+     vh) so a visible mobile URL bar doesn't push the status line off-screen. */
+  .hero-section {
+    min-height: calc(100svh - 26px);
+    margin-top: 0;
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hero-grid { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .hero-text { display: contents; }
+  .hero-kicker   { order: 1; padding-right: 116px; } /* clears the index chip */
+  /* The portrait is the section's shock absorber: it takes as much room as the
+     viewport allows so the stack below it still lands above the fold on short
+     phones. */
+  .hero-portrait { order: 2; width: min(300px, 74vw, 34svh); margin: 18px auto 22px; }
+  .hero-title    { order: 3; margin: 0 0 4px; }
+  .hero-tagline  { order: 4; margin-top: 12px; font-size: 20px; }
+  .hero-lede     { order: 5; margin-top: 16px; font-size: 16px; }
+  .hero-chips    { order: 6; margin-top: 18px; gap: 8px; }
+  .hero-status   { order: 7; margin-top: 20px; }
+  .hero-portrait-box { width: 100%; }
+  /* The note rides the portrait's own corner — with the wrapper shrunk to the
+     portrait, "right/left" are its edges rather than the page's. */
+  .hero-note-a { top: -10px; left: -10px; right: auto; }
+  /* "↗ that's me" is redundant once the portrait leads the section */
+  .hero-note-b { display: none; }
+
+  /* ---- 01 now ---- */
+  .now-well { padding: 18px; border-radius: 8px; }
+  .now-card { transform: none; }
+
+  /* ---- 02 work ---- */
+  .exp-card { grid-template-columns: 1fr; gap: 14px; }
+  .exp-card p { font-size: 15px; }
+
+  .featured-tab { left: 16px; }
+  .featured-hero { min-height: 160px; }
+  .featured-hero img { max-height: 220px; }
+
+  /* A long group label shrinks the dashed line to nothing before it wraps
+     itself. Pinning the line's width flips that: the label wraps, the rule
+     survives. */
+  .group-rule { gap: 10px; }
+  .group-rule-line { flex-shrink: 0; min-width: 20px; }
+  .featured-body { grid-template-columns: 1fr; gap: 16px; padding: 18px; }
+  .featured-body h3 { font-size: clamp(24px, 7vw, 30px); }
+  .featured-body p { font-size: 15px; }
+
+  .project-media { min-height: 0; padding: 16px; }
+  .project-media img { max-height: 190px; }
+  .project-content { padding: 18px; }
+  .project-content h3 { font-size: clamp(22px, 6.4vw, 26px); }
+  .project-content p { font-size: 15px; }
+
+  /* ---- 03 the lab ---- */
+  .lab-card-canvas { height: 120px; }
+  /* the lift is a pointer affordance; on touch it sticks after a tap */
+  .lab-card-btn:hover { transform: none; }
+
+  /* ---- 04 stack ---- */
+  /* the legend stacks, so its inline "·" separator has nothing to separate */
+  .stack-legend { flex-direction: column; gap: 3px; }
+  .stack-legend-sep { display: none; }
+
+  /* ---- 05 notes ---- */
+  /* Notebook page: narrower gutter, and each row becomes title-over-meta with
+     the page number spanning both lines in the margin. */
+  .notes-book { padding: 14px 14px 12px 42px; }
+  .notes-margin-rule { left: 30px; }
+  .notes-index-label { display: none; }
+  .notes-header { display: none; }
 
   .notes-row {
-    grid-template-columns: 90px 1fr !important;
-    grid-template-areas: "date title" "date meta" !important;
-    row-gap: 4px !important;
-    column-gap: 12px !important;
-    padding: 12px 16px !important;
+    grid-template-columns: 40px auto auto 1fr;
+    row-gap: 3px;
+    column-gap: 8px;
+    align-items: baseline;
+    padding: 11px 2px;
+    border-bottom: 1px dashed color-mix(in oklab, var(--color-ink) 12%, transparent);
   }
-  .notes-row .notes-date  { grid-area: date; align-self: start; }
-  .notes-row .notes-title { grid-area: title; white-space: normal !important; font-size: 16px !important; }
-  .notes-row .notes-meta  { grid-area: meta; display: flex; gap: 10px; align-items: center; }
-  .notes-header { grid-template-columns: 90px 1fr !important; padding: 8px 16px !important; }
-  .notes-header > :nth-child(3),
-  .notes-header > :nth-child(4) { display: none; }
+  .notes-row .notes-date  { grid-area: 1 / 1 / 3 / 2; align-self: start; padding-top: 3px; }
+  .notes-row .notes-title { grid-area: 1 / 2 / 2 / 5; }
+  .notes-row .notes-title > .hand { white-space: normal; font-size: 19px; line-height: 1.14; }
+  .notes-leader { display: none; }
+  .notes-row .notes-read { grid-area: 2 / 2 / 3 / 3; text-align: left; font-size: 10px; }
+  .notes-row .notes-when { grid-area: 2 / 3 / 3 / 4; text-align: left; font-size: 10px; }
+  /* the edge tab has no page edge to tuck into here — it becomes a pill on the
+     meta line, which is where the design puts it */
+  .notes-edge-tab {
+    position: static;
+    grid-area: 2 / 4 / 3 / 5;
+    justify-self: end;
+    align-self: center;
+    transform: none;
+    min-width: 0;
+    padding: 1px 7px;
+    border-right: 1.2px solid;
+    border-radius: 3px;
+    font-size: 9px;
+  }
+  .notes-foot { margin-top: 10px; padding-top: 10px; }
 
-  .divider { margin: 56px 0; }
-  .marker-highlight { padding: 0 3px; }
-  .note { font-size: 18px; }
+  /* ---- 06 say hi ---- */
+  /* The postcard stacks: message side above, dashed fold, address side below. */
+  .postcard { transform: none; }
+  .contact-grid { grid-template-columns: 1fr; min-height: 0; }
+  .contact-grid h2 { font-size: clamp(38px, 11vw, 48px); }
+  .contact-message { padding: 26px 20px 20px; }
+  .contact-colophon {
+    border-left: none;
+    border-top: 2px dashed var(--color-ink);
+    padding: 20px;
+  }
+  .postcard-divider { display: none; }
+  .contact-stamps { margin-bottom: 16px; gap: 12px; }
+  .contact-postmark { width: 84px; height: 84px; }
+  /* the stamp's type has to come down with the frame or "$0.42" sits on the
+     perforation */
+  .contact-stamp { width: 74px; height: 90px; padding: 4px; }
+  .contact-stamp > .hand { font-size: 20px; }
+  .contact-stamp > .mono { margin-top: 4px; line-height: 1.3; }
+  .contact-stamp > .mono:last-child { font-size: 10px; }
+}
+
+/* ---- Very narrow phones (SE-class): the notebook row runs out of room for
+   four meta columns, so the read time drops and the gutter tightens. ---- */
+@media (max-width: 360px) {
+  /* every line wraps one step earlier here, so the hero rhythm tightens to keep
+     the whole stack on the landing screen */
+  h1 { font-size: 40px; }
+  .hero-portrait { margin: 12px auto 16px; }
+  .hero-tagline { margin-top: 10px; }
+  .hero-lede { margin-top: 12px; }
+  .hero-chips { margin-top: 14px; }
+  .hero-status { margin-top: 14px; }
+
+  .notes-book { padding: 14px 12px 12px 34px; }
+  .notes-margin-rule { left: 24px; }
+  .notes-row { grid-template-columns: 36px auto 1fr; column-gap: 7px; }
+  .notes-row .notes-title { grid-area: 1 / 2 / 2 / 4; }
+  .notes-row .notes-read { display: none; }
+  .notes-row .notes-when { grid-area: 2 / 2 / 3 / 3; }
+  .notes-edge-tab { grid-area: 2 / 3 / 3 / 4; }
 }
 
 /* ---- Nav: desktop rail vs. mobile index chip + overlay ---- */
@@ -412,37 +621,3 @@ a { color: var(--color-ink); }
 }
 .m-nav-ov-here { font-size: 18px; color: var(--color-electric); }
 .m-nav-overlay-foot { font-size: 10px; text-align: center; margin-top: 14px; }
-
-@media (max-width: 820px) {
-  .project-slab { grid-template-columns: 1fr !important; }
-  .project-slab .ph,
-  .project-slab > div:first-child {
-    border-left: none !important;
-    border-right: none !important;
-    border-bottom: 2px solid var(--color-ink) !important;
-    min-height: 200px !important;
-  }
-  .project-slab[data-flip="1"] { grid-auto-flow: row; }
-  .project-slab[data-flip="1"] > :first-child {
-    order: 2;
-    border-bottom: none !important;
-    border-top: 2px solid var(--color-ink) !important;
-  }
-  .project-slab[data-flip="1"] > :nth-child(2) { order: 1; }
-  .project-content { padding: 24px !important; }
-  .project-content h3 { font-size: 24px !important; }
-}
-
-@media (max-width: 720px) {
-  .contact-colophon {
-    border-left: none !important;
-    border-top: 2px dashed var(--color-ink) !important;
-    padding: 28px !important;
-  }
-  .contact-grid > :first-child { padding: 28px !important; }
-  .contact-grid h2 { font-size: 48px !important; }
-  .contact-grid { grid-template-columns: 1fr !important; }
-  .postcard-divider { display: none !important; }
-
-  #sec-now > div:nth-child(2) { padding: 24px !important; }
-}

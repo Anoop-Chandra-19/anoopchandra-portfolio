@@ -16,16 +16,16 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
       </p>
 
       <div className="relative">
-        <div className="bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
+        <div className="notes-book bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
           {/* Red margin rule */}
           <span
             aria-hidden="true"
-            className="absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
+            className="notes-margin-rule absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
             style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
           />
           {/* Rotated INDEX label */}
           <div
-            className="mono faint absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
+            className="mono faint notes-index-label absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
             style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
           >
             ✎ index — pp. {pad(Math.min(...pages))} — {pad(Math.max(...pages))}
@@ -33,10 +33,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
 
           <div
             className="mono faint notes-header grid gap-3.5 pt-0 pr-[90px] pb-3 pl-1.5 text-[9px] tracking-[2px] uppercase mb-1.5"
-            style={{
-              gridTemplateColumns: "44px 1fr 90px 64px",
-              borderBottom: "1px dashed var(--color-ink-faint)",
-            }}
+            style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
           >
             <span className="text-right">pg.</span>
             <span>title</span>
@@ -49,8 +46,9 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
               <li key={e.slug}>
                 <Link
                   href={`/journal/${e.slug}`}
+                  // the column track lives in CSS (not inline) so the mobile pass
+                  // can re-flow the row without an !important fight
                   className="notes-row grid gap-3.5 items-baseline py-3 pr-[90px] pl-1.5 relative no-underline transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
-                  style={{ gridTemplateColumns: "44px 1fr 90px 64px" }}
                   aria-label={`Open note: ${e.title}`}
                   onClick={(ev) => {
                     // keep native behavior for new-tab/window clicks
@@ -75,28 +73,27 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                     </span>
                     <span
                       aria-hidden="true"
-                      className="flex-1 h-0 min-w-6 -translate-y-1"
+                      className="notes-leader flex-1 h-0 min-w-6 -translate-y-1"
                       style={{ borderBottom: "1.5px dotted var(--color-ink-faint)" }}
                     />
                   </span>
 
-                  <span className="mono faint notes-meta text-[11px] text-right text-ink-soft">
+                  <span className="mono faint notes-meta notes-read text-[11px] text-right text-ink-soft">
                     {e.read}
                   </span>
 
-                  <span className="mono notes-meta text-[11px] text-right text-ink-soft">
+                  <span className="mono notes-meta notes-when text-[11px] text-right text-ink-soft">
                     {e.dateDisplay}
                   </span>
 
                   <span
                     aria-hidden="true"
                     className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-2.5 pr-2"
+                    // only the tag colour is dynamic — border/radius live in CSS
+                    // so the mobile pass can turn the edge tab into a pill
                     style={{
-                      fontFamily: "var(--font-mono)",
                       background: `color-mix(in oklab, ${tagColor(e.color)} 18%, var(--color-paper))`,
-                      border: `1.2px solid ${tagColor(e.color)}`,
-                      borderRight: "none",
-                      borderRadius: "3px 0 0 3px",
+                      borderColor: tagColor(e.color),
                       color: tagColor(e.color),
                     }}
                   >
@@ -108,7 +105,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
           </ul>
 
           <div
-            className="flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
+            className="notes-foot flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
             style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
           >
             <span className="mono faint text-[11px]">

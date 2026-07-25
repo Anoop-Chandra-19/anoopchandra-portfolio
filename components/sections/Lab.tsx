@@ -99,7 +99,7 @@ export default function Lab() {
                   </span>
                 </div>
                 <div
-                  className="h-40 flex items-center justify-center border-b-2 border-ink"
+                  className="lab-card-canvas h-40 flex items-center justify-center border-b-2 border-ink"
                   style={{ background: STRIPE_BG }}
                 >
                   <span className="hand text-[22px] text-ink-soft">{ACTIONS[e.slug]}</span>

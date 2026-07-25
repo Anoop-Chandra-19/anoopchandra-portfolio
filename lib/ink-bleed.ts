@@ -4,8 +4,23 @@
 
 export const FWD_MS = 1500;
 export const BACK_MS = 1100;
+/** Phone-sized viewports run the ceremony shorter — the durations the design's
+    mobile prototype uses (ink-bleed-mobile.js). There's less screen for the ink
+    to cross, so the desktop timing reads as a stall on a phone. */
+export const FWD_MS_SM = 1050;
+export const BACK_MS_SM = 820;
+/** Matches the CSS mobile breakpoint in globals.css */
+const SM_MAX_W = 720;
 export const JITTER = 0.22;
 export const INK = "#0e0c08";
+
+/** Chosen once at navigate time from the captured viewport — no resize tracking
+    mid-flight (the animation is ~1s and the viewport is locked anyway). */
+export const transitionMs = (effect: "bleed" | "peel", vw: number): number => {
+  const small = vw <= SM_MAX_W;
+  if (effect === "bleed") return small ? FWD_MS_SM : FWD_MS;
+  return small ? BACK_MS_SM : BACK_MS;
+};
 
 /** Reference viewport the spatter offsets were designed on */
 const DESIGN_MIN_DIM = 680;

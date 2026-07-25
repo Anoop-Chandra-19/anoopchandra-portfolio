@@ -135,9 +135,9 @@ export default function Stack() {
   return (
     <section id="sec-stack" className="section">
       <SectionHeader num="04" title="Stack" meta="grouped by where I use it" />
-      <div className="mono faint text-[11px] mb-[18px] flex gap-[18px] flex-wrap">
+      <div className="mono faint stack-legend text-[11px] mb-[18px] flex gap-[18px] flex-wrap">
         <span>tally marks = rough years of use</span>
-        <span>·</span>
+        <span className="stack-legend-sep">·</span>
         <span>circled = current obsession</span>
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">

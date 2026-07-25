@@ -34,7 +34,6 @@ export default function Contact() {
           style={{
             background: "color-mix(in oklab, var(--color-coral) 6%, var(--color-paper))",
             boxShadow: "6px 6px 0 color-mix(in oklab, var(--color-ink) 12%, transparent)",
-            transform: "rotate(-0.6deg)",
           }}
         >
           <span
@@ -44,7 +43,7 @@ export default function Contact() {
           />
 
           {/* LEFT — message side */}
-          <div className="pt-11 px-9 pb-9 relative z-[2]">
+          <div className="contact-message pt-11 px-9 pb-9 relative z-[2]">
             <div className="mono faint text-[10px] tracking-[3px] uppercase">
               ✎ message side
             </div>
@@ -102,13 +101,13 @@ export default function Contact() {
 
           {/* RIGHT — address side */}
           <div className="contact-colophon postcard-address pt-[30px] px-9 pb-9 relative z-[2] flex flex-col">
-            <div className="flex justify-between items-start mb-7 gap-5">
+            <div className="contact-stamps flex justify-between items-start mb-7 gap-5">
               {/* Postmark */}
               <svg
                 viewBox="0 0 130 130"
                 width="110"
                 height="110"
-                className="shrink-0 opacity-[0.78]"
+                className="contact-postmark shrink-0 opacity-[0.78]"
                 style={{ transform: "rotate(-9deg)" }}
               >
                 <circle cx="65" cy="65" r="58" fill="none" stroke="var(--color-electric)" strokeWidth="1.6" />
@@ -140,7 +139,7 @@ export default function Contact() {
 
               {/* Stamp */}
               <div
-                className="w-[92px] h-[110px] border-[1.5px] border-ink rounded-sm relative shrink-0 p-1.5 flex flex-col items-center justify-center text-center"
+                className="contact-stamp w-[92px] h-[110px] border-[1.5px] border-ink rounded-sm relative shrink-0 p-1.5 flex flex-col items-center justify-center text-center"
                 style={{
                   background: "color-mix(in oklab, var(--color-teal) 14%, var(--color-paper))",
                   transform: "rotate(2.5deg)",

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 const CARDS = [
@@ -34,15 +35,17 @@ export default function Now() {
     <section id="sec-now" className="section">
       <SectionHeader num="01" title="Now" meta="week of apr 29, 2026" />
       <div
-        className="p-10 rounded-lg"
+        className="now-well p-10 rounded-lg"
         style={{ background: "color-mix(in oklab, var(--color-coral) 8%, var(--color-paper-2))" }}
       >
         <div className="row items-stretch gap-6">
           {CARDS.map((c) => (
             <div
               key={c.h}
-              className="sketch-box flex-1 bg-paper"
-              style={{ transform: `rotate(${c.rot}deg)` }}
+              className="sketch-box now-card flex-1 bg-paper"
+              // rotation rides on a custom property so the mobile pass can zero
+              // it in CSS — an inline transform would need !important to undo
+              style={{ "--rot": `${c.rot}deg` } as CSSProperties}
             >
               <div className="mono faint text-[11px] mb-1.5">{c.tag}</div>
               <h4>{c.h}</h4>

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { SectionHeaderArrow } from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
@@ -126,7 +127,7 @@ function TagPill({ t }: { t: string }) {
 function ExperienceCard({ p, i }: { p: Experience; i: number }) {
   return (
     <article
-      className={`sketch-box ${i % 2 ? "tilt-r" : "tilt-l"} p-6 grid gap-[22px] items-start grid-cols-[minmax(180px,220px)_1fr]`}
+      className={`sketch-box exp-card ${i % 2 ? "tilt-r" : "tilt-l"} p-6 grid gap-[22px] items-start grid-cols-[minmax(180px,220px)_1fr]`}
     >
       <div>
         <div className="hand text-2xl leading-[1.05]" style={{ color: `var(--color-${p.k})` }}>
@@ -161,7 +162,7 @@ function ExperienceCard({ p, i }: { p: Experience; i: number }) {
 function ProjectImage({ p }: { p: Project }) {
   if (p.img) {
     return (
-      <div className="bg-paper-2 border-x-2 border-ink relative min-h-[280px] flex items-center justify-center p-5">
+      <div className="project-media bg-paper-2 border-x-2 border-ink relative min-h-[280px] flex items-center justify-center p-5">
         <Image
           src={p.img}
           alt={p.t}
@@ -173,7 +174,7 @@ function ProjectImage({ p }: { p: Project }) {
     );
   }
   return (
-    <div className="ph border-0 border-l-2 border-ink rounded-none min-h-[280px]">
+    <div className="project-media ph border-0 border-l-2 border-ink rounded-none min-h-[280px]">
       <div className="text-center p-5">
         <div className="hand text-[22px] text-ink mb-1.5">diagram coming</div>
         <div className="mono faint text-[11px] leading-[1.5]">{p.imgLabel}</div>
@@ -188,7 +189,9 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
     <article
       className="sketch-box project-slab p-0 overflow-hidden grid"
       data-flip={flip ? "1" : "0"}
-      style={{ gridTemplateColumns: flip ? "1fr 1.4fr" : "1.4fr 1fr" }}
+      // column track rides a custom property so the mobile collapse is a plain
+      // CSS override rather than an !important fight with the inline style
+      style={{ "--slab-cols": flip ? "1fr 1.4fr" : "1.4fr 1fr" } as CSSProperties}
     >
       {!flip && <ProjectImage p={p} />}
       <div className="project-content p-8">
@@ -219,11 +222,11 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
 function FeaturedSlab({ p }: { p: Project }) {
   return (
     <article className="sketch-box featured-slab p-0 overflow-hidden relative">
-      <div className="mono absolute -top-px left-6 z-[3] bg-ink text-paper text-[10px] tracking-[3px] uppercase pt-[5px] pb-1.5 px-3 rounded-b">
+      <div className="mono featured-tab absolute -top-px left-6 z-[3] bg-ink text-paper text-[10px] tracking-[3px] uppercase pt-[5px] pb-1.5 px-3 rounded-b">
         ★ featured project
       </div>
 
-      <div className="bg-paper-2 border-b-2 border-ink relative min-h-[320px] flex items-center justify-center overflow-hidden">
+      <div className="featured-hero bg-paper-2 border-b-2 border-ink relative min-h-[320px] flex items-center justify-center overflow-hidden">
         {p.img ? (
           <Image
             src={p.img}
@@ -277,10 +280,13 @@ function GroupRule({
   count: string;
 }) {
   return (
-    <div className="flex items-center gap-[18px]">
+    <div className="group-rule flex items-center gap-[18px]">
       <span className="mono faint text-[11px] tracking-[3px] uppercase">{label}</span>
-      <span className="flex-1 h-px" style={{ borderTop: "1.5px dashed var(--color-ink-faint)" }} />
-      <span className="mono faint text-[11px]">{count}</span>
+      <span
+        className="group-rule-line flex-1 h-px"
+        style={{ borderTop: "1.5px dashed var(--color-ink-faint)" }}
+      />
+      <span className="mono faint group-rule-count text-[11px]">{count}</span>
     </div>
   );
 }

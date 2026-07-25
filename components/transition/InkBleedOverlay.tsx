@@ -2,8 +2,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import type { InkEffect } from "@/components/transition/InkTransitionProvider";
 import {
-  BACK_MS,
-  FWD_MS,
   INK,
   SPATTERS,
   SPATTER_BIRTHS,
@@ -19,6 +17,7 @@ import {
   peelShadowGeom,
   spatterPath,
   spatterScale,
+  transitionMs,
 } from "@/lib/ink-bleed";
 
 const EMPTY_CLIP = "polygon(0px 0px, 0px 0px, 0px 0px)";
@@ -89,7 +88,7 @@ export default function InkBleedOverlay({
   // per-frame setState.
   useEffect(() => {
     if (!start) return;
-    const duration = effect === "bleed" ? FWD_MS : BACK_MS;
+    const duration = transitionMs(effect, vw);
     const maxR = maxRadius(cx, cy, vw, vh);
     const scale = spatterScale(vw, vh);
     const maxK = peelMaxK(vw, vh);
