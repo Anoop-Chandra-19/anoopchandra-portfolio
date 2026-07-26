@@ -65,7 +65,7 @@ export default function JournalIndex({
         <h1 className="mb-2">
           The <span className="text-electric">Journal</span>
         </h1>
-        <p className="hand text-[28px] leading-[1.25] mt-2.5 mb-0 max-w-[720px] text-ink-soft">
+        <p className="text-[19px] leading-[1.5] italic font-normal mt-2.5 mb-0 max-w-[720px] text-ink-soft">
           Case studies from shipped work, plus notes-in-progress — bug stories, hot takes, things
           I figured out the hard way.
         </p>
@@ -130,8 +130,8 @@ export default function JournalIndex({
                   p.{pad(e.page)}
                 </span>
 
-                <span className="journal-toc-title flex items-baseline min-w-0 gap-2 overflow-hidden">
-                  <span className="hand text-2xl leading-[1.1] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
+                <span className="journal-toc-title flex items-center min-w-0 gap-2 overflow-hidden">
+                  <span className="text-[18px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
                     {e.title}
                   </span>
                   {e.kind === "case" && (
@@ -179,7 +179,7 @@ export default function JournalIndex({
           <span className="mono faint text-[11px]">
             {visible.length} entries shown · {counts.case} case studies + {counts.note} notes
           </span>
-          <span className="hand text-lg text-ink-faint">tap any line to open the page ↦</span>
+          <span className="text-[15px] italic text-ink-faint">tap any line to open the page ↦</span>
         </div>
       </div>
 

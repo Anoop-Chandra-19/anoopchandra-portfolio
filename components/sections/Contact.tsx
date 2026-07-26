@@ -52,7 +52,7 @@ export default function Contact() {
               <br />
               talk.
             </h2>
-            <p className="hand mt-0 max-w-[360px] text-[22px] leading-[1.35] text-ink">
+            <p className="mt-0 max-w-[360px] text-[17px] leading-[1.6] text-ink">
               Open to{" "}
               <span className="marker-highlight purple">interesting full-stack + AI roles</span>,
               freelance gigs, and PC build advice over coffee.

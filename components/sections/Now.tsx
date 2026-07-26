@@ -49,7 +49,7 @@ export default function Now() {
             >
               <div className="mono faint text-[11px] mb-1.5">{c.tag}</div>
               <h4>{c.h}</h4>
-              <ul className="pl-[18px] mt-2 text-[15px] leading-[1.65]">
+              <ul className="pl-[18px] mt-2 text-[16px] leading-[1.6]">
                 {c.items.map((i) => (
                   <li key={i}>{i}</li>
                 ))}

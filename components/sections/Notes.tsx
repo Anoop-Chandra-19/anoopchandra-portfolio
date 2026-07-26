@@ -11,7 +11,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
   return (
     <section id="sec-notes" className="section">
       <SectionHeader num="05" title="Notes & Stories" meta={`${entries.length} entries · index`} />
-      <p className="faint max-w-[720px] mb-6 text-base">
+      <p className="faint max-w-[720px] mb-6">
         Working journal — bug stories, hot takes, things I figured out the hard way.
       </p>
 
@@ -67,8 +67,8 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                     p.{pad(e.page)}
                   </span>
 
-                  <span className="notes-title flex items-baseline min-w-0 gap-2 overflow-hidden">
-                    <span className="hand text-[22px] leading-[1.1] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
+                  <span className="notes-title flex items-center min-w-0 gap-2 overflow-hidden">
+                    <span className="text-[17px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
                       {e.title}
                     </span>
                     <span
@@ -113,7 +113,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
             </span>
             <Link
               href="/journal"
-              className="hand text-xl text-electric no-underline"
+              className="text-[16px] text-electric no-underline"
               onClick={(e) => {
                 e.preventDefault();
                 navigate("/journal", {

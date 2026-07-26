@@ -18,7 +18,9 @@ export default function Hero() {
             <br />
             <span className="anim-swipe d-name2 inline-block text-electric">chandra.</span>
           </h1>
-          <div className="hand anim-rise d-subtle hero-tagline mt-[18px] text-[26px]">
+          {/* A line of text, not a second headline. Deks are regular italic —
+              never bold. Size is not a licence to go bold. */}
+          <div className="anim-rise d-subtle hero-tagline mt-[18px] text-[19px] leading-[1.65] italic font-normal text-ink-soft">
             full-stack dev <span className="faint">×</span> AI engineer{" "}
             <span className="faint">×</span> linux daily-driver
           </div>

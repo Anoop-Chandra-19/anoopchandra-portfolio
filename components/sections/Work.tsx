@@ -130,7 +130,7 @@ function ExperienceCard({ p, i }: { p: Experience; i: number }) {
       className={`sketch-box exp-card ${i % 2 ? "tilt-r" : "tilt-l"} p-6 grid gap-[22px] items-start grid-cols-[minmax(180px,220px)_1fr]`}
     >
       <div>
-        <div className="hand text-2xl leading-[1.05]" style={{ color: `var(--color-${p.k})` }}>
+        <div className="text-[18px] leading-[1.25]" style={{ color: `var(--color-${p.k})` }}>
           @ {p.org}
         </div>
         <div className="mono faint text-[11px] mt-2 leading-[1.7]">
@@ -140,8 +140,8 @@ function ExperienceCard({ p, i }: { p: Experience; i: number }) {
       </div>
       <div className="min-w-0">
         <h3 className="mt-0 mb-2.5 text-[24px] leading-[1.18] tracking-[-0.012em]">{p.t}</h3>
-        <p className="mt-0 text-[15px] leading-[1.6] mb-3">{p.summary}</p>
-        <ul className="pl-[18px] mt-0 text-sm leading-[1.7]">
+        <p className="mt-0 text-[17px] leading-[1.6] mb-3">{p.summary}</p>
+        <ul className="pl-[18px] mt-0 text-[17px] leading-[1.7]">
           {p.contributions.map((b) => (
             <li key={b}>{b}</li>
           ))}
@@ -176,7 +176,7 @@ function ProjectImage({ p }: { p: Project }) {
   return (
     <div className="project-media ph border-0 border-l-2 border-ink rounded-none min-h-[280px]">
       <div className="text-center p-5">
-        <div className="hand text-[22px] text-ink mb-1.5">diagram coming</div>
+        <div className="text-[17px] text-ink mb-1.5">diagram coming</div>
         <div className="mono faint text-[11px] leading-[1.5]">{p.imgLabel}</div>
       </div>
     </div>
@@ -199,8 +199,8 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
           {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
         </div>
         <h3 className="mt-2 mb-3.5 text-[25px] leading-[1.18] tracking-[-0.012em]">{p.t}</h3>
-        <p className="mt-0 text-base max-w-[520px] mb-4">{p.d}</p>
-        <ul className="pl-[18px] mt-0 text-sm leading-[1.7]">
+        <p className="mt-0 text-[17px] max-w-[520px] mb-4">{p.d}</p>
+        <ul className="pl-[18px] mt-0 text-[17px] leading-[1.7]">
           {p.bullets.map((b) => (
             <li key={b}>{b}</li>
           ))}
@@ -242,7 +242,7 @@ function FeaturedSlab({ p }: { p: Project }) {
         <div>
           <div className="mono faint text-[11px] tracking-[2px] uppercase">{p.cat}</div>
           <h3 className="mt-2 mb-3.5 text-[30px] leading-[1.18] tracking-[-0.012em]">{p.t}</h3>
-          <div className="hand text-xl" style={{ color: `var(--color-${p.k})` }}>
+          <div className="text-[16px]" style={{ color: `var(--color-${p.k})` }}>
             @ {p.org}
           </div>
           <div className="mono faint text-[11px] mt-3.5 leading-[1.7]">
@@ -252,8 +252,8 @@ function FeaturedSlab({ p }: { p: Project }) {
           </div>
         </div>
         <div>
-          <p className="mt-0 text-[17px] leading-[1.6] mb-[18px]">{p.d}</p>
-          <ul className="pl-[18px] mt-0 text-[15px] leading-[1.75]">
+          <p className="mt-0 text-[18px] leading-[1.65] mb-[18px]">{p.d}</p>
+          <ul className="pl-[18px] mt-0 text-[17px] leading-[1.7]">
             {p.bullets.map((b) => (
               <li key={b}>{b}</li>
             ))}

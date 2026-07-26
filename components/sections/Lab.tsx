@@ -55,7 +55,7 @@ export default function Lab() {
   return (
     <section id="sec-lab" className="section" ref={sectionRef}>
       <SectionHeader num="03" title="The Lab" meta="3 live experiments · all in-browser" />
-      <p className="faint max-w-[720px] mb-7 text-base">
+      <p className="faint max-w-[720px] mb-7">
         Real ML running entirely in your browser with TensorFlow.js — no server, no cold starts.
         Everything below is live: open an experiment and try it.
       </p>
@@ -102,11 +102,11 @@ export default function Lab() {
                   className="lab-card-canvas h-40 flex items-center justify-center border-b-2 border-ink"
                   style={{ background: STRIPE_BG }}
                 >
-                  <span className="hand text-[22px] text-ink-soft">{ACTIONS[e.slug]}</span>
+                  <span className="text-[17px] text-ink-soft">{ACTIONS[e.slug]}</span>
                 </div>
                 <div className="p-[18px]">
                   <h4>{e.title}</h4>
-                  <p className="text-[13px] mt-1.5">{DESCRIPTIONS[e.slug]}</p>
+                  <p className="text-[16px] leading-[1.55] mt-1.5">{DESCRIPTIONS[e.slug]}</p>
                   <Chip>▸ open experiment</Chip>
                 </div>
               </div>
