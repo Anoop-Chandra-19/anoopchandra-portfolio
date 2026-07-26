@@ -127,14 +127,14 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
           {cents.map((c, i) => (
             <span
               key={`c${i}`}
-              className="lx-kcent hand"
+              className="lx-kcent"
               style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%`, color: `var(--color-${CLUSTER_COLORS[i]})` }}
             >
               ✕
             </span>
           ))}
           {!pts.length && (
-            <span className="hand lx-kfield-hint">click anywhere to drop points ··· or scatter ↓</span>
+            <span className="lx-kfield-hint">click anywhere to drop points ··· or scatter ↓</span>
           )}
         </div>
         <div className="lx-krow">
@@ -164,7 +164,7 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
       </div>
       <div className="lx-panel lx-out">
         <div className="mono faint lx-cap">$ kmeans --k {k}</div>
-        <div className="lx-kstat hand">
+        <div className="lx-kstat">
           {running
             ? `iterating… step ${iter}`
             : done

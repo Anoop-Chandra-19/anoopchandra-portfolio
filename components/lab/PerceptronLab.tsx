@@ -342,7 +342,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
             />
           ))}
           {!pts.length && (
-            <span className="hand lx-kfield-hint">
+            <span className="lx-kfield-hint">
               click to place points ··· switch colour below ··· click a point to flip it
             </span>
           )}
@@ -401,7 +401,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
         <div className="mono faint lx-cap">
           $ perceptron --lr {LR} --epochs {epochs}
         </div>
-        <div className="lx-kstat hand">
+        <div className="lx-kstat">
           {training
             ? `training… epoch ${cur ? cur.epoch : 1}`
             : w
@@ -429,7 +429,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           <div className="mono lx-cw">w = [{shownW.map((v) => v.toFixed(2)).join(", ")}]</div>
         )}
         {w && !training && acc < 1 && (
-          <div className="hand lx-cnote">
+          <div className="lx-cnote">
             {epochs >= EPOCHS
               ? "a straight line can't split these — that's the ceiling of a linear model."
               : `didn't converge in ${epochs} pass${epochs === 1 ? "" : "es"} — give it more epochs to keep going.`}

@@ -99,7 +99,9 @@ body:has([data-lab-root]) {
   line-height: 1;
 }
 .lx-blurb {
-  font-size: 21px;
+  font-size: 19px;
+  line-height: 1.5;
+  font-weight: 400;
   color: var(--color-ink-soft);
   margin: 0;
   max-width: 640px;
@@ -177,7 +179,9 @@ body:has([data-lab-root]) {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 22px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.6;
   color: var(--color-ink-faint);
   pointer-events: none;
   white-space: nowrap;
@@ -207,8 +211,11 @@ body:has([data-lab-root]) {
   padding-left: 28px;
 }
 .lx-empty {
-  font-size: 20px;
-  line-height: 1.5;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 42ch;
+  color: var(--color-ink-soft);
   margin-top: 14px;
 }
 .lx-guess {
@@ -230,8 +237,10 @@ body:has([data-lab-root]) {
   color: var(--color-ink-faint);
 }
 .lx-g-name {
-  font-size: 23px;
-  line-height: 1;
+  font-family: var(--font-body);
+  font-size: 21px;
+  line-height: 1.1;
+  font-weight: 400;
 }
 .lx-bar {
   height: 12px;
@@ -282,9 +291,11 @@ body:has([data-lab-root]) {
   font-weight: 600;
   font-size: 34px;
   line-height: 1;
+  letter-spacing: -0.015em;
   margin-top: 6px;
 }
 .lx-verdict-pct {
+  font-family: var(--font-body);
   font-size: 16px;
   margin-left: 8px;
   color: var(--color-ink-soft);
@@ -336,7 +347,8 @@ body:has([data-lab-root]) {
   margin-left: 1px;
 }
 .lx-hint2 {
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
   margin-top: 12px;
   max-width: 340px;
   line-height: 1.5;
@@ -351,7 +363,9 @@ body:has([data-lab-root]) {
   display: flex;
   justify-content: space-between;
   gap: 14px;
+  font-family: var(--font-mono);
   font-size: 12px;
+  letter-spacing: -0.01em;
   border-bottom: 1px dashed color-mix(in oklab, var(--color-ink) 12%, transparent);
   padding-bottom: 8px;
 }
@@ -386,9 +400,12 @@ body:has([data-lab-root]) {
   transform: translate(-50%, -50%);
   transition: background 0.3s;
 }
+/* A plot marker the algorithm placed, not a label — mono, and a size down
+   from v2 because the glyph renders larger here than it did in Kalam. */
 .lx-kcent {
   position: absolute;
-  font-size: 28px;
+  font-family: var(--font-mono);
+  font-size: 22px;
   font-weight: 700;
   transform: translate(-50%, -52%);
   transition: left 0.55s cubic-bezier(0.3, 0.7, 0.3, 1), top 0.55s cubic-bezier(0.3, 0.7, 0.3, 1);
@@ -400,7 +417,9 @@ body:has([data-lab-root]) {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 20px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.65;
   color: var(--color-ink-faint);
   pointer-events: none;
   white-space: nowrap;
@@ -447,7 +466,10 @@ body:has([data-lab-root]) {
   flex: 1;
 }
 .lx-kstat {
-  font-size: 22px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-ink-soft);
   margin: 6px 0 18px;
 }
 .lx-klegend {
@@ -515,10 +537,12 @@ body:has([data-lab-root]) {
   margin-top: 16px;
 }
 .lx-cnote {
-  font-size: 19px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
   color: var(--color-ink-soft);
   margin-top: 10px;
-  max-width: 30ch;
+  max-width: 42ch;
 }
 
 /* ---- bench boot (model loading transcript in the output panel) ---- */
@@ -574,8 +598,8 @@ body:has([data-lab-root]) {
   color: var(--lxa);
 }
 .lx-aside-body {
-  font-size: 19px;
-  line-height: 1.45;
+  font-size: 17.5px;
+  line-height: 1.55;
   color: var(--color-ink);
 }
 

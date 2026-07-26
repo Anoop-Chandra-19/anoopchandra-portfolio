@@ -59,14 +59,14 @@ export default function LabShell({ exp }: { exp: LabExp }) {
           live
         </span>
         <h1 className="lx-title">{exp.title}</h1>
-        <p className="hand lx-blurb">{exp.blurb}</p>
+        <p className="lx-blurb">{exp.blurb}</p>
       </header>
 
       <Demo accent={exp.accent} />
 
       <div className="lx-aside">
         <span className="lx-aside-mark mono">✎ how it actually works</span>
-        <span className="hand lx-aside-body">{exp.foot}</span>
+        <span className="lx-aside-body">{exp.foot}</span>
       </div>
     </main>
   );

@@ -186,7 +186,7 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
         <div className="mono faint lx-cap">draw here ✎</div>
         <div className="lx-canvaswrap">
           <canvas ref={canvasRef} width={360} height={360} className="lx-canvas" />
-          {!has && <span className="hand lx-canvas-hint">try a bird, bee, bicycle…</span>}
+          {!has && <span className="lx-canvas-hint">try a bird, bee, bicycle…</span>}
         </div>
         <div className="lx-prevrow">
           <div>
@@ -210,7 +210,7 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
             {guesses.map((g, i) => (
               <li key={g.name}>
                 <span className="mono lx-g-rank">{i + 1}.</span>
-                <span className="hand lx-g-name">{g.name}</span>
+                <span className="lx-g-name">{g.name}</span>
                 <span className="lx-bar">
                   <span className="lx-bar-fill" style={{ width: `${Math.round(g.p * 100)}%` }} />
                 </span>
