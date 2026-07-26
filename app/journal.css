@@ -114,7 +114,11 @@ body:has([data-journal-root]) {
    plate numbers auto-increment via CSS counters — authors never
    number by hand. Hero is plate 000, set in ArticleEntry. */
 
-.je{font-family:var(--font-display);color:var(--color-ink)}
+/* One measure for the whole reading column. 64ch at the journal's 20px
+   reading size resolves to 640px — kept in px, not ch, because `ch` resolves
+   against each element's OWN size, which would put the h3s at 763px and the
+   lists at 614px and leave the column edge ragged. */
+.je{font-family:var(--font-display);color:var(--color-ink);--je-measure:640px}
 .je-plate{counter-increment:plate}
 /* decimal-leading-zero only pads to 2 digits (01, 02…10…) — the hero plate
    is hardcoded "plate 000" (3 digits), so inline plates need their own
@@ -159,34 +163,34 @@ body:has([data-journal-root]) {
 /* body — reading column + red margin rule */
 .je-body{position:relative;width:100%;padding-left:58px;counter-reset:sec plate}
 .je-rule{position:absolute;left:28px;top:-4px;bottom:60px;width:1.4px;background:color-mix(in oklab,var(--color-coral) 72%,transparent);opacity:.65}
-.je-body p{font-family:var(--font-display);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:600px;color:var(--color-ink);text-wrap:pretty}
+.je-body p{font-family:var(--font-display);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:var(--je-measure);color:var(--color-ink);text-wrap:pretty}
 .je-ic{font-family:var(--font-mono);font-size:.8em;background:color-mix(in oklab,var(--color-ink) 7%,var(--color-paper-2));border:1px solid var(--color-ink-faint);border-radius:3px;padding:1px 5px}
 .je-body strong{font-weight:600}
 .je-body a{color:var(--color-electric);text-decoration:none;border-bottom:1.5px dotted color-mix(in oklab,var(--color-electric) 55%,transparent)}
 .je-body a:hover{color:var(--color-ink);border-bottom-color:var(--color-ink)}
 .je-hl{background:linear-gradient(180deg,transparent 58%,color-mix(in oklab,var(--color-coral) 58%,#fff) 58%,color-mix(in oklab,var(--color-coral) 58%,#fff) 94%,transparent 94%);color:inherit;padding:0 3px}
 
-.je-h2{margin:44px 0 16px;max-width:640px;counter-increment:sec}
+.je-h2{margin:44px 0 16px;max-width:var(--je-measure);counter-increment:sec}
 .je-secn{display:block;font-family:var(--font-accent);font-weight:600;font-size:20px;color:var(--color-coral);line-height:1;margin-bottom:2px}
 .je-secn::before{content:"\270E \A7" counter(sec,decimal-leading-zero)}
 .je-h2 h2{font-family:var(--font-display);font-weight:600;font-size:33px;line-height:1.12;margin:0;color:var(--color-ink);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:color-mix(in oklab,var(--color-coral) 55%,transparent);text-decoration-thickness:1.6px;text-underline-offset:9px}
-.je-body h3{font-family:var(--font-display);font-weight:600;font-size:24px;line-height:1.2;margin:28px 0 10px;max-width:600px;color:var(--color-ink)}
+.je-body h3{font-family:var(--font-display);font-weight:600;font-size:24px;line-height:1.2;margin:28px 0 10px;max-width:var(--je-measure);color:var(--color-ink)}
 
-.je-ul{list-style:none;padding:0;margin:6px 0 24px;max-width:600px}
+.je-ul{list-style:none;padding:0;margin:6px 0 24px;max-width:var(--je-measure)}
 .je-ul li{position:relative;padding-left:28px;font-family:var(--font-display);font-size:19px;line-height:1.6;margin-bottom:11px}
 .je-ul li::before{content:"";position:absolute;left:2px;top:11px;width:8px;height:8px;border:1.6px solid var(--color-coral);border-radius:2px;transform:rotate(45deg)}
-.je-ol{padding-left:26px;margin:6px 0 24px;max-width:600px;font-family:var(--font-display);font-size:19px;line-height:1.6}
+.je-ol{padding-left:26px;margin:6px 0 24px;max-width:var(--je-measure);font-family:var(--font-display);font-size:19px;line-height:1.6}
 .je-ol li{margin-bottom:9px}
 .je-ol li::marker{font-family:var(--font-mono);font-size:13px;color:var(--color-coral)}
 
 /* boxed callout: lives inline in the reading column */
 /* Phase 5 moves this to tinted serif at body size — a callout carries
    information you must read, and Caveat is never load-bearing. */
-.je-callout{max-width:560px;margin:24px 0;font-family:var(--font-accent);font-weight:600;font-size:23px;line-height:1.32;color:var(--color-ink);background:color-mix(in oklab,var(--color-coral) 10%,var(--color-paper));border:1.5px dashed var(--color-coral);border-radius:7px;padding:16px 18px}
+.je-callout{max-width:var(--je-measure);margin:24px 0;font-family:var(--font-display);font-weight:400;font-size:20px;line-height:1.6;color:var(--color-ink);background:color-mix(in oklab,var(--color-coral) 10%,var(--color-paper));border:1.5px dashed var(--color-coral);border-radius:7px;padding:16px 18px}
 .je-callout .lbl{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-coral);margin-bottom:6px}
 
 /* code */
-.je-code{margin:26px 0;max-width:640px;border:1.5px solid var(--color-ink);border-radius:7px;overflow:hidden}
+.je-code{margin:26px 0;max-width:var(--je-measure);border:1.5px solid var(--color-ink);border-radius:7px;overflow:hidden}
 .je-code .bar{display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1.5px solid var(--color-ink);background:var(--color-paper)}
 .je-code .prompt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-coral);letter-spacing:-1px}
 .je-code .fn{font-family:var(--font-mono);font-size:11px;color:var(--color-ink-soft)}
@@ -194,7 +198,9 @@ body:has([data-journal-root]) {
 .je-code pre code{font-family:inherit;font-size:inherit;background:none;border:none;padding:0}
 
 /* pull quote */
-.je-quote{position:relative;margin:36px 0 36px -8px;max-width:600px;padding:6px 0 6px 26px;border-left:3px solid var(--color-coral)}
+/* Hangs 8px left into the margin rule, so it needs 8px more width to still
+   land on the column's shared right edge. */
+.je-quote{position:relative;margin:36px 0 36px -8px;max-width:calc(var(--je-measure) + 8px);padding:6px 0 6px 26px;border-left:3px solid var(--color-coral)}
 .je-quote p{font-family:var(--font-accent);font-weight:600;font-size:36px;line-height:1.22;color:var(--color-ink);margin:0}
 .je-quote cite{display:block;font-family:var(--font-mono);font-style:normal;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);margin-top:12px}
 
@@ -204,7 +210,7 @@ body:has([data-journal-root]) {
 .je-callout p:last-child{margin-bottom:0}
 .je-plate figcaption p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
 
-.je-end{display:flex;justify-content:space-between;max-width:600px;font-family:var(--font-mono);font-size:11px;color:var(--color-ink-faint);margin-top:34px;padding-top:14px;border-top:1px dashed var(--color-ink-faint)}
+.je-end{display:flex;justify-content:space-between;max-width:var(--je-measure);font-family:var(--font-mono);font-size:11px;color:var(--color-ink-faint);margin-top:34px;padding-top:14px;border-top:1px dashed var(--color-ink-faint)}
 
 /* footer / prev-next */
 .je-foot{margin-top:52px;padding-top:24px;border-top:2px solid var(--color-ink)}
