@@ -4,10 +4,20 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import type { JournalEntryMeta } from "@/lib/journal-meta";
+import type { JournalEntryMeta, Section } from "@/lib/journal-meta";
 
-export type { JournalEntryMeta };
+export type { JournalEntryMeta, Section };
 export { pad, tabColors } from "@/lib/journal-meta";
+
+/** Mirrors github-slugger closely enough for our headings: lowercase, strip
+ *  anything that isn't a word char/space/hyphen, spaces → hyphens. */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
 
 export type JournalEntry = JournalEntryMeta & {
   /** raw MDX body (compiled by <MDXRemote> on the article page) */
@@ -49,7 +59,7 @@ function parseEntry(file: string): JournalEntry {
   const raw = fs.readFileSync(path.join(CONTENT_DIR, file), "utf8");
   const { data, content } = matter(raw);
 
-  for (const field of ["title", "kind", "date", "tag", "page", "dek"]) {
+  for (const field of ["title", "kind", "date", "tag", "dek"]) {
     if (data[field] === undefined || data[field] === null || data[field] === "") {
       fail(file, `missing required frontmatter field "${field}"`);
     }
@@ -57,9 +67,6 @@ function parseEntry(file: string): JournalEntry {
   if (!oneOf(data.kind, KINDS)) fail(file, `"kind" must be one of ${KINDS.join(" | ")}`);
   if (data.status !== undefined && !oneOf(data.status, STATUSES)) {
     fail(file, `"status" must be one of ${STATUSES.join(" | ")}`);
-  }
-  if (typeof data.page !== "number" || !Number.isInteger(data.page) || data.page < 1) {
-    fail(file, `"page" must be a positive integer, got ${JSON.stringify(data.page)}`);
   }
   if (data.hero && !data.heroAlt) fail(file, `"heroAlt" is required when "hero" is set`);
   if (data.related !== undefined && !Array.isArray(data.related)) {
@@ -76,7 +83,8 @@ function parseEntry(file: string): JournalEntry {
     dateDisplay: displayDate(date, file),
     read: readTime(content),
     tag: String(data.tag),
-    page: data.page,
+    no: 0,
+    page: 0,
     dek: String(data.dek),
     sub: data.sub ? String(data.sub) : null,
     hero: data.hero ? String(data.hero) : null,
@@ -87,6 +95,10 @@ function parseEntry(file: string): JournalEntry {
     body: content,
   };
 }
+
+/** Page range of the whole notebook, for the index header ("pp. 003 — 051").
+ *  Populated by getEntries(); call that first. */
+export const BOOK = { first: 3, last: 3 };
 
 let cache: JournalEntry[] | null = null;
 
@@ -99,18 +111,27 @@ export function getEntries(): JournalEntry[] {
     .sort();
   const entries = files.map(parseEntry);
 
-  const pages = new Map<number, string>();
-  for (const e of entries) {
-    const dupe = pages.get(e.page);
-    if (dupe) fail(`${e.slug}.mdx`, `page ${e.page} is already used by ${dupe}.mdx`);
-    pages.set(e.page, e.slug);
-  }
   const slugs = new Set(entries.map((e) => e.slug));
   for (const e of entries) {
     for (const r of e.related) {
       if (!slugs.has(r)) fail(`${e.slug}.mdx`, `"related" references unknown slug "${r}"`);
     }
   }
+
+  // One continuous notebook: a page number only ever increases with time.
+  // Authored page numbers gave the newest entry the lowest number, which was
+  // internally consistent but broke the fiction. `no` (chronological entry
+  // number, shown in the ledger) and `page` (the leaf the entry starts on) are
+  // DIFFERENT numbers — don't collapse them.
+  const chrono = entries.slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  let cursor = 3; // p.001–002 are the cover leaf
+  chrono.forEach((e, i) => {
+    e.no = i + 1;
+    e.page = cursor;
+    cursor += Math.max(2, Math.round(parseInt(e.read, 10) / 2));
+  });
+  BOOK.first = 3;
+  BOOK.last = cursor - 1;
 
   entries.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   cache = entries;
@@ -155,4 +176,18 @@ export function getRelated(meta: JournalEntryMeta): JournalEntryMeta[] {
   return meta.related
     .map((slug) => entries.find((e) => e.slug === slug))
     .filter((e): e is JournalEntryMeta => Boolean(e));
+}
+
+/** `##` headings of an entry, for the § rail. Slugs match what rehype-slug
+ *  stamps on the rendered <h2 id>, so the rail's anchors resolve without any
+ *  client-side DOM scraping. */
+export function getSections(entry: JournalEntry): Section[] {
+  const out: Section[] = [];
+  const re = /^##\s+(.+)$/gm;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(entry.body))) {
+    const title = m[1].trim();
+    out.push({ n: out.length + 1, id: slugify(title), title });
+  }
+  return out;
 }

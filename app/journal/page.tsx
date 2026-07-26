@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getEntryMetas } from "@/lib/journal";
+import { BOOK, getEntryMetas } from "@/lib/journal";
 import JournalIndex from "@/components/journal/JournalIndex";
 
 export const metadata: Metadata = {
@@ -17,9 +17,12 @@ export const metadata: Metadata = {
 };
 
 export default function JournalPage() {
+  // BOOK is populated as a side effect of loading the entries, so read it
+  // after the call rather than relying on JSX prop evaluation order.
+  const entries = getEntryMetas();
   return (
     <div data-journal-root>
-      <JournalIndex entries={getEntryMetas()} />
+      <JournalIndex entries={entries} book={{ ...BOOK }} />
     </div>
   );
 }

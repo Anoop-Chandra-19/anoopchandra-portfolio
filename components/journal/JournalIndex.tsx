@@ -14,9 +14,13 @@ const FILTERS: ReadonlyArray<[Filter, string]> = [
 
 export default function JournalIndex({
   entries,
+  book,
   inert,
 }: {
   entries: JournalEntryMeta[];
+  /** page range of the whole notebook — the last leaf, not the last entry's
+   *  first leaf, so the header states the book's real extent */
+  book?: { first: number; last: number };
   /** true when rendered as a non-interactive copy inside the transition overlay */
   inert?: boolean;
 }) {
@@ -33,7 +37,9 @@ export default function JournalIndex({
   );
   const visible = filter === "all" ? entries : entries.filter((e) => e.kind === filter);
   const pages = entries.map((e) => e.page);
-  const ppRange = `pp. ${pad(Math.min(...pages))} — ${pad(Math.max(...pages))}`;
+  const first = book?.first ?? Math.min(...pages);
+  const last = book?.last ?? Math.max(...pages);
+  const ppRange = `pp. ${pad(first)} — ${pad(last)}`;
 
   return (
     <div className="page" inert={inert}>
@@ -70,8 +76,12 @@ export default function JournalIndex({
           I figured out the hard way.
         </p>
         <div
-          className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-[10px] tracking-[2px] uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral text-coral"
-          style={{ transform: "rotate(3deg)" }}
+          className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-[10px] tracking-[2px] uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
+          style={{
+            transform: "rotate(3deg)",
+            // small accent text mixes toward ink; the border stays pure coral
+            color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
+          }}
         >
           est. 2024 · updated weekly
         </div>
@@ -130,15 +140,13 @@ export default function JournalIndex({
                   p.{pad(e.page)}
                 </span>
 
-                <span className="journal-toc-title flex items-center min-w-0 gap-2 overflow-hidden">
+                <span className="journal-toc-title flex items-baseline min-w-0 gap-2 overflow-hidden">
                   <span className="text-[18px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
                     {e.title}
                   </span>
-                  {e.kind === "case" && (
-                    <span className="mono shrink-0 text-[9px] tracking-[2px] uppercase text-ink bg-paper-2 border border-ink py-0.5 px-1.5 rounded-[3px]">
-                      ★ case study
-                    </span>
-                  )}
+                  {/* No "★ case study" badge here: the edge tab already states
+                      the kind through its colour, and a badge saying it again
+                      is two labels on one row telling the reader one thing. */}
                   <span
                     aria-hidden="true"
                     className="journal-toc-leader flex-1 h-0 min-w-6 -translate-y-1"
@@ -177,7 +185,8 @@ export default function JournalIndex({
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
           <span className="mono faint text-[11px]">
-            {visible.length} entries shown · {counts.case} case studies + {counts.note} notes
+            {visible.length} entries shown · {counts.case} case studies + {counts.note} notes · pp.{" "}
+            {pad(first)}–{pad(last)}
           </span>
           <span className="text-[15px] italic text-ink-faint">tap any line to open the page ↦</span>
         </div>

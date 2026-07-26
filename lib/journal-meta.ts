@@ -2,6 +2,9 @@
 // Safe to import from client components — the fs-backed loader lives in lib/journal.ts.
 
 
+/** A `##` heading in an entry, for the § rail. */
+export type Section = { n: number; id: string; title: string };
+
 export type JournalEntryMeta = {
   slug: string;
   kind: "case" | "note";
@@ -13,7 +16,10 @@ export type JournalEntryMeta = {
   /** auto-computed read time, e.g. "5 min" */
   read: string;
   tag: string;
-  /** hand-picked notebook page number (unique across entries) */
+  /** chronological entry number, shown in the ledger ("entry № 011") */
+  no: number;
+  /** the leaf this entry starts on — derived, never authored. Different from
+   *  `no`: one continuous notebook where a page only increases with time. */
   page: number;
   dek: string;
   sub: string | null;
@@ -30,22 +36,23 @@ export type JournalEntryMeta = {
  *
  *  One notebook, one accent. Tags are a taxonomy, not a palette — an earlier
  *  pass gave every tag its own hue, and three entries side by side read as
- *  three different sites. Tabs are ink; only case studies take the accent, so
- *  the thing worth spotting in a list of eleven entries is the only thing
- *  coloured. Do not colour-code tags. */
+ *  three different sites. The tab encodes the KIND, never the tag: coral for
+ *  case studies, teal for notes. The tag is the text inside it.
+ *
+ *  Both are mixed toward ink before they're drawn — pure coral is 2.6:1 on
+ *  cream and pure teal not much better, which is fine for the border but
+ *  illegible for 10px mono sitting on its own tint. */
 export const tabColors = (kind: JournalEntryMeta["kind"]) =>
   kind === "case"
     ? {
-        background: "color-mix(in oklab, var(--color-coral) 18%, var(--color-paper))",
+        background: "color-mix(in oklab, var(--color-coral) 15%, var(--color-paper))",
         borderColor: "var(--color-coral)",
-        /* 58% toward ink: pure coral is 2.6:1 on cream — fine as a border,
-           illegible as 9–10px mono sitting on its own tint. */
         color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
       }
     : {
-        background: "var(--color-paper-2)",
-        borderColor: "color-mix(in oklab, var(--color-ink) 40%, transparent)",
-        color: "var(--color-ink-soft)",
+        background: "color-mix(in oklab, var(--color-teal) 15%, var(--color-paper))",
+        borderColor: "var(--color-teal)",
+        color: "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
       };
 
 export const pad = (n: number) => String(n).padStart(3, "0");

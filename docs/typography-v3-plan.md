@@ -256,6 +256,25 @@ them. And `heroCaption` in frontmatter.
 The handoff ships `implementation/` files written against this repo's
 conventions, so this is adoption, not design work.
 
+**Done.** Notes on how it landed:
+
+- New deps: `remark-gfm` (native `[^1]` footnotes) + `rehype-slug` (heading ids
+  the § rail anchors against). `lib/journal.ts` derives the same slugs from the
+  MDX source, so the rail needs no DOM scraping.
+- Fenced code carries props through `rehype-mdx-code-props`:
+  ```` ```py title="intake.py" hi="3" cap="…" ````
+- **Footnotes are the handoff's documented fallback, not the margin version.**
+  remark-gfm emits all footnotes as one list at the end of the document; lifting
+  each one beside its referencing paragraph would mean rewriting the MDAST. The
+  refs are styled (`.je-fnref`, accent-ink) and the list is styled (`.je-fnlist`
+  — same serif 15px, same accent markers) but it sits at the end of the column
+  rather than in the margin. `<Side n={1}>` can place one manually where it
+  matters.
+- remark-gfm's screen-reader-only `<h2 id="footnote-label">` has to bypass the
+  `h2` override, or it gets a `✎ §NN` kicker and bumps the section counter.
+- Page numbers are now derived: `p.003` (oldest) → `p.023` (newest), book range
+  `pp. 003 — 024`. `page:` removed from all frontmatter.
+
 ## Phase 6 — mobile re-tune
 
 Source: `type-v3-mobile.css`. The prototype targets `.mscreen .m-*` / `.mv-*` / `.mx-*`;

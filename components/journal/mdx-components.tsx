@@ -5,6 +5,7 @@
 import Image from "next/image";
 import type { ComponentPropsWithoutRef, ReactElement } from "react";
 import type { MDXComponents } from "mdx/types";
+import CodeBlock from "@/components/journal/CodeBlock";
 
 /* ---- custom blocks authored directly in MDX ---- */
 
@@ -25,6 +26,23 @@ function Callout({
   return (
     <aside className={`je-callout${variant === "note" ? "" : ` is-${variant}`}`}>
       {label && <span className="lbl">{label}</span>}
+      {children}
+    </aside>
+  );
+}
+
+// <Side>…</Side> — commentary only. Renders in the live right margin: Caveat,
+// no box, no tint, no label, with a short accent tick pointing back at the
+// column. Place it immediately BEFORE the paragraph it annotates — it floats
+// right and aligns to that paragraph. Collapses inline below 1140px.
+//
+// The rule of the page: boxes get serif, Caveat gets no box. A dotted box
+// around handwriting is two metaphors fighting, which is why the old single
+// <Callout> split into <Callout> (load-bearing, boxed, serif) and this.
+function Side({ n, children }: { n?: number; children: React.ReactNode }) {
+  return (
+    <aside className={`je-side${n ? " is-fn" : ""}`}>
+      {n ? <span className="n">{n}.</span> : null}
       {children}
     </aside>
   );
@@ -62,33 +80,39 @@ function Quote({ cite, children }: { cite?: string; children: React.ReactNode })
 
 /* ---- native markdown element overrides ---- */
 
-// ``` fenced code ``` → notebook code card. The bar label prefers a
-// title="intake.py" fence prop (via rehype-mdx-code-props), then the
-// fence language (```py).
-function Pre({ title, children, ...rest }: ComponentPropsWithoutRef<"pre">) {
-  const code = children as ReactElement<{ className?: string }> | undefined;
+// ``` fenced code ``` → the light-on-paper code card. Fence props ride through
+// rehype-mdx-code-props, so a fence can carry a filename, highlighted lines and
+// a caption:  ```py title="intake.py" hi="3" cap="Never block the request."
+function Pre({ title, hi, cap, children }: ComponentPropsWithoutRef<"pre"> & {
+  hi?: string;
+  cap?: string;
+}) {
+  const code = children as ReactElement<{ className?: string; children?: string }> | undefined;
   const cls = code?.props?.className ?? "";
-  const lang = cls.replace(/language-/, "") || "code";
-  return (
-    <div className="je-code">
-      <div className="bar">
-        <span className="prompt">&gt;_</span>
-        <span className="fn">{title ?? lang}</span>
-      </div>
-      <pre {...rest}>{children}</pre>
-    </div>
-  );
+  const lang = cls.replace(/language-/, "") || undefined;
+  const src = typeof code?.props?.children === "string" ? code.props.children : "";
+  const hiLines = hi
+    ? hi.split(/[,\s]+/).map(Number).filter((n) => Number.isFinite(n) && n > 0)
+    : undefined;
+  return <CodeBlock code={src} lang={lang} file={title} hi={hiLines} cap={cap} />;
 }
 
 export const mdxComponents: MDXComponents = {
   p: (p) => <p {...p} />,
-  // ## → hand section-number + wavy-underlined serif heading
-  h2: ({ children, ...rest }: ComponentPropsWithoutRef<"h2">) => (
-    <div className="je-h2">
-      <span className="je-secn" aria-hidden="true" />
+  // ## → hand section-number + wavy-underlined serif heading.
+  // remark-gfm emits its own <h2 id="footnote-label"> as the (screen-reader
+  // only) heading of the footnote list. That is not a section: giving it a
+  // ✎ §NN kicker would both show a marker and bump the section counter, so it
+  // renders plain and stays out of the count.
+  h2: ({ children, ...rest }: ComponentPropsWithoutRef<"h2">) =>
+    rest.id === "footnote-label" ? (
       <h2 {...rest}>{children}</h2>
-    </div>
-  ),
+    ) : (
+      <div className="je-h2">
+        <span className="je-secn" aria-hidden="true" />
+        <h2 {...rest}>{children}</h2>
+      </div>
+    ),
   h3: (p: ComponentPropsWithoutRef<"h3">) => <h3 {...p} />,
   ul: (p: ComponentPropsWithoutRef<"ul">) => <ul className="je-ul" {...p} />,
   ol: (p: ComponentPropsWithoutRef<"ol">) => <ol className="je-ol" {...p} />,
@@ -97,7 +121,22 @@ export const mdxComponents: MDXComponents = {
   pre: Pre,
   code: (p: ComponentPropsWithoutRef<"code">) => <code className="je-ic" {...p} />,
   a: (p: ComponentPropsWithoutRef<"a">) => <a {...p} />,
+  // remark-gfm renders footnote refs as <sup><a>…</a></sup>; style the anchor
+  // as the accent-ink pill the design specifies.
+  sup: (p: ComponentPropsWithoutRef<"sup">) => <sup className="je-fnref" {...p} />,
+  // remark-gfm's footnote list carries its own class="footnotes", so spread
+  // first and merge — otherwise it overwrites ours.
+  section: ({ children, className, ...rest }: ComponentPropsWithoutRef<"section">) =>
+    "data-footnotes" in rest ? (
+      <section {...rest} className={`je-fnlist ${className ?? ""}`.trim()}>
+        <div className="je-fnlbl">footnotes</div>
+        {children}
+      </section>
+    ) : (
+      <section {...rest} className={className}>{children}</section>
+    ),
   Callout,
+  Side,
   Hl,
   Figure,
   Quote,

@@ -3,7 +3,6 @@ title: "LegalRescue.ai"
 kind: case
 date: 2026-04-30
 tag: legal-ai
-page: 4
 dek: "Designing and shipping a scalable LLM backend for a legal-aid startup — voice intake, classification, and async workflows that had to make money."
 sub: "MS capstone · client under NDA"
 hero: /projects/legalrescue-nda.png
@@ -13,11 +12,15 @@ status: published
 related: [shipping-llms-at-a-startup, notes-on-rag-eval-harnesses]
 ---
 
+<Side>← this number is the whole story</Side>
+
 Two months in, the prototype was a Notion doc and a Loom. Six months later we
 were running classification on real customer audio at <Hl>sub-2s P95 latency</Hl>.
 This is what changed in between.
 
 ## The shape of the problem
+
+<Side>people, not forms.</Side>
 
 Walk-in clients calling a legal-aid line don't fill out intake forms — **they
 tell their story**. Sometimes for forty minutes. The product turns that voice
@@ -36,17 +39,19 @@ The stack that got us there was deliberately boring around one non-boring model:
 - A custom prompt-eval harness to keep regressions out of prod
 
 <Callout>
-The hardest part wasn't the LLM. It was the orchestration around it — making
-async workflows feel synchronous to the person on the phone.
+Budget: **2s P95**, end of audio to first structured field.[^1] Model choice,
+queue depth and retry policy were all derived from that one number.
 </Callout>
 
 ## Making async feel synchronous
+
+<Side>the hardest part was never the LLM — it was the orchestration around it</Side>
 
 Every request fans out into a queue the moment audio lands. The client holds a
 lightweight job handle and polls; the UI streams partial state so the wait
 <Hl>never reads as a dead spinner</Hl>.
 
-```py title="intake.py"
+```py title="intake.py" hi="3" cap="Hand back a handle immediately — never block the request."
 @app.post("/intake")
 async def intake(audio: UploadFile):
     job = await queue.enqueue(transcribe, audio)
@@ -60,9 +65,13 @@ The model is 5% of the work. The other 95% is everything around it.
 
 ## What I'd do differently
 
+<Side>← learned this the hard way</Side>
+
 Build the eval harness *first*. We bolted ours on three months in and immediately
 wished we'd had it from week one — it would have caught two prompt regressions
 that shipped to prod.
 
 And pick a vector DB on day one, not day ninety. We bounced between three before
 settling, and [each migration cost a sprint](#).
+
+[^1]: P95, not P50. The long tail is where trust in the product actually lives.

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAdjacent, getEntries, getEntryBySlug } from "@/lib/journal";
+import { getAdjacent, getEntries, getEntryBySlug, getRelated, getSections } from "@/lib/journal";
 import ArticleEntry from "@/components/journal/ArticleEntry";
 
 // Every valid slug is known at build time (slug = filename in content/journal),
@@ -45,7 +45,13 @@ export default async function ArticlePage({
   const { prev, next } = getAdjacent(slug);
   return (
     <div data-journal-root>
-      <ArticleEntry entry={entry} prev={prev} next={next} />
+      <ArticleEntry
+        entry={entry}
+        prev={prev}
+        next={next}
+        sections={getSections(entry)}
+        related={getRelated(entry)}
+      />
     </div>
   );
 }
