@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 import { loadModel, subscribeModel, type ModelPhase } from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
 import LabButton from "./LabButton";
@@ -22,6 +23,7 @@ const FIELD = 28;
 const FIELD_PAD = 3;
 
 export default function DoodleLab({ accent }: { accent: LabAccent }) {
+  const { active: isTransitionActive } = useInkTransition();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
   const [has, setHas] = useState(false);
@@ -31,8 +33,9 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
 
   useEffect(() => subscribeModel("doodle", (p) => setPhase(p.phase)), []);
   useEffect(() => {
+    if (isTransitionActive) return;
     loadModel("doodle").catch(() => {});
-  }, []);
+  }, [isTransitionActive]);
 
   /** 28×28 model input (0..255, bright strokes on black), or null if empty */
   const modelField = useCallback((): Float32Array | null => {

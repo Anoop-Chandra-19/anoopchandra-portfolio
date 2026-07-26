@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useLenisInstance } from "@/components/LenisProvider";
 import { useReducedMotion } from "./useReducedMotion";
 
@@ -31,20 +32,31 @@ function activeSectionAt(scrollY: number): string {
 /** Scroll-spy shared by the desktop rail and the mobile index overlay.
     frozenAt: render as a static snapshot inside a transition page copy —
     compute the marker once as if scrolled to that offset, never track scroll. */
-export function useActiveSection(frozenAt?: number) {
+export function useActiveSection(frozenAt?: number): string {
+  const pathname = usePathname();
   const frozen = frozenAt !== undefined;
-  // Frozen copies mount while the live page is still in the DOM — compute the
-  // marker synchronously so the copy's first painted frame already matches
-  // (an effect would flash the "cover" default for a frame first).
-  const [active, setActive] = useState(() => (frozen ? activeSectionAt(frozenAt) : "home"));
+  // A peel transition always returns to the top. Resolve that snapshot without
+  // reading the journal/lab document, whose height and missing home sections
+  // cannot describe the destination nav state.
+  const [active, setActive] = useState(() =>
+    frozen && frozenAt > 0 ? activeSectionAt(frozenAt) : "home"
+  );
 
   useEffect(() => {
     if (frozen) return;
-    const onScroll = () => setActive(activeSectionAt(window.scrollY));
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [frozen]);
+    const syncActiveSection = () => setActive(activeSectionAt(window.scrollY));
+    syncActiveSection();
+    // App Router may restore a cached home tree before applying its final scroll
+    // position. Recheck after that paint so preserved nav state cannot survive.
+    const frame = requestAnimationFrame(syncActiveSection);
+    window.addEventListener("scroll", syncActiveSection, { passive: true });
+    window.addEventListener("pageshow", syncActiveSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", syncActiveSection);
+      window.removeEventListener("pageshow", syncActiveSection);
+    };
+  }, [frozen, pathname]);
 
   return active;
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 import { loadModel, subscribeModel, type ModelPhase } from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
 import LabButton from "./LabButton";
@@ -58,6 +59,7 @@ function verdictLabel(s: number): string {
 }
 
 export default function SentimentLab({ accent }: { accent: LabAccent }) {
+  const { active: isTransitionActive } = useInkTransition();
   const [text, setText] = useState("");
   const [res, setRes] = useState<Reading | null>(null);
   const [log, setLog] = useState<{ t: string; s: number }[]>([]);
@@ -66,8 +68,9 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
 
   useEffect(() => subscribeModel("sentiment", (p) => setPhase(p.phase)), []);
   useEffect(() => {
+    if (isTransitionActive) return;
     loadModel("sentiment").catch(() => {});
-  }, []);
+  }, [isTransitionActive]);
 
   const run = useCallback(async () => {
     const t = text.trim();

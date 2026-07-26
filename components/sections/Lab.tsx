@@ -1,10 +1,8 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
-import { prefetchModel, type LabModelId } from "@/lib/lab-models";
 import { LAB_EXPS } from "@/lib/lab-meta";
 
 const ACTIONS: Record<string, string> = {
@@ -19,41 +17,14 @@ const DESCRIPTIONS: Record<string, string> = {
   kmeans: "Place points → watch clustering animate step-by-step.",
 };
 
-/** experiments whose model is worth warming before the bench opens */
-const MODEL_OF: Partial<Record<string, LabModelId>> = {
-  doodle: "doodle",
-  sentiment: "sentiment",
-};
-
 const STRIPE_BG =
   "repeating-linear-gradient(45deg, transparent 0 8px, rgba(0,0,0,0.05) 8px 9px)";
 
 export default function Lab() {
   const { navigate } = useInkTransition();
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Warm the model fetches during idle once §03 scrolls into view — by the
-  // time a card is tapped the weights are usually cached. prefetchModel
-  // no-ops under Data Saver.
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver((entries) => {
-      if (!entries.some((e) => e.isIntersecting)) return;
-      io.disconnect();
-      const warm = () => {
-        prefetchModel("doodle");
-        prefetchModel("sentiment");
-      };
-      if ("requestIdleCallback" in window) window.requestIdleCallback(warm);
-      else setTimeout(warm, 500);
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
   return (
-    <section id="sec-lab" className="section" ref={sectionRef}>
+    <section id="sec-lab" className="section">
       <SectionHeader num="03" title="The Lab" meta="3 live experiments · all in-browser" />
       <p className="faint max-w-[720px] mb-7">
         Real ML running entirely in your browser with TensorFlow.js — no server, no cold starts.
@@ -61,16 +32,12 @@ export default function Lab() {
       </p>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5">
         {LAB_EXPS.map((e, i) => {
-          const model = MODEL_OF[e.slug];
-          const warm = model ? () => prefetchModel(model) : undefined;
           return (
             <Link
               key={e.slug}
               href={`/lab/${e.slug}`}
               className="lab-card-btn"
               aria-label={`Open experiment: ${e.title}`}
-              onPointerEnter={warm}
-              onPointerDown={warm}
               onClick={(ev) => {
                 // keep native behavior for new-tab/window clicks
                 if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;

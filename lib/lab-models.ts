@@ -132,11 +132,3 @@ export function loadModel(id: LabModelId): Promise<LoadedModel> {
   return e.promise;
 }
 
-/** Fire-and-forget warm-up for intent signals (Lab section in view, card
-    hover/press). Respects Data Saver. */
-export function prefetchModel(id: LabModelId): void {
-  if (typeof window === "undefined") return;
-  type NavConn = Navigator & { connection?: { saveData?: boolean } };
-  if ((navigator as NavConn).connection?.saveData) return;
-  loadModel(id).catch(() => {});
-}
