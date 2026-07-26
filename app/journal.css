@@ -118,7 +118,11 @@ body:has([data-journal-root]) {
    reading size resolves to 640px — kept in px, not ch, because `ch` resolves
    against each element's OWN size, which would put the h3s at 763px and the
    lists at 614px and leave the column edge ragged. */
-.je{font-family:var(--font-display);color:var(--color-ink);--je-measure:640px}
+/* Accent text under ~14px is mixed toward ink before it is drawn: coral is
+   ~2.6:1 on cream — right for rules, borders, tints and bullets, illegible for
+   9–11px mono. Pure --accent = graphics; --accent-ink = small text
+   (63% mix ≈ 5:1, and it holds if the accent is ever re-tuned lighter). */
+.je{font-family:var(--font-display);color:var(--color-ink);--je-measure:640px;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink))}
 .je-plate{counter-increment:plate}
 /* decimal-leading-zero only pads to 2 digits (01, 02…10…) — the hero plate
    is hardcoded "plate 000" (3 digits), so inline plates need their own
@@ -126,7 +130,7 @@ body:has([data-journal-root]) {
 @counter-style plate-pad{system:extends decimal;pad:3 "0"}
 .je-plate-tab.auto::before{content:"plate " counter(plate,plate-pad)}
 
-.je-progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--color-coral);transform-origin:0 50%;transform:scaleX(0);z-index:50}
+.je-progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);z-index:50}
 .je-inner{position:relative;width:960px;max-width:100%;margin:0 auto;padding:44px 40px 100px}
 
 /* top nav */
@@ -141,8 +145,8 @@ body:has([data-journal-root]) {
 .je-ledger .dash{flex:0 0 auto;width:16px;height:1px;background:var(--color-ink-faint)}
 .je-chips{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:18px}
 .je-chip{font-family:var(--font-mono);font-weight:400;font-size:12px;letter-spacing:.02em;color:var(--color-ink-soft);border:1.4px solid var(--color-ink);border-radius:999px;padding:4px 12px;background:var(--color-paper)}
-.je-chip.is-kind{background:color-mix(in oklab,var(--color-coral) 14%,var(--color-paper));border-color:var(--color-coral);color:color-mix(in oklab,var(--color-coral) 78%,var(--color-ink));text-transform:uppercase;letter-spacing:1.5px}
-.je-stamp{margin-left:4px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--color-coral);border:1.6px solid var(--color-coral);border-radius:4px;padding:4px 10px;transform:rotate(-3deg)}
+.je-chip.is-kind{background:color-mix(in oklab,var(--accent) 14%,var(--color-paper));border-color:var(--accent);color:color-mix(in oklab,var(--accent) 78%,var(--color-ink));text-transform:uppercase;letter-spacing:1.5px}
+.je-stamp{margin-left:4px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent-ink);border:1.6px solid var(--accent);border-radius:4px;padding:4px 10px;transform:rotate(-3deg)}
 .je-title{font-family:var(--font-display);font-weight:600;font-size:72px;line-height:1;letter-spacing:-1.4px;margin:0 0 18px;color:var(--color-ink);text-wrap:balance}
 .je-dek{font-family:var(--font-display);font-style:italic;font-size:24px;line-height:1.42;color:var(--color-ink-soft);margin:0 0 24px;max-width:680px;text-wrap:pretty}
 .je-byline{display:flex;align-items:center;gap:11px;font-family:var(--font-mono);font-size:11px;letter-spacing:.6px;color:var(--color-ink-faint);padding:13px 0;border-top:1px solid var(--color-ink-faint);border-bottom:1px solid var(--color-ink-faint)}
@@ -150,49 +154,64 @@ body:has([data-journal-root]) {
 .je-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-ink);background:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,0,0,.09) 3px 4px);flex:0 0 auto}
 .je-bsub{color:var(--color-ink-soft)}
 .je-grow{flex:1}
-.je-htag{color:var(--color-coral)}
+.je-htag{color:var(--accent-ink)}
 
 /* plates (hero + figures) */
 .je-plate{position:relative;background:#fffdf7;border:1px solid var(--color-ink);box-shadow:0 8px 22px rgba(0,0,0,.12);padding:14px 14px 12px;margin:0 0 40px;max-width:820px}
 .je-hero{margin-bottom:46px}
 .je-plate img{display:block;width:100%;max-height:420px;object-fit:contain;background:var(--color-paper-2)}
 .je-plate-tab{position:absolute;top:-11px;left:18px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-paper);background:var(--color-ink);padding:3px 9px;border-radius:3px}
-.je-plate figcaption{font-family:var(--font-mono);font-size:11px;line-height:1.55;color:var(--color-ink-faint);margin-top:11px;padding-left:14px;border-left:2px solid var(--color-coral)}
+.je-plate figcaption{font-family:var(--font-mono);font-size:11px;line-height:1.55;color:var(--color-ink-faint);margin-top:11px;padding-left:14px;border-left:2px solid var(--accent)}
 .je-tape{position:absolute;top:-12px;right:26px;width:74px;height:24px;background:rgba(216,182,120,.5);border:1px solid rgba(0,0,0,.06);transform:rotate(17deg)}
 
 /* body — reading column + red margin rule */
 .je-body{position:relative;width:100%;padding-left:58px;counter-reset:sec plate}
-.je-rule{position:absolute;left:28px;top:-4px;bottom:60px;width:1.4px;background:color-mix(in oklab,var(--color-coral) 72%,transparent);opacity:.65}
+.je-rule{position:absolute;left:28px;top:-4px;bottom:60px;width:1.4px;background:color-mix(in oklab,var(--accent) 72%,transparent);opacity:.65}
 .je-body p{font-family:var(--font-display);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:var(--je-measure);color:var(--color-ink);text-wrap:pretty}
 .je-ic{font-family:var(--font-mono);font-size:.8em;background:color-mix(in oklab,var(--color-ink) 7%,var(--color-paper-2));border:1px solid var(--color-ink-faint);border-radius:3px;padding:1px 5px}
 .je-body strong{font-weight:600}
 .je-body a{color:var(--color-electric);text-decoration:none;border-bottom:1.5px dotted color-mix(in oklab,var(--color-electric) 55%,transparent)}
 .je-body a:hover{color:var(--color-ink);border-bottom-color:var(--color-ink)}
-.je-hl{background:linear-gradient(180deg,transparent 58%,color-mix(in oklab,var(--color-coral) 58%,#fff) 58%,color-mix(in oklab,var(--color-coral) 58%,#fff) 94%,transparent 94%);color:inherit;padding:0 3px}
+/* Thinner than the portfolio's marker: at 20px serif a 36%-tall band sits over
+   the descenders and fights the text. A ~20% band reads as an underline
+   stroke instead. */
+.je-hl{background:linear-gradient(180deg,transparent 76%,color-mix(in oklab,var(--accent) 58%,#fff) 76%,color-mix(in oklab,var(--accent) 58%,#fff) 96%,transparent 96%);color:inherit;padding:0 3px}
 
 .je-h2{margin:44px 0 16px;max-width:var(--je-measure);counter-increment:sec}
-.je-secn{display:block;font-family:var(--font-accent);font-weight:600;font-size:20px;color:var(--color-coral);line-height:1;margin-bottom:2px}
+.je-secn{display:block;font-family:var(--font-accent);font-weight:600;font-size:20px;color:var(--accent-ink);line-height:1;margin-bottom:2px}
 .je-secn::before{content:"\270E \A7" counter(sec,decimal-leading-zero)}
-.je-h2 h2{font-family:var(--font-display);font-weight:600;font-size:33px;line-height:1.12;margin:0;color:var(--color-ink);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:color-mix(in oklab,var(--color-coral) 55%,transparent);text-decoration-thickness:1.6px;text-underline-offset:9px}
+.je-h2 h2{font-family:var(--font-display);font-weight:600;font-size:33px;line-height:1.12;margin:0;color:var(--color-ink);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:color-mix(in oklab,var(--accent) 55%,transparent);text-decoration-thickness:1.6px;text-underline-offset:9px}
 .je-body h3{font-family:var(--font-display);font-weight:600;font-size:24px;line-height:1.2;margin:28px 0 10px;max-width:var(--je-measure);color:var(--color-ink)}
 
 .je-ul{list-style:none;padding:0;margin:6px 0 24px;max-width:var(--je-measure)}
 .je-ul li{position:relative;padding-left:28px;font-family:var(--font-display);font-size:19px;line-height:1.6;margin-bottom:11px}
-.je-ul li::before{content:"";position:absolute;left:2px;top:11px;width:8px;height:8px;border:1.6px solid var(--color-coral);border-radius:2px;transform:rotate(45deg)}
+.je-ul li::before{content:"";position:absolute;left:2px;top:11px;width:8px;height:8px;border:1.6px solid var(--accent);border-radius:2px;transform:rotate(45deg)}
 .je-ol{padding-left:26px;margin:6px 0 24px;max-width:var(--je-measure);font-family:var(--font-display);font-size:19px;line-height:1.6}
 .je-ol li{margin-bottom:9px}
-.je-ol li::marker{font-family:var(--font-mono);font-size:13px;color:var(--color-coral)}
+.je-ol li::marker{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink)}
 
 /* boxed callout: lives inline in the reading column */
-/* Phase 5 moves this to tinted serif at body size — a callout carries
-   information you must read, and Caveat is never load-bearing. */
-.je-callout{max-width:var(--je-measure);margin:24px 0;font-family:var(--font-display);font-weight:400;font-size:20px;line-height:1.6;color:var(--color-ink);background:color-mix(in oklab,var(--color-coral) 10%,var(--color-paper));border:1.5px dashed var(--color-coral);border-radius:7px;padding:16px 18px}
-.je-callout .lbl{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-coral);margin-bottom:6px}
+/* Load-bearing, so it stays in the column: boxed, tinted, serif at body size.
+   Quiet by default — the left bar carries the accent and the label is the only
+   coloured type. */
+.je-callout{--cal:var(--accent);position:relative;max-width:var(--je-measure);margin:26px 0;padding:15px 20px;background:color-mix(in oklab,var(--cal) 7%,var(--color-paper));border:1px solid color-mix(in oklab,var(--cal) 34%,var(--color-ink-faint));border-left:3px solid var(--cal);border-radius:3px;font-family:var(--font-display);font-weight:400;font-size:19px;line-height:1.6;color:var(--color-ink);text-wrap:pretty}
+/* Signal colours, not accents. Warning is deliberately OFF-palette: people have
+   a learned response to yellow-plus-triangle, and a warning styled to blend in
+   gets skimmed — so it is not harmonised with the accent. Tip is quiet cool ink
+   carried by the ✦ glyph. Both sit off the accent so neither can be mistaken
+   for "this entry's colour". */
+.je-callout.is-warning{--cal:oklch(.78 .155 85);background:color-mix(in oklab,var(--cal) 26%,var(--color-paper));border-color:color-mix(in oklab,var(--cal) 62%,var(--color-ink-faint));border-left-color:var(--cal)}
+.je-callout.is-tip{--cal:oklch(.5 .04 205);background:color-mix(in oklab,var(--cal) 5%,var(--color-paper));border-color:color-mix(in oklab,var(--cal) 30%,var(--color-ink-faint))}
+/* The label is the part that has to register fastest, so it drops toward ink:
+   pure accent at 9.5px is 2.6:1, the exact case --accent-ink exists to prevent. */
+.je-callout .lbl{display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:9.5px;font-weight:500;letter-spacing:2.2px;text-transform:uppercase;color:color-mix(in oklab,var(--cal) 63%,var(--color-ink));margin-bottom:8px}
+.je-callout.is-warning .lbl{color:color-mix(in oklab,var(--cal) 22%,var(--color-ink))}
+.je-callout.is-tip .lbl{color:color-mix(in oklab,var(--cal) 88%,var(--color-ink))}
 
 /* code */
 .je-code{margin:26px 0;max-width:var(--je-measure);border:1.5px solid var(--color-ink);border-radius:7px;overflow:hidden}
 .je-code .bar{display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1.5px solid var(--color-ink);background:var(--color-paper)}
-.je-code .prompt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--color-coral);letter-spacing:-1px}
+.je-code .prompt{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--accent-ink);letter-spacing:-1px}
 .je-code .fn{font-family:var(--font-mono);font-size:11px;color:var(--color-ink-soft)}
 .je-code pre{margin:0;padding:15px 17px;font-family:var(--font-mono);font-size:13px;line-height:1.7;white-space:pre-wrap;background:color-mix(in oklab,var(--color-ink) 5%,var(--color-paper-2));color:var(--color-ink)}
 .je-code pre code{font-family:inherit;font-size:inherit;background:none;border:none;padding:0}
@@ -200,13 +219,14 @@ body:has([data-journal-root]) {
 /* pull quote */
 /* Hangs 8px left into the margin rule, so it needs 8px more width to still
    land on the column's shared right edge. */
-.je-quote{position:relative;margin:36px 0 36px -8px;max-width:calc(var(--je-measure) + 8px);padding:6px 0 6px 26px;border-left:3px solid var(--color-coral)}
+.je-quote{position:relative;margin:36px 0 36px -8px;max-width:calc(var(--je-measure) + 8px);padding:6px 0 6px 26px;border-left:3px solid var(--accent)}
 .je-quote p{font-family:var(--font-accent);font-weight:600;font-size:36px;line-height:1.22;color:var(--color-ink);margin:0}
 .je-quote cite{display:block;font-family:var(--font-mono);font-style:normal;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);margin-top:12px}
 
 /* MDX wraps block JSX children in <p>; undo the .je-body p serif styling
    inside chrome blocks that set their own voice (hand callout, mono caption) */
-.je-callout p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0 0 8px;max-width:none}
+.je-callout p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
+.je-callout p+p{margin-top:10px}
 .je-callout p:last-child{margin-bottom:0}
 .je-plate figcaption p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
 

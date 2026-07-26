@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { pad, tagColor, type JournalEntryMeta } from "@/lib/journal-meta";
+import { pad, tabColors, type JournalEntryMeta } from "@/lib/journal-meta";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 
 type Filter = "all" | "case" | "note";
@@ -63,14 +63,14 @@ export default function JournalIndex({
           a working notebook · {ppRange}
         </div>
         <h1 className="mb-2">
-          The <span className="text-electric">Journal</span>
+          The <span className="text-coral">Journal</span>
         </h1>
         <p className="text-[19px] leading-[1.5] italic font-normal mt-2.5 mb-0 max-w-[720px] text-ink-soft">
           Case studies from shipped work, plus notes-in-progress — bug stories, hot takes, things
           I figured out the hard way.
         </p>
         <div
-          className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-[10px] tracking-[2px] uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-electric text-electric"
+          className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-[10px] tracking-[2px] uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral text-coral"
           style={{ transform: "rotate(3deg)" }}
         >
           est. 2024 · updated weekly
@@ -158,11 +158,11 @@ export default function JournalIndex({
                   className="journal-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[90px] py-[3px] pl-2.5 pr-2"
                   style={{
                     fontFamily: "var(--font-mono)",
-                    background: `color-mix(in oklab, ${tagColor(e.color)} 18%, var(--color-paper))`,
-                    border: `1.2px solid ${tagColor(e.color)}`,
+                    ...tabColors(e.kind),
+                    borderWidth: "1.2px",
+                    borderStyle: "solid",
                     borderRight: "none",
                     borderRadius: "3px 0 0 3px",
-                    color: tagColor(e.color),
                   }}
                 >
                   {e.tag}

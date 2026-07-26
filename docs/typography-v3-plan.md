@@ -194,6 +194,68 @@ Remaining deltas:
 - Measures move from `600px` to `64ch`.
 - `.je-navlbl` — keeps Caveat, drops to 20–22px.
 
+## Phase 5b — journal accent tokens *(added mid-flight)*
+
+v3 ships a colour decision the type plan missed. `journal-entry.css` and
+`Type System v3.html` both define:
+
+```
+--accent      = coral       → graphics: rules, borders, tints, bullets
+--accent-ink  = 63% → ink   → all accent TEXT under ~14px
+```
+
+Pure coral is **2.59:1** on cream (measured, not assumed) — fine for a 3px
+progress bar, illegible for 9–11px mono. Small accent text moved to
+`--accent-ink`: **5.28:1**. Also fixed `.je-hl` (58→94% band → the design's
+76→96%; the journal runs at 20px and needs a thinner band than the site) and
+rebuilt `.je-callout` as the design's left-bar card at 19px.
+
+One departure: the handoff sets `.je-callout .lbl` to pure `--cal` — coral at
+9.5px, the exact case its own `--accent-ink` rule exists to prevent. Applied the
+63% mix instead.
+
+## Phase 5c — one notebook, one accent *(added mid-flight)*
+
+From the journal handoff's "Colour" section: **tags are a taxonomy, not a
+palette.** Colour-coding every tag made three entries side by side read as three
+different sites.
+
+- `tagColor()` and the `color:` frontmatter field are **retired** — replaced by
+  `tabColors(kind)`. Tabs are ink (`paper-2` fill, 40% ink border, `ink-soft`
+  text); only **case studies** take coral, at 58% toward ink.
+- Journal wordmark + `EST. 2024` badge → **coral**, not electric. "The index
+  shouldn't be the one place that doesn't speak its own palette."
+- electric `#cc00e6` is now **body links only**. A hue is the wordmark or the
+  link, never both.
+- `<Callout>` takes `variant="note|warning|tip"`. `note` is **deliberately
+  unlabelled** — a label on every callout tells the reader nothing. warning
+  (ochre `oklch(.78 .155 85)`) and tip (`oklch(.5 .04 205)`) sit deliberately
+  *off* the accent so neither reads as "this entry's colour".
+
+Applies to the homepage §05 ledger too — same `tabColors`, one code path.
+
+## Phase 8 — journal entry structure *(new, runs before Phase 6)*
+
+`design_handoff_journal_entry/` — "The Annotated Manuscript". Roughly 70% is
+already built (masthead, ledger, chips, plates, serif column, margin rule,
+callout, quote, prev/next). Missing the parts that define the layout:
+
+| feature | classes | component |
+| --- | --- | --- |
+| § rail — sticky section tabs, mono `§NN` over Caveat titles | `.je-secnav` | `SectionRail.tsx` |
+| live right margin — `<Side>` commentary, Caveat, accent tick | `.je-side` | — |
+| margin footnotes — `[^1]` lifted out of the column | `.je-fnref`, `.je-side.is-fn` | — |
+| code block — line numbers, gutter rule, lang pill, copy, syntax tokens, caption | `.je-code .bar/.ln/.cap`, `--tk-*` | `CodeBlock.tsx` |
+| "also in this notebook" | `.je-also` | — |
+| three-band layout `[rail 132][col 640][margin 330]` | `--rail/--colgap/--col/--side-w/--side-gap` | — |
+
+Plus the loader change: page numbers **derived, not authored** — `entry.no`
+(chronological №) and `entry.page` (leaf) are different numbers, don't collapse
+them. And `heroCaption` in frontmatter.
+
+The handoff ships `implementation/` files written against this repo's
+conventions, so this is adoption, not design work.
+
 ## Phase 6 — mobile re-tune
 
 Source: `type-v3-mobile.css`. The prototype targets `.mscreen .m-*` / `.mv-*` / `.mx-*`;
@@ -248,7 +310,21 @@ sheet serif 15/1.5, side note Caveat 20/1.36.
 
 Phase 0 must land first and alone — it's the one with regression risk. Phases 1–3
 (desktop) then 4–5 (lab, journal) are independent of each other. Phase 6 depends on
-1–5 being settled, since mobile is a re-tune of decisions made there, not a scale of
-them. Phase 7 runs last.
+1–5 **and 8** being settled, since mobile is a re-tune of decisions made there, not
+a scale of them — and the § rail and margin notes have their own responsive
+behaviour. Phase 7 runs last.
+
+Running order: `0 → 1 → 2 → 3 → 4 → 5 → 5b → 5c → 8 → 6 → 7`.
 
 Suggested commits: one per phase, so any single step is revertable.
+
+## Notes for later
+
+- **Desktop notes titles are 17px, mobile spec says 18px** — the phone is larger
+  than the desktop. That inversion is in the handoff itself (desktop takes the
+  generic 22→17 bucket; mobile specifies `.m-note-title` directly). Worth looking
+  at side by side once Phase 6 lands.
+- **Tailwind cascade**: element defaults live in `@layer base`, role helpers
+  (`.mono`, `.hand`, `.accent`) in `@layer components`. Anything unlayered silently
+  beats every `text-…` class in the markup. Keep new element rules — including the
+  ones inside media queries — inside `@layer base`.

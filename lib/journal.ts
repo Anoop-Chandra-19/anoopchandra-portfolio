@@ -4,10 +4,10 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import type { JournalEntryMeta, TagColor } from "@/lib/journal-meta";
+import type { JournalEntryMeta } from "@/lib/journal-meta";
 
-export type { JournalEntryMeta, TagColor };
-export { pad, tagColor } from "@/lib/journal-meta";
+export type { JournalEntryMeta };
+export { pad, tabColors } from "@/lib/journal-meta";
 
 export type JournalEntry = JournalEntryMeta & {
   /** raw MDX body (compiled by <MDXRemote> on the article page) */
@@ -16,7 +16,6 @@ export type JournalEntry = JournalEntryMeta & {
 
 const CONTENT_DIR = path.join(process.cwd(), "content", "journal");
 const KINDS = ["case", "note"] as const;
-const COLORS = ["electric", "coral", "teal", "navy"] as const;
 const STATUSES = ["published", "draft"] as const;
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
@@ -56,9 +55,6 @@ function parseEntry(file: string): JournalEntry {
     }
   }
   if (!oneOf(data.kind, KINDS)) fail(file, `"kind" must be one of ${KINDS.join(" | ")}`);
-  if (data.color !== undefined && !oneOf(data.color, COLORS)) {
-    fail(file, `"color" must be one of ${COLORS.join(" | ")}`);
-  }
   if (data.status !== undefined && !oneOf(data.status, STATUSES)) {
     fail(file, `"status" must be one of ${STATUSES.join(" | ")}`);
   }
@@ -80,7 +76,6 @@ function parseEntry(file: string): JournalEntry {
     dateDisplay: displayDate(date, file),
     read: readTime(content),
     tag: String(data.tag),
-    color: (data.color as TagColor | undefined) ?? null,
     page: data.page,
     dek: String(data.dek),
     sub: data.sub ? String(data.sub) : null,

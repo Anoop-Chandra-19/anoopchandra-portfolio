@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { pad, tagColor, type JournalEntryMeta } from "@/lib/journal-meta";
+import { pad, tabColors, type JournalEntryMeta } from "@/lib/journal-meta";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 
 export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
@@ -89,13 +89,9 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                   <span
                     aria-hidden="true"
                     className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-2.5 pr-2"
-                    // only the tag colour is dynamic — border/radius live in CSS
+                    // only the tab colour is dynamic — border/radius live in CSS
                     // so the mobile pass can turn the edge tab into a pill
-                    style={{
-                      background: `color-mix(in oklab, ${tagColor(e.color)} 18%, var(--color-paper))`,
-                      borderColor: tagColor(e.color),
-                      color: tagColor(e.color),
-                    }}
+                    style={tabColors(e.kind)}
                   >
                     {e.tag}
                   </span>

@@ -3,7 +3,6 @@ title: "The AM5 Memory Fix"
 kind: note
 date: 2026-04-24
 tag: hardware
-color: coral
 page: 142
 dek: "Two sticks of DDR5-6000 should just work. Four sticks? Welcome to the BIOS rabbit hole."
 related: [why-i-switched-to-hyprland, a-year-of-arch-arch-is-great-and-awful]
@@ -17,7 +16,7 @@ And then nothing booted.
 
 AM5's memory controller is fine with 2x DIMMs at the rated EXPO speed. With 4x DIMMs, it falls off a cliff — officially supported up to DDR5-3600 in some configurations, and even that is generous. The system was POSTing fine at JEDEC speeds; EXPO at 6000 was hard-failing into a memtest loop.
 
-<Callout color="coral">TL;DR — 4 sticks of DDR5 on AM5 is not a supported config at advertised speeds. Pick 2 sticks of higher density, or accept JEDEC.</Callout>
+<Callout>TL;DR — 4 sticks of DDR5 on AM5 is not a supported config at advertised speeds. Pick 2 sticks of higher density, or accept JEDEC.</Callout>
 
 ## The fix
 

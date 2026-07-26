@@ -8,11 +8,23 @@ import type { MDXComponents } from "mdx/types";
 
 /* ---- custom blocks authored directly in MDX ---- */
 
-// <Callout label="note">…</Callout> — boxed emphasis, inline in the column.
-function Callout({ label = "note", children }: { label?: string; children: React.ReactNode }) {
+// <Callout variant="note|warning|tip">…</Callout> — load-bearing content only:
+// boxed, tinted, serif at body size, and it never leaves the reading column.
+// `note` is deliberately unlabelled — a label on every callout tells the reader
+// nothing and costs a line; the tint and the left rule carry it. Only warning
+// and tip earn a label, and both sit off the accent so they can never be
+// mistaken for "this entry's colour".
+function Callout({
+  variant = "note",
+  children,
+}: {
+  variant?: "note" | "warning" | "tip";
+  children: React.ReactNode;
+}) {
+  const label = variant === "warning" ? "⚠ warning" : variant === "tip" ? "✦ tip" : null;
   return (
-    <aside className="je-callout">
-      <span className="lbl">✎ {label}</span>
+    <aside className={`je-callout${variant === "note" ? "" : ` is-${variant}`}`}>
+      {label && <span className="lbl">{label}</span>}
       {children}
     </aside>
   );
