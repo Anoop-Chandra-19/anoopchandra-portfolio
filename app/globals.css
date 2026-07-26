@@ -18,13 +18,16 @@
 
 * { box-sizing: border-box; }
 
+/* The root font-size is the rem basis for ~170 Tailwind spacing and text
+   utilities, so it is frozen at 17px and does NOT carry the reading size.
+   Changing it here would silently rescale every margin on the site. The
+   reading size lives on <body>. */
 html, body {
   margin: 0;
   padding: 0;
   background: var(--color-paper);
   color: var(--color-ink);
   font-size: 17px;
-  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -35,6 +38,12 @@ html, body {
 body {
   --font-body: var(--font-display);
   font-family: var(--font-body);
+  /* v3 base: 18/1.65. opsz rides font-size, so large headings get the display
+     cut for free — never pin it with font-variation-settings. */
+  font-size: 18px;
+  line-height: 1.65;
+  letter-spacing: 0;
+  font-optical-sizing: auto;
   padding-bottom: 40px;
   padding-left: 140px;
   background-image:
@@ -89,20 +98,34 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow-y: scroll;
 }
 
+/* Hierarchy is carried by weight and size, not by swapping typefaces. 600 is
+   the ceiling: the old build ran 700 nearly everywhere, so emphasis had
+   nowhere left to go. Tracking tightens as the face grows — −0.008em at 21px
+   through −0.022em at 72px. */
 h1, h2, h3, h4 {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-optical-sizing: auto;
+  text-wrap: balance;
   margin: 0 0 14px;
-  line-height: 1.05;
 }
 
-h1 { font-size: 96px; line-height: 0.98; }
-h2 { font-size: 56px; }
-h3 { font-size: 36px; }
-h4 { font-size: 26px; line-height: 1.15; margin-bottom: 8px; }
+h1 { font-size: 72px; line-height: 1.02; letter-spacing: -0.022em; }
+h2 { font-size: 42px; line-height: 1.08; letter-spacing: -0.016em; }
+h3 { font-size: 28px; line-height: 1.18; letter-spacing: -0.012em; }
+h4 { font-size: 21px; line-height: 1.25; letter-spacing: -0.008em; margin-bottom: 8px; }
 
-p { margin: 0 0 12px; }
+/* Regular is the default: anything at reading size is 400. 600 is reserved for
+   headings, <strong>, and deliberate lead-ins — size is not a licence to go
+   bold. */
+p, li, blockquote { font-weight: 400; }
+strong, b { font-weight: 600; }
+
+p { margin: 0 0 12px; text-wrap: pretty; }
+
+/* Measure is a type decision, so it lives with the type: 66ch on the site,
+   64ch in the journal, 42ch for mono output. */
+.section > p { max-width: 66ch; }
 a { color: var(--color-ink); }
 
 .mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.2px; }
@@ -123,8 +146,11 @@ a { color: var(--color-ink); }
   padding: 18px;
   border-radius: 6px;
 }
-.sketch-box.tilt-l { transform: rotate(-0.6deg); }
-.sketch-box.tilt-r { transform: rotate(0.5deg); }
+/* Quieter than v2: the tilts and the double outline were tuned to sit beside
+   handwriting, where they read as one more informal signal. Against serif they
+   all fire at once and read as misalignment. Same signals, lower volume. */
+.sketch-box.tilt-l { transform: rotate(-0.25deg); }
+.sketch-box.tilt-r { transform: rotate(0.2deg); }
 
 .sketch-box::after {
   content: "";
@@ -132,17 +158,20 @@ a { color: var(--color-ink); }
   inset: -3px -2px -2px -3px;
   border: 1.5px solid var(--color-ink);
   border-radius: 8px;
-  opacity: 0.35;
+  opacity: 0.18;
   pointer-events: none;
   transform: rotate(0.4deg);
 }
 
+/* A baseline band, not a block. The old 55%→95% band was tuned to Kalam's
+   small x-height; against serif letterforms it crosses the middle of the word
+   and reads as a strikethrough. 84%→96% puts it under the baseline. */
 .marker-highlight {
-  background: linear-gradient(180deg, transparent 55%, var(--color-coral) 55%, var(--color-coral) 95%, transparent 95%);
-  padding: 0 4px;
+  background: linear-gradient(180deg, transparent 84%, var(--color-coral) 84%, var(--color-coral) 96%, transparent 96%);
+  padding: 0 1px;
 }
-.marker-highlight.purple { background: linear-gradient(180deg, transparent 55%, color-mix(in oklab, var(--color-electric) 70%, white) 55%, color-mix(in oklab, var(--color-electric) 70%, white) 95%, transparent 95%); }
-.marker-highlight.teal    { background: linear-gradient(180deg, transparent 55%, color-mix(in oklab, var(--color-teal) 60%, white) 55%, color-mix(in oklab, var(--color-teal) 60%, white) 95%, transparent 95%); }
+.marker-highlight.purple { background: linear-gradient(180deg, transparent 84%, var(--color-electric) 84%, var(--color-electric) 96%, transparent 96%); }
+.marker-highlight.teal    { background: linear-gradient(180deg, transparent 84%, var(--color-teal) 84%, var(--color-teal) 96%, transparent 96%); }
 
 .chip {
   display: inline-flex;
@@ -188,10 +217,12 @@ a { color: var(--color-ink); }
 }
 
 /* ---- Annotations / margin notes ---- */
+/* Caveat's x-height runs ~25% small, so 21px sits optically at ~16px. That is
+   the floor — never smaller. */
 .note {
   font-family: var(--font-accent);
   font-weight: 600;
-  font-size: 22px;
+  font-size: 21px;
   color: var(--color-electric);
   position: absolute;
   pointer-events: none;
@@ -217,7 +248,7 @@ a { color: var(--color-ink); }
   display: flex;
   align-items: baseline;
   gap: 18px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   padding-bottom: 8px;
   border-bottom: 2px dashed var(--color-ink);
 }
@@ -288,10 +319,12 @@ a { color: var(--color-ink); }
    Section treatments are ported from the design's `m-*` classes onto the
    existing desktop markup — same components, one code path. */
 
+/* The intermediate step lands on the scale's own buckets — 36 is the smallest
+   h2 and 25 an h3 — rather than on an arbitrary fraction of the desktop size. */
 @media (max-width: 1100px) {
-  h1 { font-size: 80px; }
-  h2 { font-size: 48px; }
-  h3 { font-size: 32px; }
+  h1 { font-size: 60px; }
+  h2 { font-size: 36px; }
+  h3 { font-size: 25px; }
   .page { padding: 50px 36px 100px; }
   .section { margin: 64px 0; }
 }
