@@ -136,7 +136,7 @@ body:has([data-journal-root]) {
 .je-ledger{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);padding:8px 0;border-top:2px solid var(--color-ink);border-bottom:1px solid var(--color-ink);margin-bottom:22px}
 .je-ledger .dash{flex:0 0 auto;width:16px;height:1px;background:var(--color-ink-faint)}
 .je-chips{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:18px}
-.je-chip{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--color-ink-soft);border:1.4px solid var(--color-ink);border-radius:999px;padding:4px 12px;background:var(--color-paper)}
+.je-chip{font-family:var(--font-mono);font-weight:400;font-size:12px;letter-spacing:.02em;color:var(--color-ink-soft);border:1.4px solid var(--color-ink);border-radius:999px;padding:4px 12px;background:var(--color-paper)}
 .je-chip.is-kind{background:color-mix(in oklab,var(--color-coral) 14%,var(--color-paper));border-color:var(--color-coral);color:color-mix(in oklab,var(--color-coral) 78%,var(--color-ink));text-transform:uppercase;letter-spacing:1.5px}
 .je-stamp{margin-left:4px;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--color-coral);border:1.6px solid var(--color-coral);border-radius:4px;padding:4px 10px;transform:rotate(-3deg)}
 .je-title{font-family:var(--font-display);font-weight:600;font-size:72px;line-height:1;letter-spacing:-1.4px;margin:0 0 18px;color:var(--color-ink);text-wrap:balance}

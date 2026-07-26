@@ -98,45 +98,58 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow-y: scroll;
 }
 
-/* Hierarchy is carried by weight and size, not by swapping typefaces. 600 is
-   the ceiling: the old build ran 700 nearly everywhere, so emphasis had
-   nowhere left to go. Tracking tightens as the face grows — −0.008em at 21px
-   through −0.022em at 72px. */
-h1, h2, h3, h4 {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-optical-sizing: auto;
-  text-wrap: balance;
-  margin: 0 0 14px;
+/* These are DEFAULTS, so they belong in a cascade layer that Tailwind
+   utilities out-rank. Unlayered, they silently beat every `text-…` and
+   `leading-…` class in the markup — `@layer utilities` loses to unlayered CSS
+   in Tailwind v4 regardless of specificity. Keep every element-level type rule
+   below (including the ones inside media queries) inside `@layer base`, or the
+   sizes written next to the markup stop meaning anything. */
+@layer base {
+  /* Hierarchy is carried by weight and size, not by swapping typefaces. 600 is
+     the ceiling: the old build ran 700 nearly everywhere, so emphasis had
+     nowhere left to go. Tracking tightens as the face grows — −0.008em at 21px
+     through −0.022em at 72px. */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-optical-sizing: auto;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  h1 { font-size: 72px; line-height: 1.02; letter-spacing: -0.022em; }
+  h2 { font-size: 42px; line-height: 1.08; letter-spacing: -0.016em; }
+  h3 { font-size: 28px; line-height: 1.18; letter-spacing: -0.012em; }
+  h4 { font-size: 21px; line-height: 1.25; letter-spacing: -0.008em; margin-bottom: 8px; }
+
+  /* Regular is the default: anything at reading size is 400. 600 is reserved
+     for headings, <strong>, and deliberate lead-ins — size is not a licence to
+     go bold. */
+  p, li, blockquote { font-weight: 400; }
+  strong, b { font-weight: 600; }
+
+  p { margin: 0 0 12px; text-wrap: pretty; }
+  a { color: var(--color-ink); }
 }
-
-h1 { font-size: 72px; line-height: 1.02; letter-spacing: -0.022em; }
-h2 { font-size: 42px; line-height: 1.08; letter-spacing: -0.016em; }
-h3 { font-size: 28px; line-height: 1.18; letter-spacing: -0.012em; }
-h4 { font-size: 21px; line-height: 1.25; letter-spacing: -0.008em; margin-bottom: 8px; }
-
-/* Regular is the default: anything at reading size is 400. 600 is reserved for
-   headings, <strong>, and deliberate lead-ins — size is not a licence to go
-   bold. */
-p, li, blockquote { font-weight: 400; }
-strong, b { font-weight: 600; }
-
-p { margin: 0 0 12px; text-wrap: pretty; }
 
 /* Measure is a type decision, so it lives with the type: 66ch on the site,
    64ch in the journal, 42ch for mono output. */
 .section > p { max-width: 66ch; }
-a { color: var(--color-ink); }
 
-.mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.2px; }
-/* `.hand` is a legacy name for the display face: it marked type that was set
-   in handwriting when handwriting was the text face. Under v3 that type is
-   reading type, so the class points at the serif. Handwriting proper is
-   `.accent`, applied only where it decorates. */
-.hand { font-family: var(--font-display); }
-.accent { font-family: var(--font-accent); font-weight: 600; }
-.tiny { font-size: 13px; color: var(--color-ink-soft); }
-.faint { color: var(--color-ink-faint); }
+/* Role helpers. Layered for the same reason as the element rules: they set a
+   role's default size, and the markup must be able to say "this one is 10px".
+   Chrome sizes span 8.5–14px, so that override has to work. */
+@layer components {
+  .mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.2px; }
+  /* `.hand` is a legacy name for the display face: it marked type that was set
+     in handwriting when handwriting was the text face. Under v3 that type is
+     reading type, so the class points at the serif. Handwriting proper is
+     `.accent`, applied only where it decorates. */
+  .hand { font-family: var(--font-display); }
+  .accent { font-family: var(--font-accent); font-weight: 600; }
+  .tiny { font-size: 13px; color: var(--color-ink-soft); }
+  .faint { color: var(--color-ink-faint); }
+}
 
 /* ---- Hand-drawn box primitives ---- */
 .sketch-box {
@@ -181,7 +194,9 @@ a { color: var(--color-ink); }
   border-radius: 999px;
   padding: 4px 12px;
   font-family: var(--font-mono);
+  font-weight: 400;
   font-size: 12px;
+  letter-spacing: 0.02em;
   background: var(--color-paper);
   transform: rotate(-0.4deg);
 }
@@ -322,9 +337,11 @@ a { color: var(--color-ink); }
 /* The intermediate step lands on the scale's own buckets — 36 is the smallest
    h2 and 25 an h3 — rather than on an arbitrary fraction of the desktop size. */
 @media (max-width: 1100px) {
-  h1 { font-size: 60px; }
-  h2 { font-size: 36px; }
-  h3 { font-size: 25px; }
+  @layer base {
+    h1 { font-size: 60px; }
+    h2 { font-size: 36px; }
+    h3 { font-size: 25px; }
+  }
   .page { padding: 50px 36px 100px; }
   .section { margin: 64px 0; }
 }
@@ -346,12 +363,16 @@ a { color: var(--color-ink); }
 
 @media (max-width: 720px) {
   /* ---- type scale + shell ---- */
-  html, body { font-size: 15px; }
+  /* Phase 6 re-tunes these: headings step down and body steps up, because the
+     values below were fitted to handwriting. Layered so the markup still wins. */
+  @layer base {
+    html, body { font-size: 15px; }
 
-  h1 { font-size: clamp(42px, 13.5vw, 58px); line-height: 0.94; letter-spacing: 0.3px; }
-  h2 { font-size: clamp(26px, 7.6vw, 34px); line-height: 1; }
-  h3 { font-size: clamp(19px, 5.4vw, 22px); line-height: 1.12; }
-  h4 { font-size: 18px; }
+    h1 { font-size: clamp(42px, 13.5vw, 58px); line-height: 0.94; letter-spacing: 0.3px; }
+    h2 { font-size: clamp(26px, 7.6vw, 34px); line-height: 1; }
+    h3 { font-size: clamp(19px, 5.4vw, 22px); line-height: 1.12; }
+    h4 { font-size: 18px; }
+  }
 
   .page { padding: 26px 18px 88px; max-width: 100%; }
   .section { margin: 44px 0; position: relative; }
@@ -532,7 +553,7 @@ a { color: var(--color-ink); }
 @media (max-width: 360px) {
   /* every line wraps one step earlier here, so the hero rhythm tightens to keep
      the whole stack on the landing screen */
-  h1 { font-size: 40px; }
+  @layer base { h1 { font-size: 40px; } }
   .hero-portrait { margin: 12px auto 16px; }
   .hero-tagline { margin-top: 10px; }
   .hero-lede { margin-top: 12px; }

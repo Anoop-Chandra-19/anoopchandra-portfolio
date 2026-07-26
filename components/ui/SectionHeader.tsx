@@ -94,7 +94,7 @@ export function SectionHeaderStamp({
         <div className="mono text-[10px] tracking-[3px] uppercase text-ink-soft -mb-0.5">
           § {num} · postage paid
         </div>
-        <h2 className="m-0 text-[56px] leading-none">{title}</h2>
+        <h2 className="m-0 text-[40px] leading-[1.08] tracking-[-0.016em]">{title}</h2>
       </div>
       <svg
         viewBox="0 0 200 40"

@@ -47,7 +47,8 @@ export default function SideNav({
               }`}
             />
             <span
-              className={`hand text-[17px] whitespace-nowrap transition-all duration-[180ms] ${
+              /* Persistent nav is chrome, so it leaves the serif behind entirely. */
+              className={`mono text-[11.5px] tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
                 isActive ? "text-electric translate-x-0" : "text-ink -translate-x-0.5"
               }`}
             >

@@ -149,7 +149,9 @@ export default function Stack() {
           >
             <h4 style={{ color: col.c }}>{col.h}</h4>
             <div className="mono faint text-[11px] mt-0.5">{col.note}</div>
-            <ul className="list-none p-0 mt-4 text-[15px] leading-[1.4]">
+            {/* Tooling identifiers, not a bibliography — so they go mono. The
+                h4 above them stays serif. */}
+            <ul className="mono list-none p-0 mt-4 text-[13px] tracking-[-0.01em] leading-[1.4]">
               {col.items.map(([name, years, obsession]) => (
                 <li
                   key={name}

@@ -11,7 +11,9 @@ export default function Hero() {
           <div className="mono faint anim-rise d-hello hero-kicker text-xs tracking-[3px] uppercase">
             {"// hello.tsx — apr 29, 2026"}
           </div>
-          <h1 className="hero-title mt-3.5 mb-1.5 leading-[0.95] text-[clamp(56px,8vw,96px)]">
+          {/* The only fluid type on the site. opsz rides font-size, so the top
+              of the clamp gets the display cut for free. */}
+          <h1 className="hero-title mt-3.5 mb-1.5 leading-[1.02] text-[clamp(44px,5.8vw,72px)]">
             <span className="anim-swipe d-name1 inline-block">Anoop</span>
             <br />
             <span className="anim-swipe d-name2 inline-block text-electric">chandra.</span>

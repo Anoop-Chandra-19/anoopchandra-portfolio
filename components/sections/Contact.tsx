@@ -47,7 +47,7 @@ export default function Contact() {
             <div className="mono faint text-[10px] tracking-[3px] uppercase">
               ✎ message side
             </div>
-            <h2 className="text-[64px] mt-2 mb-3.5 leading-[0.95]">
+            <h2 className="text-[46px] mt-2 mb-3.5 leading-[1.08] tracking-[-0.016em]">
               Let&apos;s
               <br />
               talk.

@@ -139,7 +139,7 @@ function ExperienceCard({ p, i }: { p: Experience; i: number }) {
         </div>
       </div>
       <div className="min-w-0">
-        <h3 className="mt-0 mb-2.5 text-[28px] leading-[1.1]">{p.t}</h3>
+        <h3 className="mt-0 mb-2.5 text-[24px] leading-[1.18] tracking-[-0.012em]">{p.t}</h3>
         <p className="mt-0 text-[15px] leading-[1.6] mb-3">{p.summary}</p>
         <ul className="pl-[18px] mt-0 text-sm leading-[1.7]">
           {p.contributions.map((b) => (
@@ -198,7 +198,7 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
         <div className="mono faint text-[11px] tracking-[2px] uppercase">
           {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
         </div>
-        <h3 className="mt-2 mb-3.5 text-[30px] leading-[1.12]">{p.t}</h3>
+        <h3 className="mt-2 mb-3.5 text-[25px] leading-[1.18] tracking-[-0.012em]">{p.t}</h3>
         <p className="mt-0 text-base max-w-[520px] mb-4">{p.d}</p>
         <ul className="pl-[18px] mt-0 text-sm leading-[1.7]">
           {p.bullets.map((b) => (
@@ -241,7 +241,7 @@ function FeaturedSlab({ p }: { p: Project }) {
       <div className="featured-body grid gap-9 p-9 px-10 grid-cols-[minmax(220px,280px)_1fr]">
         <div>
           <div className="mono faint text-[11px] tracking-[2px] uppercase">{p.cat}</div>
-          <h3 className="mt-2 mb-3.5 text-[38px] leading-[1.05]">{p.t}</h3>
+          <h3 className="mt-2 mb-3.5 text-[30px] leading-[1.18] tracking-[-0.012em]">{p.t}</h3>
           <div className="hand text-xl" style={{ color: `var(--color-${p.k})` }}>
             @ {p.org}
           </div>
