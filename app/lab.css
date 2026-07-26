@@ -275,8 +275,11 @@ body:has([data-lab-root]) {
 .lx-needle {
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+/* The one place handwriting states a result — allowed because the number
+   beside it is authoritative. */
 .lx-verdict {
-  font-family: var(--font-hand);
+  font-family: var(--font-accent);
+  font-weight: 600;
   font-size: 34px;
   line-height: 1;
   margin-top: 6px;

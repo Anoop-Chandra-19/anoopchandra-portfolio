@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Caveat, Kalam, JetBrains_Mono, Newsreader } from "next/font/google";
+import { Caveat, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 import "./animations.css";
@@ -14,20 +14,25 @@ import { LenisProvider } from "@/components/LenisProvider";
 import InkTransitionProvider from "@/components/transition/InkTransitionProvider";
 import { getEntryMetas } from "@/lib/journal";
 
-const caveat = Caveat({
-  variable: "--font-hand",
+/* v3 type system — three families, three jobs.
+   reading → Source Serif 4 · chrome → JetBrains Mono · aside → Caveat.
+   Hierarchy is carried by weight and size, not by swapping typefaces: a face
+   change means a change of role. See docs/typography-v3-plan.md. */
+
+/* Reading: everything you read — headings, body, deks, lists, article text.
+   The opsz axis rides font-size (`font-optical-sizing: auto`), so a 72px
+   heading gets the display cut for free. Never pin it with
+   font-variation-settings — that freezes wght and breaks the weight rules. */
+const sourceSerif = Source_Serif_4({
+  variable: "--font-display",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
   display: "swap",
 });
 
-const kalam = Kalam({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["300", "400", "700"],
-  display: "swap",
-});
-
+/* Chrome: anything a machine produced, or the interface talking about itself —
+   nav, chips, labels, timestamps, code, captions, lab output. */
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
@@ -35,11 +40,13 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const newsreader = Newsreader({
-  variable: "--font-serif",
+/* Aside: decoration and marginalia only — margin notes, § markers, pull
+   quotes, the lab verdict, the postcard signature. One weight, and never
+   below 20px: Caveat's x-height runs ~25% small. */
+const caveat = Caveat({
+  variable: "--font-accent",
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600"],
+  weight: ["600"],
   display: "swap",
 });
 
@@ -109,7 +116,7 @@ export default function RootLayout({
           below still surface. */}
       <body
         suppressHydrationWarning
-        className={`${caveat.variable} ${kalam.variable} ${jetbrainsMono.variable} ${newsreader.variable} antialiased`}
+        className={`${sourceSerif.variable} ${jetbrainsMono.variable} ${caveat.variable} antialiased`}
       >
         <HydrationTrigger />
         <LenisProvider>

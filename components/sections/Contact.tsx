@@ -87,7 +87,7 @@ export default function Contact() {
               </a>
             </div>
             <div
-              className="hand mt-7 text-2xl text-ink-soft inline-block"
+              className="accent mt-7 text-2xl text-ink-soft inline-block"
               style={{ transform: "rotate(-1.5deg)" }}
             >
               — Anoop ✎
@@ -150,7 +150,7 @@ export default function Contact() {
                   className="absolute inset-1 rounded-[1px] pointer-events-none"
                   style={{ border: "1px dashed color-mix(in oklab, var(--color-ink) 50%, transparent)" }}
                 />
-                <div className="hand text-[26px] leading-none text-teal">★</div>
+                <div className="accent text-[26px] leading-none text-teal">★</div>
                 <div className="mono text-[9px] tracking-[1px] mt-1.5 text-ink-soft">
                   HAND
                   <br />
@@ -162,13 +162,13 @@ export default function Contact() {
 
             <div className="mono faint text-[10px] tracking-[3px] uppercase mb-2.5">to —</div>
             <div className="flex flex-col gap-2.5 mb-[18px]">
-              <div className="hand text-[22px] text-ink pb-1 border-b-[1.2px] border-ink-faint">
+              <div className="accent text-[22px] text-ink pb-1 border-b-[1.2px] border-ink-faint">
                 whoever&apos;s reading this
               </div>
-              <div className="hand text-xl text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
+              <div className="accent text-xl text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
                 ⌂ a hiring manager · a friend · a stranger
               </div>
-              <div className="hand text-xl text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
+              <div className="accent text-xl text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
                 the internet, somewhere
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function Contact() {
                 <br />
                 Boston, MA
                 <br />
-                Caveat / Kalam / JetBrains Mono · Next.js + Vercel
+                Source Serif 4 / JetBrains Mono / Caveat · Next.js + Vercel
               </div>
             </div>
           </div>

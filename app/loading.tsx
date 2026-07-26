@@ -5,7 +5,7 @@ export default function Loading() {
       style={{ background: "var(--paper)" }}
     >
       <div
-        className="hand"
+        className="accent"
         style={{
           fontSize: 96,
           color: "var(--electric)",

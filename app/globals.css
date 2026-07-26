@@ -23,13 +23,18 @@ html, body {
   padding: 0;
   background: var(--color-paper);
   color: var(--color-ink);
-  font-family: var(--font-body);
   font-size: 17px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
+/* `--font-display` and `--font-body` are the same family — Source Serif 4 does
+   both jobs. Two names because they are two roles: if the display cut ever
+   diverges from the text cut, it is one line. next/font puts its variables on
+   <body>, so the alias lives here too. */
 body {
+  --font-body: var(--font-display);
+  font-family: var(--font-body);
   padding-bottom: 40px;
   padding-left: 140px;
   background-image:
@@ -85,7 +90,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-hand);
+  font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: 0.5px;
   margin: 0 0 14px;
@@ -101,7 +106,12 @@ p { margin: 0 0 12px; }
 a { color: var(--color-ink); }
 
 .mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.2px; }
-.hand { font-family: var(--font-hand); }
+/* `.hand` is a legacy name for the display face: it marked type that was set
+   in handwriting when handwriting was the text face. Under v3 that type is
+   reading type, so the class points at the serif. Handwriting proper is
+   `.accent`, applied only where it decorates. */
+.hand { font-family: var(--font-display); }
+.accent { font-family: var(--font-accent); font-weight: 600; }
 .tiny { font-size: 13px; color: var(--color-ink-soft); }
 .faint { color: var(--color-ink-faint); }
 
@@ -179,7 +189,8 @@ a { color: var(--color-ink); }
 
 /* ---- Annotations / margin notes ---- */
 .note {
-  font-family: var(--font-hand);
+  font-family: var(--font-accent);
+  font-weight: 600;
   font-size: 22px;
   color: var(--color-electric);
   position: absolute;
