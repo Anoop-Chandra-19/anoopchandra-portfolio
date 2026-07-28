@@ -21,3 +21,35 @@ Mel-spectrogram input (128 mel bins × ~1300 frames for a 30s clip), patch embed
 ## Deployment
 
 FastAPI inference microservice on AWS. A tiny React frontend lets you drag-drop a wav file and get a prediction in ~300ms. The live demo handled 100+ daily requests for a couple of months before I retired it.
+
+{/* ── SCAFFOLD-PROSE ─────────────────────────────────────────────
+    Placeholder text, added 2026-07-28 only so the journal index has a
+    spread of read times to sort against during the v4 design port.
+    Delete this whole block when the real entry is written.
+    See docs/hifi-v4-plan.md §1b. Find all: grep -rn SCAFFOLD-PROSE content/
+    ───────────────────────────────────────────────────────────── */}
+
+<Callout variant="warning">
+Placeholder text follows — this entry has not been written yet.
+</Callout>
+
+## Placeholder — what the data looked like
+
+Placeholder paragraph. The dataset split was the usual thing: a training set that
+was slightly too clean, a validation set that disagreed with it, and a test set
+held back until the very end so the numbers meant something. Genre labels are
+noisy by nature, and a fair amount of the early work was deciding which
+disagreements were worth fixing and which were just how music is.
+
+Placeholder paragraph. Augmentation helped more than architecture did. Time
+masking, frequency masking, and small pitch shifts bought a couple of points on
+their own, which is the sort of result that is humbling after a week spent
+tuning attention heads.
+
+## Placeholder — what I would change
+
+Placeholder paragraph. A larger patch size would have cut training time without
+costing much accuracy, and the classification head was almost certainly deeper
+than it needed to be. The interesting follow-up is not a better classifier at
+all — it is whether the learned embeddings are useful for similarity search,
+which is a different project wearing the same coat.

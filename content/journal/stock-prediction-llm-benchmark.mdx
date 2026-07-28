@@ -24,3 +24,85 @@ Can a language model trade stocks? Probably not. Can it do better than a coin fl
 ## Big caveat
 
 Past performance, etc. The point of this wasn't to make a trading bot — it was to build the harness. The harness is the artifact.
+
+{/* ── SCAFFOLD-PROSE ─────────────────────────────────────────────
+    Placeholder text, added 2026-07-28 only so the journal index has a
+    spread of read times to sort against during the v4 design port.
+    Delete this whole block when the real entry is written.
+    See docs/hifi-v4-plan.md §1b. Find all: grep -rn SCAFFOLD-PROSE content/
+    ───────────────────────────────────────────────────────────── */}
+
+<Callout variant="warning">
+Placeholder text follows — this entry has not been written yet.
+</Callout>
+
+## Placeholder — what the harness actually did
+
+Placeholder paragraph. The harness is the part worth describing, because the
+models were interchangeable and the scaffolding was not. Each run pinned a
+model, a prompt version, a date window and a random seed, then wrote every
+decision to a time-series collection alongside the reasoning trace that produced
+it. Nothing was scored live. Scoring happened afterwards, against next-day
+returns, so that a change to the scoring rule could be replayed over every run
+that had ever been recorded.
+
+Placeholder paragraph. That replay property mattered more than any single
+result. The first scoring rule was naive — direction only, equally weighted —
+and it flattered models that guessed confidently and often. Adding a confidence
+weighting and a transaction-cost penalty changed the leaderboard, and being able
+to recompute the whole history in a few minutes meant that discovery cost an
+afternoon rather than a rerun.
+
+## Placeholder — prompting notes
+
+Placeholder paragraph. Chain-of-thought helped, but not uniformly, and not for
+the reason the literature suggests. The reasoning models were already doing the
+work internally, so an explicit scaffold mostly made their output longer. For
+the smaller models the scaffold was load-bearing: without it they would name a
+direction and invent a justification afterwards, which reads convincingly and
+scores terribly.
+
+Placeholder paragraph. Forcing structured output was the single highest-leverage
+change. A free-text answer has to be parsed, and parsing free text from eleven
+different models is a study in how many ways a sentence can nearly mean BUY.
+Once the schema was mandatory the parsing layer disappeared and the failure mode
+became honest — a refusal instead of a guess.
+
+Placeholder paragraph. Temperature was set low and left alone. There is a
+version of this project that sweeps temperature properly across all eleven
+models and reports the variance, and that version is more rigorous than this
+one. It also takes four times the compute budget.
+
+## Placeholder — the results, with caveats attached
+
+Placeholder paragraph. The headline finding held up across re-scorings:
+reasoning-tuned models beat larger general models on risk-adjusted return, and
+the gap widened when transaction costs were included. The mechanism appeared to
+be selectivity rather than accuracy. The reasoning models declined to take a
+position more often, and the positions they did take were not obviously better
+picks — there were simply fewer bad ones.
+
+Placeholder paragraph. Every result carries the same asterisk. A six-month
+window on a single universe is one sample of one market regime. The window
+overlapped a period that rewarded caution, and a benchmark that rewards caution
+will rank the cautious models first. Running the same harness across a regime
+that punished it is the obvious next experiment and the one I have not done.
+
+Placeholder paragraph. There is also a leakage question that never fully went
+away. Training cutoffs are approximate and the models had plainly read a great
+deal about the companies in the universe. Restricting the prompt to price and
+volume series with tickers stripped out reduced performance across the board,
+which is either evidence of leakage or evidence that context helps, and the
+experiment as designed cannot distinguish between the two.
+
+## Placeholder — closing
+
+Placeholder paragraph. Nobody should trade on this. The artifact is the harness:
+a thing that turns an argument about which model is better into a number that
+can be recomputed when the argument changes.
+
+Placeholder paragraph. If I picked this up again the first change would be
+structural rather than analytical: split the harness into a runner and a scorer
+with a stable record format between them, so that the expensive half runs once
+and the cheap half can be rewritten as often as the question changes. Most of
+the friction in the project came from those two concerns sharing a process.

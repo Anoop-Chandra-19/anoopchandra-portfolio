@@ -74,4 +74,41 @@ that shipped to prod.
 And pick a vector DB on day one, not day ninety. We bounced between three before
 settling, and [each migration cost a sprint](#).
 
+{/* ── SCAFFOLD-PROSE ─────────────────────────────────────────────
+    Placeholder text, added 2026-07-28 only so the journal index has a
+    spread of read times to sort against during the v4 design port.
+    Delete this whole block when the real entry is written.
+    See docs/hifi-v4-plan.md §1b. Find all: grep -rn SCAFFOLD-PROSE content/
+    ───────────────────────────────────────────────────────────── */}
+
+<Callout variant="warning">
+Placeholder text follows — this entry has not been written yet.
+</Callout>
+
+## Placeholder — the queue, in more detail
+
+Placeholder paragraph. Every stage of the pipeline is a task, and every task is
+idempotent, because the only thing worse than a job that fails is a job that
+half-succeeds and then runs again. Retries carry the original request id, so a
+duplicate submission collapses into the record that already exists rather than
+creating a second case out of the same phone call.
+
+Placeholder paragraph. The queue depth was tuned against the latency budget
+rather than against throughput, which felt backwards at first. Optimising for
+throughput produced a system that was faster on average and unpredictable at the
+tail, and the tail is the part a paralegal actually experiences on a Tuesday
+afternoon with somebody waiting.
+
+## Placeholder — handling the audio nobody plans for
+
+Placeholder paragraph. Real intake audio is not clean. It is a speakerphone in a
+room with a television on, or a caller who puts the handset down for ninety
+seconds, or forty minutes of narrative with the three load-bearing facts spread
+evenly across it. Chunking on silence worked better than chunking on duration,
+and a short overlap between chunks stopped the model from losing the thread at
+the seams.
+
+Placeholder paragraph. The summarisation prompt went through more revisions than
+anything else in the system. Most of them were about what to leave out.
+
 [^1]: P95, not P50. The long tail is where trust in the product actually lives.
