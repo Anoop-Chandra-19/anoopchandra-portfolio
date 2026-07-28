@@ -225,13 +225,24 @@ which does not apply once the tab is in flow.
 
 ---
 
-## Phase 1 — Content data modules
+## Phase 1 — Content data modules (DONE, 2026-07-28)
 
 *No visual change. Pure groundwork so Phase 2 is a rendering change, not a
 content-plus-rendering change.*
 
-**New:** `content/work.ts` (or `lib/work.ts` — `content/` currently holds only MDX,
-so `lib/work-data.ts` is the more consistent home).
+**Landed as `lib/work-data.ts`** (`content/` holds only MDX, so `lib/` was the
+consistent home). Exports `ROLE`, `WORK`, `ALSO`, `PROJECTS`, `MINOR` plus the
+`WorkAccent` / `Role` / `System` / `Project` / `Minor` types. Nothing imports it
+yet — that's Phase 2. `npm run typecheck` clean.
+
+Two shape decisions made during the port, both small:
+
+- **`imgAlt` is a field, not `p.t`.** The current `ProjectImage` passes the project
+  title as alt, which is wrong for all three plates and actively misleading for the
+  NDA placard. Q1a already required custom alt for fand, so it became a field.
+- **`imgFit` is on every project, not just fand/Mosaic.** The prototype only sets it
+  where it diverges from the default; making it required means Phase 3 reads one
+  property instead of a property-or-default. All three are `"contain"` today.
 
 Port verbatim from `hifi-sections-v3.jsx:404–512`:
 
