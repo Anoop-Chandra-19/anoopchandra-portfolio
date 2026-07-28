@@ -7,8 +7,8 @@ A modern, interactive portfolio showcasing AI/ML engineering skills through **re
 ![Hero Section](./public/screenshots/hero-section.png)
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-anoopchandra.dev-cc00e6?style=for-the-badge)](https://anoopchandra.dev)
-[![Next.js](https://img.shields.io/badge/Next.js-15.3.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.2.12-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-4.22-orange?style=for-the-badge&logo=tensorflow)](https://www.tensorflow.org/js)
 
 </div>
@@ -60,8 +60,8 @@ A modern, interactive portfolio showcasing AI/ML engineering skills through **re
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **[Next.js 15](https://nextjs.org/)** - React framework with App Router
-- **[TypeScript](https://www.typescriptlang.org/)** - Type-safe development
+- **[Next.js 16](https://nextjs.org/)** - React framework with App Router
+- **[TypeScript 6](https://www.typescriptlang.org/)** - Type-safe development
 - **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first styling
 - **[Framer Motion](https://www.framer.com/motion/)** - Smooth animations
 

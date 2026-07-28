@@ -1,240 +1,184 @@
-# AGENTS.md - Development Guide for AI Coding Agents
+# AGENTS.md — Development Guide
 
-This guide provides essential information for AI coding agents working on this Next.js portfolio project.
+Guidance for coding agents working on this portfolio. Keep changes focused, preserve the established notebook/editorial visual language, and verify assumptions against the code before editing.
 
-## Project Overview
+## Project Snapshot
 
-- **Framework**: Next.js 15.3.4 with App Router
-- **Language**: TypeScript 5 (strict mode enabled)
-- **Styling**: Tailwind CSS 4.1.11
-- **Animations**: Framer Motion, GSAP, Lenis smooth scrolling
-- **ML/AI**: TensorFlow.js for client-side ML demos
-- **Package Manager**: npm
+- **Framework:** Next.js 16.2.12, App Router
+- **UI:** React 19.2.8
+- **Language:** TypeScript 6.0.3 with strict checking
+- **Styling:** Tailwind CSS 4.1.11 plus global CSS
+- **Animation:** Framer Motion, GSAP, and Lenis
+- **Content:** Local MDX journal entries rendered with `next-mdx-remote`
+- **ML:** TensorFlow.js models loaded and run in the browser
+- **Package manager:** npm; keep `package-lock.json` in sync
+- **Node.js:** 20.9.0 or newer is required by Next.js 16
 
-## Build, Lint, and Test Commands
+Treat `package.json` and `tsconfig.json` as the source of truth if a version or compiler detail in this guide becomes stale.
 
-### Development
+## Commands
+
 ```bash
-npm run dev          # Start dev server with Turbopack
+npm ci                 # Reproducible dependency install
+npm run dev            # Local development server
+npm run typecheck      # TypeScript compiler check
+npm run lint           # ESLint across the repository
+npm run build          # Production Next.js build
+npm start              # Serve a completed production build
 ```
 
-### Build & Production
-```bash
-npm run build        # Production build
-npm start            # Start production server
+There is currently no automated test suite. For code changes, run `npm run typecheck` and `npm run lint`; run `npm run build` when routing, server/client boundaries, configuration, content loading, or production behavior may be affected.
+
+Do not run a persistent development server unless the task requires interactive browser testing. Never edit generated output in `.next/`, `next-env.d.ts`, or `tsconfig.tsbuildinfo`.
+
+## Repository Map
+
+```text
+app/                       App Router pages, metadata, sitemap, and global CSS
+  journal/                 Journal index and statically generated article routes
+  lab/                     Interactive lab index and individual lab routes
+components/
+  journal/                 MDX article and journal-index UI
+  lab/                     Interactive ML and algorithm demos
+  nav/                     Desktop and mobile navigation
+  sections/                Home-page sections
+  transition/              Ink transition system and provider
+  ui/                      Shared UI primitives
+content/journal/            Journal entries in MDX
+hooks/                      Shared client hooks
+lib/
+  journal.ts               Server-only journal loading and validation
+  journal-meta.ts          Client-safe journal types and display metadata
+  lab-meta.ts              Lab metadata and accent types
+  lab-models.ts            Lazy TensorFlow.js loading and model cache
+public/models/              TensorFlow.js model manifests, weights, and vocabulary
+scripts/                    One-off maintenance utilities
+docs/                       Design and implementation notes
 ```
 
-### Code Quality
-```bash
-npm run lint         # Run ESLint with Next.js config
+## Working Principles
+
+- Make the smallest complete change that solves the task.
+- Follow nearby code before introducing a new abstraction or dependency.
+- Do not rewrite unrelated code, generated files, model artifacts, or journal content.
+- Preserve server/client boundaries. Components are Server Components by default.
+- Add `"use client"` only when a file needs hooks, event handlers, browser APIs, or a client-only library.
+- Keep browser-heavy dependencies such as TensorFlow.js out of shared/server bundles; retain dynamic loading patterns where used.
+- Prefer static generation for routes whose slugs are known at build time.
+- Surface real failures with useful messages; do not fake loading progress or silently replace meaningful errors.
+
+## TypeScript 6 Conventions
+
+- Keep strict mode passing. Do not weaken `tsconfig.json` to bypass an error.
+- Do not use `any`; model data precisely or use `unknown` and narrow it.
+- Type function parameters and exported return values. Let obvious local values infer naturally.
+- Use `import type` for type-only imports and inline `type` specifiers when mixing value and type imports.
+- Prefer discriminated unions and literal unions for finite states.
+- Use descriptive generic names such as `TData` rather than single-letter names when the meaning is not obvious.
+- Do not use non-null assertions unless an invariant is guaranteed and clear at the use site.
+- Keep `@/*` imports for cross-directory modules; use relative imports for closely related sibling files.
+- Next.js 16 dynamic route `params` are asynchronous. Type them as `Promise<{ ... }>` and await them in pages and metadata functions.
+- `tsconfig.json` uses `moduleResolution: "bundler"`, `jsx: "react-jsx"`, and `noEmit`; do not invoke `tsc` to produce runtime JavaScript.
+
+## React and Next.js
+
+- Put metadata and data loading in Server Components whenever possible.
+- Avoid duplicating server-only data into client modules. `lib/journal.ts` imports `server-only`; client code should import types and presentation metadata from `lib/journal-meta.ts`.
+- Keep effects focused and always clean up subscriptions, timers, observers, and event listeners.
+- Use passive listeners for scroll or touch observation when the handler does not call `preventDefault`.
+- Use dynamic imports for large client-only features when they are not needed for initial rendering.
+- Do not add memoization by default. Use `useMemo` or `useCallback` only for an actual identity or computation requirement.
+- Preserve static route behavior (`generateStaticParams`, `dynamicParams = false`) for journal and lab detail routes unless requirements change.
+
+## Imports and Naming
+
+Organize imports in readable groups:
+
+1. React
+2. Next.js
+3. Third-party packages
+4. Absolute local imports using `@/`
+5. Relative sibling imports
+
+Use these naming conventions:
+
+- Components and component files: `PascalCase`
+- Hooks: `camelCase` with a `use` prefix
+- Utilities and variables: `camelCase`
+- Constants: `UPPER_SNAKE_CASE` when truly constant and module-wide
+- Types: `PascalCase`
+- Boolean values: prefer `is`, `has`, `can`, or `should` prefixes
+- App Router files: Next.js lowercase conventions such as `page.tsx`, `layout.tsx`, and `loading.tsx`
+
+## Styling and Visual Language
+
+- Use Tailwind utilities for component styling and CSS for global systems or effects that utilities cannot express clearly.
+- This project uses Tailwind CSS 4's CSS-first setup. Theme tokens live in `app/globals.css`; do not create a Tailwind config solely to add a token.
+- Reuse the existing theme tokens and generated utilities:
+  - `--color-paper`: `#fdfaf2`
+  - `--color-paper-2`: `#f5f0e1`
+  - `--color-ink`: `#1a1a1a`
+  - `--color-electric`: `#cc00e6`
+  - `--color-coral`: `#ff715b`
+  - `--color-teal`: `#1ea896`
+  - `--color-navy`: `#25283d`
+- Preserve the editorial notebook aesthetic: paper backgrounds, ink borders, measured typography, and restrained accents.
+- Build mobile-first and check the existing `900px` navigation/layout breakpoint before introducing a nearby competing breakpoint.
+- Avoid inline styles unless values are computed dynamically or CSS custom properties are the cleanest bridge.
+- Respect `prefers-reduced-motion`; use the shared `useReducedMotion` hook where client logic needs that preference.
+
+## Accessibility
+
+- Use semantic HTML before adding ARIA.
+- Give icon-only controls an accessible name.
+- Use native buttons and links for interaction; add `type="button"` to non-submit buttons.
+- Ensure interactions work with keyboard input and have visible focus states.
+- Preserve focus correctly for dialogs and other overlays; support Escape where users expect dismissal.
+- Do not rely on color alone to communicate state.
+- Provide meaningful alternative text for informative images and empty alt text for decorative images.
+
+## Journal Content
+
+Journal files live at `content/journal/<slug>.mdx`; the filename is the route slug. Frontmatter is validated during loading and can fail the build.
+
+Required fields:
+
+```yaml
+title: "Entry title"
+kind: note             # note | case
+date: 2026-07-27       # YYYY-MM-DD
+tag: web               # ai/ml | backend | web | linux | hardware | meta
+dek: "Short summary"
 ```
 
-### Testing
-Currently no test suite configured. If tests are added:
-- Framework: Use Jest or Vitest
-- Run single test: `npm test -- path/to/test.spec.ts`
+Optional fields include `status` (`published` or `draft`), `sub`, `hero`, `heroAlt`, `heroCaption`, and `related`. A `hero` requires `heroAlt`; every `related` value must name an existing journal slug. Add a tag only by deliberately extending the allowlist in `lib/journal.ts`.
 
-## Code Style Guidelines
+Journal table-of-contents entries are generated from level-two (`##`) headings. Avoid manually assigning metadata that `lib/journal.ts` derives, including reading time, entry number, and page number.
 
-### Import Organization
+## TensorFlow.js and Lab Code
 
-1. **React imports first** (from "react")
-2. **Next.js imports** (from "next/...")
-3. **Third-party libraries** (alphabetically)
-4. **Local components** (using @/ alias)
-5. **Hooks** (using @/ alias)
-6. **Types** (inline or from types file)
+- Model assets under `public/models/` are production artifacts. Do not replace or regenerate them unless explicitly requested.
+- Keep model loading lazy and reuse the module-level cache in `lib/lab-models.ts`.
+- Preserve the IndexedDB fallback behavior; private browsing and quota failures must remain non-fatal.
+- Dispose every temporary tensor, including tensors created for warm-up or preprocessing.
+- Clean up model-progress subscriptions in effects.
+- Avoid moving TensorFlow.js into a static top-level runtime import in client UI; the dynamic import intentionally protects unrelated bundles.
+- If the sentiment vocabulary changes, use or update `scripts/prune-word-index.mjs` rather than hand-editing generated JSON.
 
-**Example:**
-```typescript
-"use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "@/components/Navbar";
-import { useLenis } from "@/hooks/useLenis";
-```
+## Validation Checklist
 
-### File Naming Conventions
+1. Run `npm run typecheck`.
+2. Run `npm run lint`.
+3. Run `npm run build` for production-affecting changes.
+4. If UI behavior changed, manually check keyboard access, responsive layout, reduced motion, and loading/error states.
+5. Report which checks ran and distinguish pre-existing failures from failures introduced by the change.
 
-- **Components**: PascalCase (e.g., `SectionHero.tsx`, `ContactModal.tsx`)
-- **Hooks**: camelCase with "use" prefix (e.g., `useLenis.ts`, `useDoodleModel.ts`)
-- **Pages**: lowercase (Next.js convention: `page.tsx`, `layout.tsx`)
-- **Utilities**: camelCase (e.g., `formatDate.ts`)
+## Common Pitfalls
 
-### Component Structure
-
-```typescript
-"use client"; // Add only when needed (hooks, state, browser APIs)
-
-import statements...
-
-type Props = {
-  // Define prop types inline or separately
-  onClose: () => void;
-  open: boolean;
-};
-
-export default function ComponentName({ onClose, open }: Props) {
-  // 1. State declarations
-  const [state, setState] = useState();
-  
-  // 2. Refs
-  const ref = useRef<HTMLDivElement>(null);
-  
-  // 3. Hooks
-  const lenis = useLenisInstance();
-  
-  // 4. Effects
-  useEffect(() => {
-    // Effect logic
-  }, [dependencies]);
-  
-  // 5. Event handlers
-  function handleClick() {
-    // Handler logic
-  }
-  
-  // 6. Render
-  return (
-    <div>
-      {/* JSX */}
-    </div>
-  );
-}
-```
-
-### TypeScript Guidelines
-
-- **Strict mode enabled**: All code must satisfy TypeScript strict checks
-- **Type annotations**: Always type function parameters and return values
-- **Avoid `any`**: Use proper types or `unknown` if type is truly unknown
-- **Type imports**: Use `import type` for type-only imports
-- **Generics**: Use descriptive type parameters (e.g., `<TData>` not `<T>`)
-
-**Examples:**
-```typescript
-// Good
-function scrollToSection(id: string): void {
-  const target = document.getElementById(id);
-  if (lenis && target) {
-    lenis.scrollTo(target, { offset: -64, duration: 1.1 });
-  }
-}
-
-// Good - typed state
-const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-
-// Good - typed ref
-const modalRef = useRef<HTMLDivElement>(null);
-```
-
-### Styling Conventions
-
-- **Primary**: Use Tailwind CSS utility classes
-- **CSS Variables**: For colors and design tokens (defined in `app/globals.css`)
-  - `var(--color-electric)`: #be00d9 (purple)
-  - `var(--color-coral)`: #ff715b (coral)
-  - `var(--color-navy)`: #18192d (dark navy)
-  - `var(--color-teal)`: #1ea896 (teal)
-- **Responsive**: Mobile-first approach (sm:, md:, lg:, xl:)
-- **Avoid inline styles**: Except for dynamic values that can't use Tailwind
-
-### Naming Conventions
-
-- **Variables/Functions**: camelCase (`scrollToSection`, `handleClick`)
-- **Constants**: UPPER_SNAKE_CASE (`SERVICE_ID`, `MODEL_PATH`)
-- **Components**: PascalCase (`ContactModal`, `SectionHero`)
-- **Types/Interfaces**: PascalCase (`NavLink`, `Props`)
-- **Booleans**: Prefix with `is`, `has`, `should` (`isOpen`, `hasError`)
-
-### Error Handling
-
-```typescript
-// Good - handle errors gracefully
-useEffect(() => {
-  tf.loadGraphModel(MODEL_PATH)
-    .then(m => {
-      setModel(m);
-      setReady(true);
-    })
-    .catch(() => {
-      setError("Could not load model.");
-      setLoading(false);
-    });
-}, []);
-
-// Good - type-safe error checking
-if (!model) throw new Error("Model not loaded");
-```
-
-### Accessibility Guidelines
-
-- **Add ARIA labels**: Use `aria-label` for buttons and interactive elements
-- **Semantic HTML**: Use proper HTML5 elements (`<nav>`, `<main>`, `<section>`)
-- **Keyboard navigation**: Support Tab, Escape, Enter
-- **Focus management**: Trap focus in modals, restore focus on close
-- **Role attributes**: Add `role="dialog"`, `aria-modal="true"` for modals
-
-**Example:**
-```typescript
-<button
-  onClick={handleClick}
-  aria-label="Contact Me"
-  tabIndex={0}
-  type="button"
->
-  Contact Me
-</button>
-```
-
-### Performance Considerations
-
-- **Lazy loading**: Use dynamic imports for heavy components
-- **Memoization**: Use `useMemo`, `useCallback` for expensive computations
-- **Cleanup**: Always cleanup effects, dispose TensorFlow tensors
-- **Passive listeners**: Use `{ passive: true }` for scroll/touch events
-
-```typescript
-// Good - cleanup and passive listeners
-useEffect(() => {
-  function handleScroll() { /* ... */ }
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-
-// Good - dispose tensors
-const output = model.predict(input) as tf.Tensor;
-const data = await output.data();
-input.dispose();
-output.dispose();
-```
-
-## Path Aliases
-
-- `@/*`: Maps to project root (`./`)
-- **Usage**: `import Navbar from "@/components/Navbar"`
-
-## Environment Variables
-
-Prefix with `NEXT_PUBLIC_` for client-side access:
-- `NEXT_PUBLIC_EMAILJS_SERVICE_ID`
-- `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`
-- `NEXT_PUBLIC_EMAILJS_USER_ID`
-
-## Key Patterns Used in This Codebase
-
-- **Client components**: Mark with `"use client"` directive
-- **Smooth scrolling**: Lenis integration via custom hook
-- **Framer Motion**: AnimatePresence for enter/exit animations
-- **TensorFlow.js**: Custom hooks for model loading and prediction
-- **Modal patterns**: Focus trapping, ESC to close, click outside to close
-
-## Common Pitfalls to Avoid
-
-- Don't use `cd` in bash commands - use `workdir` parameter instead
-- Don't forget `"use client"` for components with hooks/state
-- Don't mix Tailwind classes with inline styles unnecessarily
-- Don't forget to cleanup event listeners and TensorFlow tensors
-- Always type component props and state
-- Use `type="button"` for non-submit buttons to prevent form submission
+- Do not import `lib/journal.ts` into a Client Component.
+- Do not forget to await dynamic route `params`.
+- Do not turn a Server Component into a Client Component just to solve a local interaction.
+- Do not remove TensorFlow tensor disposal or effect cleanup.
+- Do not edit `.next/`, model binaries, lockfile contents by hand, or generated TypeScript files.
+- Do not add environment-variable documentation unless the variable is actually read by the application.
+- Do not claim tests exist; this repository currently relies on typecheck, lint, build, and focused manual verification.
