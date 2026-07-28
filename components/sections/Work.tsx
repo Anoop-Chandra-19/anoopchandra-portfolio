@@ -33,11 +33,12 @@ function RoleBlock() {
   );
 }
 
-function WorkCard({ p, i }: { p: System; i: number }) {
+// No tilt here, unlike the design. A sub-degree rotation composites the card and
+// drops subpixel antialiasing, which softens 14.5px body copy at 1x. The other
+// sketch-boxes keep theirs — they carry short copy.
+function WorkCard({ p }: { p: System }) {
   return (
-    <article
-      className={`sketch-box work-card ${i % 2 ? "tilt-r" : "tilt-l"} p-[26px] grid gap-6 items-start`}
-    >
+    <article className="sketch-box work-card p-[26px] grid gap-6 items-start">
       <div>
         <div className="hand text-[46px] leading-[0.9]" style={{ color: `var(--color-${p.k})` }}>
           {p.n}
@@ -196,8 +197,8 @@ export default function Work() {
         <GroupRule label="what I built there" count={`${WORK.length} systems`} />
       </div>
       <div className="col gap-[18px]">
-        {WORK.map((p, i) => (
-          <WorkCard key={p.t} p={p} i={i} />
+        {WORK.map((p) => (
+          <WorkCard key={p.t} p={p} />
         ))}
       </div>
 

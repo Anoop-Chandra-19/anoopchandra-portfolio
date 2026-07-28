@@ -328,6 +328,21 @@ stamp wrapping under it.
 **Verified 320 → 1440** (iframe probe, nine widths): zero horizontal overflow at
 every width, grid tracks and the h3 step-down flipping only at their breakpoints.
 
+### Deliberate deviation — WorkCard has no tilt
+
+The design tilts every `.sketch-box`. `WorkCard` doesn't. A `rotate(-0.25deg)`
+composites the card, so Chrome drops subpixel antialiasing and resamples the glyphs
+at a fractional angle — on a 1x display that visibly softens 14.5px body copy.
+Anoop flagged it and confirmed the untilted version reads better.
+
+`Lab.tsx` keeps its tilt (short copy), and every tilt is already zeroed below 720px.
+
+Ruled out first, so nobody re-chases them: the layout is an exact port — at the
+design's own 1355px viewport the card measures 1107px against the design's 1115 and
+the first bullet breaks on the same word, at 14.5px in both — and
+`-webkit-font-smoothing: antialiased` is the design's own value, which cannot apply
+on a composited layer regardless.
+
 ### 2.1 New structure
 
 ```
