@@ -288,10 +288,45 @@ buys nothing.
 
 ---
 
-## Phase 2 — Work section rebuild (§02)
+## Phase 2 — Work section rebuild (§02) (DONE, 2026-07-28)
 
 `components/sections/Work.tsx` is replaced structurally. This is the largest single
 change in the pass.
+
+**Landed.** Four bands as specced, counts computed. `RoleBlock`, `WorkCard`,
+`AlsoList`, `MinorRow` added; `ExperienceCard`, `EXPERIENCE`, `FeaturedSlab` and all
+`.exp-card` / `.featured-*` CSS deleted (grep for either returns nothing).
+`ProjectSlab` / `ProjectImage` carried over untouched apart from `alt` now reading
+`imgAlt` — their geometry is Phase 3. typecheck / lint / build clean.
+
+Corrections to §2.4 as written:
+
+- **The tilt reset is at ≤720px, not ≤900px.** `.work-card` collapse and the
+  `.work-status` flatten went in beside it at 720 rather than opening a new
+  breakpoint for one rule.
+- ~~The slab collapse is at 820px, not 1000px.~~ **Wrong — retracted.** The repo
+  *was* at 820, but v4 build note #4 and `styles.css` both specify 1000, with the
+  reason written into the design's own CSS: below a ~1050px viewport the 1.4fr/1fr
+  split leaves the copy column ~230px of measure, "a text ribbon, not a column".
+  The repo was stale, not authoritative. Moved to 1000 in Phase 3.
+
+**Missing bullet markers (found by Anoop, fixed):** Tailwind's preflight sets
+`list-style: none` globally, so the work-card and project-slab lists rendered as an
+18px indent with nothing in it. The design prototype is plain HTML with no reset,
+and it sets `listStyle: "none"` *explicitly* on the also-shipped list only — so the
+card lists are meant to have markers. Restored as `disc` in `--color-ink-faint`.
+
+**17px rem basis:** `text-base` resolves to 17px here, so the intro paragraph and
+the MinorRow title were a step large against the design's 16. Both now explicit px.
+See the standing note about Tailwind's rem steps on this codebase.
+
+Rail behaviour at ≤720 needed a rule the plan didn't anticipate: stacked, the rail's
+number / kind / stamp read as three orphaned lines above the heading. It becomes a
+baseline flex row instead, so `01 · AI / ML · FULL-STACK` sits on one line with the
+stamp wrapping under it.
+
+**Verified 320 → 1440** (iframe probe, nine widths): zero horizontal overflow at
+every width, grid tracks and the h3 step-down flipping only at their breakpoints.
 
 ### 2.1 New structure
 
@@ -373,10 +408,39 @@ Add to `app/globals.css` beside the existing section rules:
 
 ---
 
-## Phase 3 — Media band, lightbox
+## Phase 3 — Media band, lightbox (DONE, 2026-07-28)
 
 *Q1 resolved — all three own-time projects have real images, so no placeholder path
 is needed. Unblocked.*
+
+**Landed.** Band geometry per spec (full grid column, 2px ink side rules,
+`min-height: 200px`, `paper-2`, `overflow: hidden`), slab collapse moved 820 → 1000,
+`.project-media.ph` placeholder branch and the `imgLabel` field deleted as
+unreachable. `Lightbox` + `ZoomableImage` added; `.zoom-btn` / `.lightbox` /
+`.lightbox-bar` ported from the design's `styles.css` rather than reinvented.
+
+**The bug that prompted this:** the old band capped the image at `max-h-[280px]`
+inside a band that stretches to the copy column (~680px), so the fand plate rendered
+380×280 in a 667×683 frame. The image now fills the band — 623px wide — with
+`object-fit: contain` doing the letterboxing.
+
+Divergences from the plan text, both deliberate:
+
+- **State is per-band, not lifted into `Work`.** The plan said lift `useState` into
+  `Work` and drill an `onZoom` callback. That would make the whole of §02 a client
+  component for one overlay. `ZoomableImage` is the client boundary instead, so
+  `Work` stays a server component. Only one lightbox can be open anyway — you have
+  to click a band to open it.
+- **The overlay is portalled to `document.body`.** The band sets `overflow: hidden`;
+  portalling means a future `transform` on an ancestor can't clip a fixed overlay.
+- **Scroll lock calls `lenis.stop()`**, not `body { overflow: hidden }`. Lenis drives
+  the scroll on this site, so the CSS lock alone would not have held it.
+- **Focus:** close button takes focus on open. No trap and no focus restore — the
+  cheap half of the plan's a11y note, skipped per the standing priority.
+
+Lightbox bar shows the project **title**, not the alt text — matching the prototype,
+which passes `p.t`. The long descriptive `imgAlt` stays on the `<img>` where it
+belongs; uppercased at 12px in the bar it would have been a paragraph.
 
 **Media band geometry** (unchanged from the design, applies whether the band holds
 an image or a placeholder): fills its full grid column, `2px solid var(--color-ink)`

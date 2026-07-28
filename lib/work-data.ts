@@ -36,12 +36,14 @@ export type Project = {
   org: string;
   cat: string;
   k: WorkAccent;
-  img: string | null;
-  imgAlt: string | null;
+  img: string;
+  imgAlt: string;
+  /** intrinsic pixel size of `img`. Must be the real numbers: the lightbox sizes
+   *  the element from them, and a wrong ratio letterboxes paper into the plate. */
+  imgW: number;
+  imgH: number;
   /** "contain" for dark UI shots that shouldn't bleed into the paper */
   imgFit: "contain" | "cover";
-  /** placeholder prompt for the empty media band when `img` is null */
-  imgLabel: string | null;
   d: string;
   shortD?: string;
   bullets: string[];
@@ -125,10 +127,11 @@ export const PROJECTS: Project[] = [
     cat: "systems · Rust",
     k: "teal",
     img: "/projects/fand.png",
+    imgW: 1696,
+    imgH: 1250,
     imgAlt:
       "fand's desktop GUI — a live temperature graph for a Ryzen 7 7800X3D and an RTX 4090, with two PWM headers and their curve cards below it.",
     imgFit: "contain",
-    imgLabel: null,
     d: "Fan control daemon, CLI, and GUI for Linux. No existing tool detected the NCT6799D controller on my motherboard, so I wrote one that does — a single privileged daemon owning sysfs and NVML, with a failsafe that hands control back to firmware.",
     bullets: [
       "Rust workspace splitting a pure curve-evaluation core (mix mode, hysteresis, ramp, unit-tested) from the privileged daemon.",
@@ -144,9 +147,10 @@ export const PROJECTS: Project[] = [
     cat: "frontend · local-first",
     k: "electric",
     img: "/projects/mosaic.png",
+    imgW: 1696,
+    imgH: 1285,
     imgAlt: "Mosaic's editor beside its live print preview, mid-edit on a resume.",
     imgFit: "contain",
-    imgLabel: null,
     d: "A modular resume editor with a live print-style preview, built local-first: resume data and preferences never leave the machine. Include/exclude toggles per entry and bullet, so one dataset can produce a targeted resume per application.",
     bullets: [
       "React 19 + TypeScript + Tailwind v4, with Zustand stores persisted to IndexedDB through a Dexie storage adapter.",
@@ -161,11 +165,13 @@ export const PROJECTS: Project[] = [
     org: "MS capstone · client under NDA",
     cat: "GenAI · backend",
     k: "coral",
-    // Not the prototype's audio-2.png — that's a leftover from the audio project.
-    img: "/projects/legalrescue-nda.png",
-    imgAlt: "A placard standing in for the product UI, which the client's NDA keeps out of the portfolio.",
+    // Architecture, not UI — the NDA covers the product's screens, not its shape.
+    img: "/projects/legalrescue-architecture.png",
+    imgW: 1840,
+    imgH: 790,
+    imgAlt:
+      "System diagram: a Next.js client posts audio through an API gateway to FastAPI pods on AWS EKS, Whisper transcribes it, GPT-4.1-mini classifies against session history in Elasticache, and a Celery worker writes summaries out to RDS.",
     imgFit: "contain",
-    imgLabel: null,
     d: "Designed and shipped a scalable LLM backend for a legal-AI startup. Voice-driven case intake: Whisper for STT, GPT-4.1-mini for classification and summarization, Celery + Redis for async workflows, Postgres for session storage.",
     bullets: [
       "FastAPI + Celery + Redis on AWS EKS, with a prompt-eval harness gating releases.",
