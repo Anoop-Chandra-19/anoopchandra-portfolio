@@ -160,27 +160,6 @@ export const PROJECTS: Project[] = [
     tags: ["React 19", "TypeScript", "Tailwind v4", "Zustand", "Dexie / IndexedDB", "react-pdf"],
     cta: "github →",
   },
-  {
-    t: "LegalRescue.ai",
-    org: "MS capstone · client under NDA",
-    cat: "GenAI · backend",
-    k: "coral",
-    // Architecture, not UI — the NDA covers the product's screens, not its shape.
-    img: "/projects/legalrescue-architecture.png",
-    imgW: 1840,
-    imgH: 790,
-    imgAlt:
-      "System diagram: a Next.js client posts audio through an API gateway to FastAPI pods on AWS EKS, Whisper transcribes it, GPT-4.1-mini classifies against session history in Elasticache, and a Celery worker writes summaries out to RDS.",
-    imgFit: "contain",
-    d: "Designed and shipped a scalable LLM backend for a legal-AI startup. Voice-driven case intake: Whisper for STT, GPT-4.1-mini for classification and summarization, Celery + Redis for async workflows, Postgres for session storage.",
-    bullets: [
-      "FastAPI + Celery + Redis on AWS EKS, with a prompt-eval harness gating releases.",
-      "Whisper STT pipeline feeding GPT-4.1-mini classification at sub-2s P95.",
-      "Full CI/CD; client NDA prevents UI screenshots.",
-    ],
-    tags: ["FastAPI", "OpenAI", "Whisper", "Redis", "Celery", "AWS EKS", "PostgreSQL"],
-    cta: "request walkthrough",
-  },
 ];
 
 export const MINOR: Minor[] = [
