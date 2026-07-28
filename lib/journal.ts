@@ -26,7 +26,6 @@ export type JournalEntry = JournalEntryMeta & {
 
 const CONTENT_DIR = path.join(process.cwd(), "content", "journal");
 const KINDS = ["case", "note"] as const;
-const STATUSES = ["published", "draft"] as const;
 /* The tag is a shelf label, not a taxonomy — one 90px pill on the index, where
    the colour already carries case-vs-note. A closed list keeps it that way:
    left free-form it drifts toward one tag per entry, and the pill stops
@@ -71,9 +70,6 @@ function parseEntry(file: string): JournalEntry {
   }
   if (!oneOf(data.kind, KINDS)) fail(file, `"kind" must be one of ${KINDS.join(" | ")}`);
   if (!oneOf(data.tag, TAGS)) fail(file, `"tag" must be one of ${TAGS.join(" | ")}`);
-  if (data.status !== undefined && !oneOf(data.status, STATUSES)) {
-    fail(file, `"status" must be one of ${STATUSES.join(" | ")}`);
-  }
   if (data.hero && !data.heroAlt) fail(file, `"heroAlt" is required when "hero" is set`);
   if (data.related !== undefined && !Array.isArray(data.related)) {
     fail(file, `"related" must be a list of slugs`);
@@ -96,7 +92,6 @@ function parseEntry(file: string): JournalEntry {
     hero: data.hero ? String(data.hero) : null,
     heroAlt: data.heroAlt ? String(data.heroAlt) : null,
     heroCaption: data.heroCaption ? String(data.heroCaption) : null,
-    status: (data.status as "published" | "draft" | undefined) ?? "published",
     related: (data.related as string[] | undefined)?.map(String) ?? [],
     body: content,
   };

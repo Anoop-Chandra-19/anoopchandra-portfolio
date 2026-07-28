@@ -137,7 +137,7 @@ Keep the PNG originals as source. (Mosaic is 318 KB on disk — the largest asse
 **Q2 — RESOLVED (2026-07-28).** The README claims `status` "still gates `draft` out of
 the index." It does not: `lib/journal.ts` validates and stores it, but nothing filters
 on it. Its only consumer is the `★ shipped` badge that Phase 5.2 deletes, after which
-it is read by nothing.
+it is read by nothing. **Phase 5 deleted the field entirely** (2026-07-28) — see there.
 
 **Anoop's call: leave the stub entries in, build the index exactly as designed.** No
 draft-gating. All 11 rows stay, §05 keeps its 8, and the subject filter keeps all six
@@ -622,7 +622,39 @@ the mobile pill works at 720 / 393.
 
 ---
 
-## Phase 5 — masthead cleanup (+ two cheap a11y deletions)
+## Phase 5 — masthead cleanup (+ two cheap a11y deletions) — DONE, 2026-07-28
+
+*Done ahead of Phase 4, at Anoop's call — Phase 4 is the largest remaining phase and
+this one is four deletions plus a comment.*
+
+All four edits landed as written:
+
+- `ArticleEntry.tsx:51` — `★ shipped` gone; the chip row is date + read time.
+- `app/journal.css` — `.je-stamp` and its `@media (max-width:640px)` override deleted.
+  `--accent-ink` had no other consumer in that rule, so nothing else moved.
+- `Notes.tsx` — row `aria-label` and the edge tab's `aria-hidden` removed. Replaced
+  the `aria-label` with the same explanatory comment `JournalIndex.tsx` carries, so
+  the omission reads as deliberate rather than as a miss.
+- **`status` deleted outright, not documented** — Anoop's call mid-phase: *"lets remove
+  the status right why put in on a comment?"* A dead field with a comment saying it is
+  dead is still a dead field, and the comment is one more thing to keep true. Removed
+  the `STATUSES` const, the validation branch, the parse line (`lib/journal.ts`), the
+  `status` member on `JournalEntryMeta` (`lib/journal-meta.ts:30`) and the frontmatter
+  key from all six files that authored it — five `draft`
+  (`reading-list-q1-2026`, `quick-client-side-ml-w-tf-js`,
+  `a-year-of-arch-arch-is-great-and-awful`, `nestjs-vs-express-in-2026`,
+  `notes-on-rag-eval-harnesses`) and one `published` (`legalrescue-ai`).
+
+  This supersedes **Q2 option (a)**. Note what it confirms on the way out: those five
+  drafts were *all listed in the index*, so the README's claim that `status` gates
+  drafts was never true. Draft gating, if it is ever wanted, is a new feature — not a
+  field waiting to be wired up.
+
+Typecheck, lint and `next build` clean; all 11 journal pages still prerender.
+
+---
+
+## Phase 5 — original spec
 
 Three small, independent edits. **Low priority** — Anoop's call, 2026-07-28: the a11y
 items are secondary. 5.2 is the one that changes what's on screen; 5.1 is two line
@@ -647,9 +679,10 @@ appeared on all of them and distinguished nothing. The chip row becomes date +
 read time only. `.je-stamp` in `app/journal.css:186` and its ≤`:376` override become
 dead — delete both. The index's `★ case study` badge is unrelated and stays.
 
-**5.3 — `status` follow-up.** Per **Q2**. If (a): add a comment at
+**5.3 — `status` follow-up.** ~~Per **Q2**. If (a): add a comment at
 `lib/journal.ts:99` recording that `status` is authored and validated but not yet
-read by anything.
+read by anything.~~ **Superseded — the field was deleted instead.** See the DONE
+block at the top of this phase.
 
 ---
 

@@ -48,7 +48,6 @@ export default function ArticleEntry({
           <div className="je-chips">
             <span className="je-chip">{entry.dateDisplay}</span>
             <span className="je-chip">{entry.read} read</span>
-            {entry.status === "published" && <span className="je-stamp">★ shipped</span>}
           </div>
           <h1 className="je-title">{entry.title}</h1>
           <p className="je-dek">{entry.dek}</p>

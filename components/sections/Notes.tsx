@@ -49,7 +49,8 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                   // the column track lives in CSS (not inline) so the mobile pass
                   // can re-flow the row without an !important fight
                   className="notes-row grid gap-3.5 items-baseline py-3 pr-[90px] pl-1.5 relative no-underline transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
-                  aria-label={`Open note: ${e.title}`}
+                  /* No aria-label: on a link it replaces the whole subtree, so it
+                     was hiding the page number, read time and date. */
                   onClick={(ev) => {
                     // keep native behavior for new-tab/window clicks
                     if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
@@ -87,7 +88,6 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                   </span>
 
                   <span
-                    aria-hidden="true"
                     className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-2.5 pr-2"
                     // only the tab colour is dynamic — border/radius live in CSS
                     // so the mobile pass can turn the edge tab into a pill
