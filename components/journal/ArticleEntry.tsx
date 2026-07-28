@@ -28,8 +28,6 @@ export default function ArticleEntry({
   sections: Section[];
   related: JournalEntryMeta[];
 }) {
-  const kindLabel = entry.kind === "case" ? "case study" : "note";
-
   return (
     <div className="je">
       <ReadingProgress />
@@ -40,15 +38,14 @@ export default function ArticleEntry({
         </nav>
 
         <header className="je-mast">
-          {/* No tag in the eyebrow and no #tag in the byline below: the pill
-              row states the type once, and saying it twice more costs two
-              lines and tells the reader nothing. */}
+          {/* Neither the kind nor the tag appears here. You arrived from a
+              coloured tab that already said which bucket this is, so the pill
+              row is only what the index couldn't tell you: when, and how long. */}
           <div className="je-ledger">
             <span>entry № {pad(entry.no)}</span>
             <span className="dash" /><span>the journal · vol. 02</span>
           </div>
           <div className="je-chips">
-            <span className="je-chip is-kind">{kindLabel}</span>
             <span className="je-chip">{entry.dateDisplay}</span>
             <span className="je-chip">{entry.read} read</span>
             {entry.status === "published" && <span className="je-stamp">★ shipped</span>}

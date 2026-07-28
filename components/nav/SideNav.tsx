@@ -13,11 +13,14 @@ export default function SideNav({
   const jumpTo = useSectionJump();
 
   return (
+    /* Whole pixels only, never rem: at a 17px basis the usual Tailwind steps
+       land on fractions and the row pitch drifts, which puts each 2px dash on
+       a different sub-pixel phase and antialiases them to different weights. */
     <nav
-      className="side-nav-desktop fixed left-7 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-0.5 py-3.5 pr-2.5 pl-3.5"
+      className="side-nav-desktop fixed left-[30px] top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-[2px] py-[14px] pr-[10px] pl-[14px]"
       aria-label="Section navigation"
     >
-      <div className="mono faint anim-rail d-rail-h text-[9px] tracking-[3px] uppercase mb-2.5 pl-0.5">
+      <div className="mono faint anim-rail d-rail-h text-[9px] leading-[12px] tracking-[3px] uppercase mb-[10px] pl-[2px]">
         index
       </div>
       {NAV_ITEMS.map(([id, num, label], idx) => {
@@ -26,9 +29,8 @@ export default function SideNav({
           <a
             key={id}
             href={`#sec-${id}`}
-            className={`anim-rail d-rail-${idx} flex items-center gap-2.5 no-underline text-ink py-[5px] px-1.5 rounded transition-opacity duration-[180ms] ${
-              isActive ? "opacity-100" : "opacity-55 hover:opacity-100"
-            }`}
+            /* Colour and dash length carry the active state — no dim. */
+            className={`anim-rail d-rail-${idx} flex h-[30px] items-center gap-[10px] no-underline text-ink px-[6px] rounded`}
             onClick={(e) => {
               e.preventDefault();
               jumpTo(id);
@@ -42,14 +44,14 @@ export default function SideNav({
               {num}
             </span>
             <span
-              className={`relative h-0.5 transition-[width] duration-200 overflow-hidden ${
-                isActive ? "w-7 bg-electric" : "w-2.5 bg-ink"
+              className={`relative h-[2px] transition-[width] duration-200 overflow-hidden ${
+                isActive ? "w-[28px] bg-electric" : "w-[10px] bg-ink"
               }`}
             />
             <span
               /* Persistent nav is chrome, so it leaves the serif behind entirely. */
               className={`mono text-[11.5px] tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
-                isActive ? "text-electric translate-x-0" : "text-ink -translate-x-0.5"
+                isActive ? "text-electric translate-x-0" : "text-ink -translate-x-[1px]"
               }`}
             >
               {label}

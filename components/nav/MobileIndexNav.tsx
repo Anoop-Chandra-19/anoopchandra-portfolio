@@ -153,9 +153,11 @@ export default function MobileIndexNav({
                     }}
                   >
                     <span className="mono m-nav-ov-num">{num}</span>
-                    <span className="hand m-nav-ov-label">{label}</span>
+                    {/* the overlay is chrome end to end — the labels go mono
+                        with the numbers rather than staying display type */}
+                    <span className="mono m-nav-ov-label">{label}</span>
                     <span className="m-nav-ov-rule" aria-hidden="true" />
-                    {on && <span className="hand m-nav-ov-here">← here</span>}
+                    {on && <span className="mono m-nav-ov-here">← here</span>}
                   </a>
                 </li>
               );

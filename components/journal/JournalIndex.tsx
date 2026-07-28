@@ -89,7 +89,7 @@ export default function JournalIndex({
 
       {/* Filter rail */}
       <div className="flex items-center flex-wrap gap-2.5 mb-[22px]">
-        <span className="mono faint text-[11px]">filter ↦</span>
+        <span className="mono text-[11px] tracking-[1px] uppercase text-ink-soft">filter ↦</span>
         {FILTERS.map(([k, label]) => (
           <button
             key={k}
@@ -101,7 +101,7 @@ export default function JournalIndex({
             <span className="mono text-[11px] opacity-70 ml-1">({counts[k]})</span>
           </button>
         ))}
-        <span className="mono faint text-[11px] ml-auto">sorted newest → oldest</span>
+        <span className="mono text-[12px] text-ink-soft ml-auto">sorted newest → oldest</span>
       </div>
 
       {/* Notebook TOC panel */}
@@ -134,7 +134,9 @@ export default function JournalIndex({
               <Link
                 href={`/journal/${e.slug}`}
                 className="journal-toc-row items-baseline relative no-underline transition-colors duration-150"
-                aria-label={`Open entry: ${e.title}`}
+                /* No aria-label: on a link it replaces the whole subtree, so it
+                   was hiding the page number, kind, read time and date from
+                   screen readers. The row's own text is the better name. */
               >
                 <span className="mono faint journal-toc-page text-[11px] text-right text-ink-soft">
                   p.{pad(e.page)}
@@ -144,9 +146,14 @@ export default function JournalIndex({
                   <span className="text-[18px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
                     {e.title}
                   </span>
-                  {/* No "★ case study" badge here: the edge tab already states
-                      the kind through its colour, and a badge saying it again
-                      is two labels on one row telling the reader one thing. */}
+                  {/* The one place the kind is stated in words. The edge tab
+                      carries a subject now, not the bucket, so colour is
+                      otherwise the only signal — and the tab is aria-hidden. */}
+                  {e.kind === "case" && (
+                    <span className="mono text-[9px] tracking-[2px] uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
+                      <span aria-hidden="true">★ </span>case study
+                    </span>
+                  )}
                   <span
                     aria-hidden="true"
                     className="journal-toc-leader flex-1 h-0 min-w-6 -translate-y-1"
@@ -161,8 +168,10 @@ export default function JournalIndex({
                   {e.dateDisplay}
                 </span>
 
+                {/* Audible now that the tab carries a subject rather than
+                    restating the bucket — it was decorative when it read
+                    "case study" next to a coral tab saying the same thing. */}
                 <span
-                  aria-hidden="true"
                   className="journal-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[90px] py-[3px] pl-2.5 pr-2"
                   style={{
                     fontFamily: "var(--font-mono)",

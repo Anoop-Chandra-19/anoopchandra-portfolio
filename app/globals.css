@@ -363,15 +363,26 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 
 @media (max-width: 720px) {
   /* ---- type scale + shell ---- */
-  /* Phase 6 re-tunes these: headings step down and body steps up, because the
-     values below were fitted to handwriting. Layered so the markup still wins. */
-  @layer base {
-    html, body { font-size: 15px; }
+  /* Mobile re-tunes, it does not rescale. The old sizes were fitted to
+     handwriting, which reads ~25% smaller than serif at the same px, so
+     headings step DOWN (~0.78×) and body steps UP. No clamps: the phone is one
+     width band, and a clamp here only re-introduces the fluid sizes the scale
+     replaced. Layered so the markup still wins. */
+  /* The reading size is set on <body>, unlayered, because that is where the
+     desktop rule sets it — a layered copy inside this media query loses to it
+     no matter how narrow the screen gets. (The block this replaces set
+     `html, body { font-size: 15px }` inside `@layer base`, so mobile has in
+     fact been reading at the desktop 18px the whole time.) `html` stays at its
+     17px rem basis at every width: it is what ~170 Tailwind spacing utilities
+     resolve against, and moving it would silently rescale the whole layout. */
+  body { font-size: 16px; line-height: 1.6; }
 
-    h1 { font-size: clamp(42px, 13.5vw, 58px); line-height: 0.94; letter-spacing: 0.3px; }
-    h2 { font-size: clamp(26px, 7.6vw, 34px); line-height: 1; }
-    h3 { font-size: clamp(19px, 5.4vw, 22px); line-height: 1.12; }
-    h4 { font-size: 18px; }
+  @layer base {
+    h1 { font-size: 42px; line-height: 1.03; letter-spacing: -0.022em; }
+    h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.014em; }
+    h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.012em; }
+    h4 { font-size: 17px; line-height: 1.25; letter-spacing: -0.008em; }
+    p { font-size: 16px; line-height: 1.62; }
   }
 
   .page { padding: 26px 18px 88px; max-width: 100%; }
@@ -380,8 +391,11 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 
   .row { flex-direction: column; gap: 14px; }
   .col { gap: 14px; }
-  .marker-highlight { padding: 0 3px; }
+  /* the marker band is the same geometry at both widths — no mobile override */
+  /* Caveat's floor: 20px on the phone, one step under the desktop 21. */
   .note { font-size: 20px; }
+  /* chips are chrome, one step down from desktop's 12 */
+  .chip { font-size: 11.5px; }
 
   /* No chaotic tilts on a narrow screen — they cost horizontal room and read
      as misalignment rather than personality at this size. */
@@ -393,13 +407,21 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   .featured-slab,
   .lab-card-btn .sketch-box { padding: 0; }
 
-  /* Section intro paragraph under each header */
-  .section > p.faint { font-size: 14px; margin-bottom: 16px; }
+  /* Section intro paragraph under each header. It is prose, so it steps up with
+     the body rather than shrinking away from it — `faint` already marks it as
+     secondary and doing that twice just makes it hard to read. */
+  .section > p.faint { font-size: 16px; line-height: 1.6; margin-bottom: 16px; }
 
   /* ---- section headers: number + meta on one baseline row, title below ---- */
   .section-header { flex-wrap: wrap; gap: 6px 14px; margin-bottom: 20px; padding-bottom: 8px; }
-  .section-header .num { order: 1; font-size: 12px; }
-  .section-header .meta { order: 2; margin-left: auto; text-align: right; }
+  .section-header .num { order: 1; font-size: 11px; letter-spacing: 1px; }
+  .section-header .meta {
+    order: 2;
+    margin-left: auto;
+    text-align: right;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+  }
   .section-header h2 { order: 3; flex: 1 0 100%; margin: 6px 0 0; }
 
   /* §02's hand-drawn arrow and §06's postmark rule are desktop flourishes that
@@ -408,6 +430,8 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   .sh-arrow { margin-bottom: 20px; padding-bottom: 8px; }
   .sh-arrow-svg { display: none; }
   .sh-arrow-row { flex-wrap: wrap; gap: 6px 14px; padding-left: 0; }
+  .sh-num { font-size: 11px; letter-spacing: 1px; }
+  .sh-meta { font-size: 10.5px; letter-spacing: 0.5px; }
   .sh-arrow-row .sh-num { order: 1; }
   .sh-arrow-row .sh-meta { order: 2; margin-left: auto; }
   .sh-arrow-row h2 { order: 3; flex: 1 0 100%; margin: 6px 0 0; }
@@ -415,7 +439,11 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   .sh-stamp { gap: 12px; margin-bottom: 20px; }
   .sh-stamp-rule { display: none; }
   .sh-stamp-box { padding: 6px 16px 8px; }
-  .sh-stamp-box h2 { font-size: clamp(30px, 9vw, 40px); }
+  /* The stamp's h2 comes down to the base h2, same as every other section
+     header — the box is the flourish, not the type. Unlayered because the
+     desktop size is a Tailwind utility (40px, a step under the base h2 so it
+     fits inside the box). */
+  .sh-stamp-box h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.014em; }
 
   /* ---- 00 hero: kicker, portrait, then the type stack ---- */
   /* Desktop is a two-column grid with the portrait beside the copy; on a phone
@@ -434,16 +462,20 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   }
   .hero-grid { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
   .hero-text { display: contents; }
-  .hero-kicker   { order: 1; padding-right: 116px; } /* clears the index chip */
+  .hero-kicker   { order: 1; padding-right: 116px; font-size: 10px; letter-spacing: 3px; } /* clears the index chip */
   /* The portrait is the section's shock absorber: it takes as much room as the
      viewport allows so the stack below it still lands above the fold on short
      phones. */
   .hero-portrait { order: 2; width: min(300px, 74vw, 34svh); margin: 18px auto 22px; }
-  .hero-title    { order: 3; margin: 0 0 4px; }
-  .hero-tagline  { order: 4; margin-top: 12px; font-size: 20px; }
-  .hero-lede     { order: 5; margin-top: 16px; font-size: 16px; }
+  /* The hero title is the site's only fluid type, and a Tailwind clamp sets it
+     — which out-ranks `@layer base`. Restating it here (unlayered) is what
+     lands the mobile h1 on 42 and lets the narrow-phone block reach it at all. */
+  .hero-title    { order: 3; margin: 0 0 4px; font-size: 42px; line-height: 1.03; }
+  /* the dek: italic, regular, one step under body's neighbours — 400 always */
+  .hero-tagline  { order: 4; margin-top: 12px; font-size: 17px; line-height: 1.55; }
+  .hero-lede     { order: 5; margin-top: 16px; font-size: 16px; line-height: 1.62; }
   .hero-chips    { order: 6; margin-top: 18px; gap: 8px; }
-  .hero-status   { order: 7; margin-top: 20px; }
+  .hero-status   { order: 7; margin-top: 20px; font-size: 10.5px; letter-spacing: 0.5px; }
   .hero-portrait-box { width: 100%; }
   /* The note rides the portrait's own corner — with the wrapper shrunk to the
      portrait, "right/left" are its edges rather than the page's. */
@@ -456,8 +488,19 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   .now-card { transform: none; }
 
   /* ---- 02 work ---- */
+  /* Every card heading collapses onto the base h3 here — 24 / 25 / 30 is a
+     desktop hierarchy that needs three columns of width to read as one. On a
+     single-column phone the cards are already ordered top to bottom, so the
+     prototype gives them all one size and lets position do the ranking.
+     Unlayered because the sizes are Tailwind utilities on the markup. */
+  .exp-card h3,
+  .project-content h3,
+  .featured-body h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.012em; }
+  .exp-card p,
+  .project-content p,
+  .featured-body p { font-size: 16px; line-height: 1.62; }
+
   .exp-card { grid-template-columns: 1fr; gap: 14px; }
-  .exp-card p { font-size: 15px; }
 
   .featured-tab { left: 16px; }
   .featured-hero { min-height: 160px; }
@@ -469,14 +512,10 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   .group-rule { gap: 10px; }
   .group-rule-line { flex-shrink: 0; min-width: 20px; }
   .featured-body { grid-template-columns: 1fr; gap: 16px; padding: 18px; }
-  .featured-body h3 { font-size: clamp(24px, 7vw, 30px); }
-  .featured-body p { font-size: 15px; }
 
   .project-media { min-height: 0; padding: 16px; }
   .project-media img { max-height: 190px; }
   .project-content { padding: 18px; }
-  .project-content h3 { font-size: clamp(22px, 6.4vw, 26px); }
-  .project-content p { font-size: 15px; }
 
   /* ---- 03 the lab ---- */
   .lab-card-canvas { height: 120px; }
@@ -485,8 +524,10 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 
   /* ---- 04 stack ---- */
   /* the legend stacks, so its inline "·" separator has nothing to separate */
-  .stack-legend { flex-direction: column; gap: 3px; }
+  .stack-legend { flex-direction: column; gap: 3px; font-size: 10.5px; letter-spacing: 0.5px; }
   .stack-legend-sep { display: none; }
+  /* tooling identifiers — mono, one step down from desktop's 13 */
+  .stack-list { font-size: 12.5px; }
 
   /* ---- 05 notes ---- */
   /* Notebook page: narrower gutter, and each row becomes title-over-meta with
@@ -504,12 +545,19 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
     padding: 11px 2px;
     border-bottom: 1px dashed color-mix(in oklab, var(--color-ink) 12%, transparent);
   }
-  .notes-row .notes-date  { grid-area: 1 / 1 / 3 / 2; align-self: start; padding-top: 3px; }
+  .notes-row .notes-date  { grid-area: 1 / 1 / 3 / 2; align-self: start; padding-top: 3px; font-size: 10.5px; }
   .notes-row .notes-title { grid-area: 1 / 2 / 2 / 5; }
-  .notes-row .notes-title > .hand { white-space: normal; font-size: 19px; line-height: 1.14; }
+  /* the title is the row's only reading type, so it steps up while the meta
+     around it steps down — the row has two lines to itself here */
+  .notes-row .notes-title > :first-child {
+    white-space: normal;
+    font-size: 18px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
   .notes-leader { display: none; }
-  .notes-row .notes-read { grid-area: 2 / 2 / 3 / 3; text-align: left; font-size: 10px; }
-  .notes-row .notes-when { grid-area: 2 / 3 / 3 / 4; text-align: left; font-size: 10px; }
+  .notes-row .notes-read { grid-area: 2 / 2 / 3 / 3; text-align: left; font-size: 9.5px; letter-spacing: 0.5px; }
+  .notes-row .notes-when { grid-area: 2 / 3 / 3 / 4; text-align: left; font-size: 9.5px; letter-spacing: 0.5px; }
   /* the edge tab has no page edge to tuck into here — it becomes a pill on the
      meta line, which is where the design puts it */
   .notes-edge-tab {
@@ -530,7 +578,9 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   /* The postcard stacks: message side above, dashed fold, address side below. */
   .postcard { transform: none; }
   .contact-grid { grid-template-columns: 1fr; min-height: 0; }
-  .contact-grid h2 { font-size: clamp(38px, 11vw, 48px); }
+  /* the postcard headline is display type on its own card, so it sits above
+     the base h2 — at the h1 size, which is where two short words belong */
+  .contact-grid h2 { font-size: 34px; line-height: 1.03; letter-spacing: -0.018em; }
   .contact-message { padding: 26px 20px 20px; }
   .contact-colophon {
     border-left: none;
@@ -543,17 +593,22 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   /* the stamp's type has to come down with the frame or "$0.42" sits on the
      perforation */
   .contact-stamp { width: 74px; height: 90px; padding: 4px; }
-  .contact-stamp > .hand { font-size: 20px; }
+  .contact-stamp > .accent { font-size: 20px; }
   .contact-stamp > .mono { margin-top: 4px; line-height: 1.3; }
   .contact-stamp > .mono:last-child { font-size: 10px; }
+  /* Caveat address lines: 20px is the floor, and `text-xl` lands under it once
+     the rem basis drops to 15 */
+  .contact-addr > * { font-size: 20px; }
 }
 
 /* ---- Very narrow phones (SE-class): the notebook row runs out of room for
    four meta columns, so the read time drops and the gutter tightens. ---- */
 @media (max-width: 360px) {
-  /* every line wraps one step earlier here, so the hero rhythm tightens to keep
-     the whole stack on the landing screen */
-  @layer base { h1 { font-size: 40px; } }
+  /* Every line wraps one step earlier here, so the hero rhythm tightens to keep
+     the whole stack on the landing screen. The h1 no longer needs its own step
+     down: 42px of serif fits "chandra." at 331px, where the old 58px clamp
+     ceiling did not — the size override this block used to carry never applied
+     to the hero anyway, since a Tailwind clamp out-ranks `@layer base`. */
   .hero-portrait { margin: 12px auto 16px; }
   .hero-tagline { margin-top: 10px; }
   .hero-lede { margin-top: 12px; }
@@ -594,6 +649,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   cursor: pointer;
   transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.12s;
 }
+.m-nav-tab .mono { font-size: 11px; letter-spacing: 1px; }
 .m-nav-tab:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 var(--color-ink);
@@ -644,8 +700,8 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   padding-bottom: 14px;
   margin-bottom: 14px;
   border-bottom: 2px dashed var(--color-ink);
-  font-size: 11px;
-  letter-spacing: 2px;
+  font-size: 10px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
 }
 .m-nav-close {
@@ -654,8 +710,8 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   border: none;
   background: none;
   color: var(--color-ink);
-  font-size: 11px;
-  letter-spacing: 2px;
+  font-size: 10px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -671,18 +727,23 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   color: var(--color-ink);
   text-decoration: none;
 }
-.m-nav-ov-num { font-size: 13px; color: var(--color-ink-faint); min-width: 22px; }
-.m-nav-ov-label { font-size: 30px; line-height: 1; }
+/* The overlay is an index, not a page — every line in it is chrome, so it
+   leaves the serif behind entirely and goes mono. This is the single biggest
+   visual change on the phone: the labels drop from 30px of display type to
+   19px of mono, which is what makes it read as a table of contents rather than
+   a second homepage. */
+.m-nav-ov-num { font-size: 11px; letter-spacing: 1px; color: var(--color-ink-faint); min-width: 22px; }
+.m-nav-ov-label { font-size: 19px; line-height: 1.1; font-weight: 500; letter-spacing: -0.02em; }
 .m-nav-overlay-list li.on .m-nav-ov-label { color: var(--color-electric); }
 .m-nav-ov-rule {
   flex: 1;
   min-width: 16px;
   border-bottom: 1.5px dotted var(--color-ink-faint);
-  /* The row centres its items by box, but Caveat's lowercase sits low in its
-     box — a leader on the exact centre reads as floating above the words it
-     connects. Drop it onto the hand font's optical middle so it lines up with
-     both the label and "← here". */
-  transform: translateY(2px);
 }
-.m-nav-ov-here { font-size: 18px; color: var(--color-electric); }
-.m-nav-overlay-foot { font-size: 10px; text-align: center; margin-top: 14px; }
+.m-nav-ov-here {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-electric);
+}
+.m-nav-overlay-foot { font-size: 9.5px; letter-spacing: 1.5px; text-align: center; margin-top: 14px; }

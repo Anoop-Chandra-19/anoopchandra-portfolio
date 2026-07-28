@@ -161,7 +161,7 @@ export default function Contact() {
             </div>
 
             <div className="mono faint text-[10px] tracking-[3px] uppercase mb-2.5">to —</div>
-            <div className="flex flex-col gap-2.5 mb-[18px]">
+            <div className="contact-addr flex flex-col gap-2.5 mb-[18px]">
               <div className="accent text-[22px] text-ink pb-1 border-b-[1.2px] border-ink-faint">
                 whoever&apos;s reading this
               </div>

@@ -151,7 +151,7 @@ export default function Stack() {
             <div className="mono faint text-[11px] mt-0.5">{col.note}</div>
             {/* Tooling identifiers, not a bibliography — so they go mono. The
                 h4 above them stays serif. */}
-            <ul className="mono list-none p-0 mt-4 text-[13px] tracking-[-0.01em] leading-[1.4]">
+            <ul className="mono stack-list list-none p-0 mt-4 text-[13px] tracking-[-0.01em] leading-[1.4]">
               {col.items.map(([name, years, obsession]) => (
                 <li
                   key={name}

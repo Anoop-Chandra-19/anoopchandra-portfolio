@@ -27,6 +27,11 @@ export type JournalEntry = JournalEntryMeta & {
 const CONTENT_DIR = path.join(process.cwd(), "content", "journal");
 const KINDS = ["case", "note"] as const;
 const STATUSES = ["published", "draft"] as const;
+/* The tag is a shelf label, not a taxonomy — one 90px pill on the index, where
+   the colour already carries case-vs-note. A closed list keeps it that way:
+   left free-form it drifts toward one tag per entry, and the pill stops
+   sorting anything. Adding a tag is a deliberate edit here, not a typo. */
+const TAGS = ["ai/ml", "backend", "web", "linux", "hardware", "meta"] as const;
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 function fail(file: string, msg: string): never {
@@ -65,6 +70,7 @@ function parseEntry(file: string): JournalEntry {
     }
   }
   if (!oneOf(data.kind, KINDS)) fail(file, `"kind" must be one of ${KINDS.join(" | ")}`);
+  if (!oneOf(data.tag, TAGS)) fail(file, `"tag" must be one of ${TAGS.join(" | ")}`);
   if (data.status !== undefined && !oneOf(data.status, STATUSES)) {
     fail(file, `"status" must be one of ${STATUSES.join(" | ")}`);
   }

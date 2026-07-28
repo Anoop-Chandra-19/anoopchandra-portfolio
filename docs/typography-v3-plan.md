@@ -313,6 +313,43 @@ sheet serif 15/1.5, side note Caveat 20/1.36.
 `≤360px` (SE-class) block gets re-checked against the new h1 — 42px may not need the
 40px override any more.
 
+**Done.** Notes on how it landed:
+
+- **The mobile reading size was never applying.** The `≤720px` block set
+  `html, body { font-size: 15px }` inside `@layer base`, and the unlayered
+  `html, body { font-size: 17px }` / `body { font-size: 18px }` at the top of
+  the file beat it — so the phone has been reading at the *desktop* 18px all
+  along. Same cascade trap as the `.mono` bug in Phase 3, one file over. The
+  reading size now sits on an unlayered `body` rule inside the media query;
+  element defaults (`h1`–`h4`, `p`) stay in `@layer base` so the markup can
+  still override them.
+- **`html` stays 17px at every width.** It is the rem basis for ~170 Tailwind
+  spacing utilities, and moving it rescales the whole mobile layout sideways.
+  Every mobile chrome size is therefore written in px, not `text-…`.
+- **No clamps.** `h1`/`h2`/`h3` and four card headings were fluid; the phone is
+  one width band, and a clamp there re-introduces exactly the fluid sizing the
+  fixed scale replaced. The hero title keeps its desktop clamp and gets a flat
+  42px here — it is a Tailwind utility, so the rule has to be unlayered.
+- **Card headings collapse to one size (20px).** 24 / 25 / 30 is a hierarchy
+  that needs three columns to read as one; in a single column the cards are
+  already ordered top to bottom, so the prototype gives them all `.mscreen h3`
+  and lets position do the ranking.
+- **Four dead selectors found and fixed** — `.notes-row .notes-title > .hand`,
+  `.journal-toc-title > .hand`, `.contact-stamp > .hand` and the `≤360px`
+  `h1` override. The first three target a `.hand` class the markup lost in
+  Phase 1; the fourth was layered under a utility clamp. All four had been
+  silently doing nothing.
+- Nav overlay went mono end to end (label 19/500/−0.02em, "← here" 11px
+  uppercase), and the leader's `translateY(2px)` came out with it — that offset
+  existed to meet Caveat's optical middle.
+- Two classes added to markup so the mobile rules had something to hold:
+  `.stack-list` and `.contact-addr`.
+
+**Deliberately left alone:** `.lab-card-canvas > span` (the "draw a digit ↗"
+action line). `type-v3-mobile.css` moves its `.m-lab-canvas .hand` equivalent to
+mono 13px, but ours is already serif rather than handwriting, and switching
+family across a breakpoint reads worse than either choice does on its own.
+
 ## Phase 7 — verification
 
 - `npm run lint` + `npm run build` clean.
@@ -322,6 +359,40 @@ sheet serif 15/1.5, side note Caveat 20/1.36.
   that alters section heights changes what it captures.
 - Confirm no `--font-hand` / `--font-serif` / Kalam / Newsreader references survive.
 - Confirm Caveat appears *only* at the audited accent sites, and never below 20px.
+
+**Done.** Lint and build clean, 21/21 routes. The width pass ran through same-origin
+iframes rather than window resizes — the window manager refuses viewports under 500px,
+and an iframe gets the media queries right at any width, plus computed styles and
+overflow numbers instead of eyeballed screenshots.
+
+Three defects, all fixed:
+
+- **The left rail's dashes had visibly different weights** — heaviest at `cover`,
+  softening down to `say hi`. Not a colour or opacity difference: at the 17px rem basis
+  `h-0.5` is 2.125px and the row pitch 31.094px, so each dash sat on a different
+  sub-pixel phase and got antialiased differently (`cover` covered two whole device
+  rows, `say hi` spread over three). `SideNav.tsx` is now whole pixels throughout —
+  pitch 32, dash 2px, and an even 274px nav height so `-translate-y-1/2` lands on the
+  grid too. The inactive label also carried `-translate-x-0.5` (−1.0625px), which blurred
+  every inactive label against a crisp active one; now −1px.
+- **`/lab/[slug]` overflowed horizontally at 331px** — `.lx-kfield-hint` is a `nowrap`
+  line that measures 345px, and `.lx-modes` wouldn't wrap its two buttons. Both fixed.
+- **The § rail's titles were Caveat at 16px**, four steps under the floor this plan sets
+  for the aside role. Raised to 20px with the clamp at 4 lines; verified unclipped across
+  all 11 articles at the 132px and 104px rail widths.
+
+One thing deliberately left alone: the rail's `opacity: isActive ? 1 : 0.55`, which is in
+the reference and has never rendered in any build — `.anim-rail` fills forwards to opacity
+1 and out-ranks the cascade. Restoring it makes each row land dark and fade down 180ms
+later, which reads as a glitch. The rail's active state is colour and dash length; there
+is no dim. Don't "fix" the fill mode.
+
+Verified at 1440/1100/820/393/331: no page-level horizontal overflow anywhere (the
+overflowing spans inside `.je-code` are the code block's own scroll container), `html`
+holds 17px at every width, and no Caveat below 20px on any surface. The ink transition
+still fires and still snapshots the correct live DOM. No `--font-hand` / `--font-serif` /
+Newsreader references survive; the two Kalam mentions left are comments explaining why a
+size or band was retuned.
 
 ---
 
