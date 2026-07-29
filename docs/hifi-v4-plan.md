@@ -771,7 +771,108 @@ intentional — do not normalise them.
 
 ---
 
-## Phase 7 — Mobile pass
+## Phase 7 — Mobile pass (DONE, 2026-07-29)
+
+**Landed.** All four sub-phases. Verified 320 → 1440 (eleven widths, same-origin
+iframe probe): **zero horizontal overflow at every width, and nothing inside §02
+escapes the viewport at any of them.** typecheck / lint / `next build` clean, all
+20 routes prerendered.
+
+**One breakpoint, not three.** The plan hedged between ≤900 / ≤720 / ≤430; everything
+here landed at **720**, which is already where §02 goes single-column and the tilts
+zero out. Copy and layout switch together rather than staggering across a new
+breakpoint nothing else uses.
+
+**Type sizes were deliberately not ported from `mobile.css`.** v4's mobile prose
+scale (`.mscreen p` 15px, `.m-ul` 14px) is pre-v3; the typography source for this
+codebase is `design_handoff_type_v3`, whose mobile pass steps body *up*. Only the
+v4-only chrome — the numbers, stamps and kind lines that did not exist in v3 —
+came across verbatim.
+
+### 7.1 — condensed copy
+
+`shortD` / `shortBullets` populated from `M_WORK` / `M_ALSO` / `M_PROJECTS`, plus two
+fields the Phase 1 list didn't anticipate:
+
+- **`shortImpact`** — the design shortens the impact line on systems 01 and 02.
+- **`shortTags`** — a *replacement* list, not a subset. Mobile both drops a tag
+  (`Responses API`) and renames one (`Dexie / IndexedDB` → `Dexie`), so hiding
+  individual pills could not express it.
+
+`ALSO` became `Also[]` (`{ d, shortD }`) rather than a parallel `ALSO_SHORT` array —
+two arrays that must stay index-aligned is the fork this field design exists to avoid.
+Omitted wherever mobile and desktop copy are identical (fand's summary, five of the
+twelve bullets); callers fall back to the long field.
+
+**Rendered both, hidden in CSS**, per the plan's recommendation, through three
+helpers in `Work.tsx` (`Copy` / `Bullets` / `TagRow`) that are the only places the
+duplication lives. §02 stays a Server Component. The utility only ever sets
+`display: none`, never a shown value — the visible variant keeps whatever display its
+own Tailwind classes give it (`grid` on bullet lists, `flex` on tag rows), and being
+unlayered it outranks them. Measured at 393: every `.wide-only` computes `none`, every
+`.narrow-only` computes its natural `grid` / `flex` / `inline` / `block`, and the
+mirror image holds at 1280.
+
+### 7.2 — layout
+
+- **The work-card rail was rebuilt, correcting Phase 2.** Phase 2 improvised
+  `01 · AI / ML · FULL-STACK` on one flex row with the stamp wrapping under it; the
+  design's `m-work-top` puts the **number and the stamp on the top row** with the kind
+  line under both. Now a 2-column grid on named classes (`.work-rail` / `.work-num` /
+  `.work-kind`) instead of `> div:first-child` positional selectors. Measured at 393:
+  number at x36, stamp right-aligned flush to the content edge, kind spanning row 2.
+- **The status stamp keeps a rotation on mobile** — `-1.5deg`, per `.m-work-status`.
+  The blanket `.work-status { transform: none }` was over-applying the untilted-card
+  rule; that rule exists to protect 14.5px body copy, and this is a 9px mono label the
+  design explicitly keeps pressed on.
+- **The impact line sits out the body step-up.** `.work-card p` bumps to 16px on
+  mobile, which was catching the impact paragraph too. The design keeps impact one
+  step under the summary (14 against 15), so it holds at 15px rather than being
+  raised and then pulled back down.
+- Role org → 26px; minor rows → title and year on one baseline row (`m-minor-top`)
+  with copy and dotted CTA beneath. Also-list's 14px dash column and the slab band's
+  stacked geometry were already correct — confirmed, not changed (band 339×232 at 393,
+  plate contained at 299×190 inside the 20px padding).
+
+### 7.3 — zoomable lightbox
+
+**Shipped.** Phase 3 made this conditional on "real screenshots worth zooming into" —
+Q1 resolved that way, and a 1696px-wide fan-curve GUI is unreadable at 393.
+
+Ported from `LightboxM`: pinch 1–6×, one-finger pan when zoomed, double-tap 1× ↔ 2.6×,
+translation clamped to the scaled bounds, `touch-action: none` on the stage.
+
+Divergences, both deliberate:
+
+- **Desktop behaviour is untouched, without a media query.** Double-tap zoom is gated
+  on `pointerType === "touch"`; pinch needs two pointers and pan needs `s > 1`, so a
+  mouse can reach none of it. Verified by dispatching mouse pointer events at 1280:
+  tap on the plate does nothing, double-click does nothing, tap beside the plate still
+  closes — exactly what it did before.
+- **The scrim click became a tap test on the stage.** The stage has to own the pointer
+  stream, so click-to-dismiss is now "last pointer up, moved < 6px, and the press did
+  not land on the plate". A pan no longer dismisses on release.
+- **Settling is CSS, not an inline transition.** The component writes only the
+  transform; `.lightbox-stage.is-gesturing` drops the easing mid-gesture, which keeps
+  the animation declarative and lets `prefers-reduced-motion` reach it.
+- The zoom hint is `@media (hover: none)` only — there is nothing a mouse can do with
+  it. The bar wraps below 560px so the caption isn't squeezed out by the hint and the
+  new `reset` button.
+
+Verified at 393 with synthetic touch pointers: double-tap → exactly 2.6×; pinch → 4×,
+clamping at the 6× ceiling; pan clamps to 277.6 / 614.4px against a computed maximum of
+278 / 614; `reset` returns to 1× and removes its own button; double-tap while zoomed
+returns to 1×; Esc closes and the Lenis scroll lock releases.
+
+### 7.4 — journal index on mobile
+
+Already landed in Phase 4. Re-verified at 393 and 720: the tab is a `<button>` (not
+nested in the row `<a>`), absolutely positioned on the meta line at `bottom: 12px;
+right: 0`, 67×18, and topmost at its own centre.
+
+---
+
+## Phase 7 — original spec
 
 The repo is one responsive component tree, not a separate mobile app, so `mobile-parts.jsx`
 is read as a **spec for the ≤900px / ≤720px / ≤430px branches**, not as code to port.

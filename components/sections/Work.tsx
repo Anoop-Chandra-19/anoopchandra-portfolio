@@ -16,19 +16,72 @@ function TagPill({ t }: { t: string }) {
   );
 }
 
+// The phone runs condensed variants of these sentences (design: mobile-parts.jsx).
+// Both strings ship and CSS hides one, which keeps §02 a Server Component — a
+// width hook would cost a client boundary and flash the wrong copy on first
+// paint. The three helpers below are the only places that duplication lives.
+
+function Copy({ long, short }: { long: string; short?: string }) {
+  if (!short) return <>{long}</>;
+  return (
+    <>
+      <span className="wide-only">{long}</span>
+      <span className="narrow-only">{short}</span>
+    </>
+  );
+}
+
+function Bullets({ items, short, className }: { items: string[]; short?: string[]; className: string }) {
+  const list = (xs: string[], variant: string) => (
+    <ul className={`${className} ${variant}`.trim()}>
+      {xs.map((b) => (
+        <li key={b}>{b}</li>
+      ))}
+    </ul>
+  );
+  if (!short) return list(items, "");
+  return (
+    <>
+      {list(items, "wide-only")}
+      {list(short, "narrow-only")}
+    </>
+  );
+}
+
+// Replaces the whole row rather than hiding individual pills: mobile both drops
+// tags and renames them ("Dexie / IndexedDB" → "Dexie").
+function TagRow({ tags, short }: { tags: string[]; short?: string[] }) {
+  const row = (xs: string[], variant: string) => (
+    <div className={`flex gap-1.5 flex-wrap mt-4 ${variant}`.trim()}>
+      {xs.map((t) => (
+        <TagPill key={t} t={t} />
+      ))}
+    </div>
+  );
+  if (!short) return row(tags, "");
+  return (
+    <>
+      {row(tags, "wide-only")}
+      {row(short, "narrow-only")}
+    </>
+  );
+}
+
 function RoleBlock() {
   return (
     <div
-      className="sketch-box p-7 mb-[26px]"
+      className="sketch-box role-block p-7 mb-[26px]"
       style={{ background: "color-mix(in oklab, var(--color-electric) 5%, var(--color-paper))" }}
     >
       <div className="flex items-baseline gap-4 flex-wrap mb-3">
-        <span className="hand text-[34px] leading-none text-electric">{ROLE.org}</span>
+        <span className="hand role-org text-[34px] leading-none text-electric">{ROLE.org}</span>
         <span className="mono faint text-[11px] tracking-[2px] uppercase">
           {ROLE.role} · {ROLE.period}
         </span>
       </div>
-      <p className="m-0 text-[16.5px] leading-[1.62] max-w-[760px]">{ROLE.blurb}</p>
+      <p className="m-0 text-[16.5px] leading-[1.62] max-w-[760px]">
+        <Copy long={ROLE.blurb} short={ROLE.shortBlurb} />
+      </p>
     </div>
   );
 }
@@ -39,11 +92,14 @@ function RoleBlock() {
 function WorkCard({ p }: { p: System }) {
   return (
     <article className="sketch-box work-card p-[26px] grid gap-6 items-start">
-      <div>
-        <div className="hand text-[46px] leading-[0.9]" style={{ color: `var(--color-${p.k})` }}>
+      <div className="work-rail">
+        <div
+          className="hand work-num text-[46px] leading-[0.9]"
+          style={{ color: `var(--color-${p.k})` }}
+        >
           {p.n}
         </div>
-        <div className="mono faint text-[11px] tracking-[2px] uppercase mt-2.5 leading-[1.6]">
+        <div className="mono faint work-kind text-[11px] tracking-[2px] uppercase mt-2.5 leading-[1.6]">
           {p.kind}
         </div>
         <div
@@ -55,26 +111,24 @@ function WorkCard({ p }: { p: System }) {
       </div>
       <div className="min-w-0">
         <h3 className="mt-0 mb-2.5 text-[27px] leading-[1.12]">{p.t}</h3>
-        <p className="mt-0 mb-3.5 text-[15.5px] leading-[1.62]">{p.d}</p>
-        <ul className="pl-[18px] m-0 text-[14.5px] leading-[1.68] grid gap-2">
-          {p.bullets.map((b) => (
-            <li key={b}>{b}</li>
-          ))}
-        </ul>
-        <p className="mt-4 mb-0 text-[15px] leading-[1.6]">
+        <p className="mt-0 mb-3.5 text-[15.5px] leading-[1.62]">
+          <Copy long={p.d} short={p.shortD} />
+        </p>
+        <Bullets
+          items={p.bullets}
+          short={p.shortBullets}
+          className="pl-[18px] m-0 text-[14.5px] leading-[1.68] grid gap-2"
+        />
+        <p className="work-impact mt-4 mb-0 text-[15px] leading-[1.6]">
           <span
             className="mono text-[10.5px] tracking-[2px] uppercase mr-2"
             style={{ color: `var(--color-${p.k})` }}
           >
             ↳ impact
           </span>
-          {p.impact}
+          <Copy long={p.impact} short={p.shortImpact} />
         </p>
-        <div className="flex gap-1.5 flex-wrap mt-4">
-          {p.tags.map((t) => (
-            <TagPill key={t} t={t} />
-          ))}
-        </div>
+        <TagRow tags={p.tags} short={p.shortTags} />
       </div>
     </article>
   );
@@ -84,9 +138,11 @@ function AlsoList() {
   return (
     <ul className="also-list list-none p-0 m-0 grid gap-3">
       {ALSO.map((a) => (
-        <li key={a} className="grid gap-3 items-start">
+        <li key={a.d} className="grid gap-3 items-start">
           <span className="mono text-[13px] leading-[1.6] text-ink-faint">—</span>
-          <span className="text-[15px] leading-[1.6]">{a}</span>
+          <span className="text-[15px] leading-[1.6]">
+            <Copy long={a.d} short={a.shortD} />
+          </span>
         </li>
       ))}
     </ul>
@@ -99,9 +155,9 @@ function MinorRow({ m }: { m: Minor }) {
       className="minor-row grid gap-6 items-baseline py-3.5"
       style={{ borderTop: "1.5px dashed var(--color-ink-faint)" }}
     >
-      <div>
+      <div className="minor-head">
         <div className="text-[16px] font-semibold leading-[1.3]">{m.t}</div>
-        <div className="mono faint text-[11px] mt-[3px]">{m.y}</div>
+        <div className="mono faint minor-year text-[11px] mt-[3px]">{m.y}</div>
       </div>
       <div>
         <p className="m-0 text-[14.5px] leading-[1.6]">{m.d}</p>
@@ -145,17 +201,15 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
           {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
         </div>
         <h3 className="mt-2 mb-3.5 text-[25px] leading-[1.18] tracking-[-0.012em]">{p.t}</h3>
-        <p className="mt-0 text-[17px] max-w-[520px] mb-4">{p.d}</p>
-        <ul className="pl-[18px] mt-0 text-[17px] leading-[1.7]">
-          {p.bullets.map((b) => (
-            <li key={b}>{b}</li>
-          ))}
-        </ul>
-        <div className="flex gap-1.5 flex-wrap mt-4">
-          {p.tags.map((t) => (
-            <TagPill key={t} t={t} />
-          ))}
-        </div>
+        <p className="mt-0 text-[17px] max-w-[520px] mb-4">
+          <Copy long={p.d} short={p.shortD} />
+        </p>
+        <Bullets
+          items={p.bullets}
+          short={p.shortBullets}
+          className="pl-[18px] mt-0 text-[17px] leading-[1.7]"
+        />
+        <TagRow tags={p.tags} short={p.shortTags} />
         <div className="mt-[18px]">
           <Chip kind={p.k}>{p.cta}</Chip>
         </div>
