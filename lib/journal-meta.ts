@@ -1,5 +1,6 @@
 // Serializable journal metadata + display helpers.
 // Safe to import from client components — the fs-backed loader lives in lib/journal.ts.
+import type { CSSProperties } from "react";
 
 
 /** A `##` heading in an entry, for the § rail. */
@@ -53,5 +54,19 @@ export const tabColors = (kind: JournalEntryMeta["kind"]) =>
         borderColor: "var(--color-teal)",
         color: "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
       };
+
+/** Same palette as `tabColors`, split for the /journal index, where the tab is
+ *  a filter button: only the hue and the small-text colour are per-row: the
+ *  tint DEPTH is a state (rest 15% / hover 34%), so `.journal-edge-tab`
+ *  composes the background itself from `--tab-c` rather than being handed a
+ *  finished colour. §05's tabs are static and keep `tabColors`. */
+export const tabAccent = (kind: JournalEntryMeta["kind"]): CSSProperties =>
+  ({
+    "--tab-c": kind === "case" ? "var(--color-coral)" : "var(--color-teal)",
+    color:
+      kind === "case"
+        ? "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))"
+        : "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
+  }) as CSSProperties;
 
 export const pad = (n: number) => String(n).padStart(3, "0");

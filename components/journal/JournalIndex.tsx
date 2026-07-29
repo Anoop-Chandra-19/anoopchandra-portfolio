@@ -1,16 +1,68 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { pad, tabColors, type JournalEntryMeta } from "@/lib/journal-meta";
+import { pad, tabAccent, type JournalEntryMeta } from "@/lib/journal-meta";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 
 type Filter = "all" | "case" | "note";
+type SortKey = "title" | "read" | "date";
+type Sort = { key: SortKey; dir: "asc" | "desc" };
 
 const FILTERS: ReadonlyArray<[Filter, string]> = [
   ["all", "all entries"],
   ["case", "case studies"],
   ["note", "notes & stories"],
 ];
+
+const KIND_LABEL: Record<Exclude<Filter, "all">, string> = {
+  case: "case studies",
+  note: "notes & stories",
+};
+
+/** `no` is the chronological entry number, so date sorts without re-parsing the
+ *  display string. `read` is "N min" — parseInt stops at the space. */
+const SORTERS: Record<SortKey, (x: JournalEntryMeta, y: JournalEntryMeta) => number> = {
+  date: (x, y) => x.no - y.no,
+  read: (x, y) => parseInt(x.read, 10) - parseInt(y.read, 10),
+  title: (x, y) => x.title.localeCompare(y.title),
+};
+
+function SortHead({
+  label,
+  sortKey,
+  sort,
+  onSort,
+  align,
+}: {
+  label: string;
+  sortKey: SortKey;
+  sort: Sort;
+  onSort: (key: SortKey) => void;
+  align?: "right";
+}) {
+  const on = sort.key === sortKey;
+  return (
+    /* aria-sort belongs on the header cell, not the button — the prototype had
+       it on the button. It stays inert until this ledger is a real grid: the
+       rows are links, and faking table roles over them would cost them their
+       link semantics for an attribute nothing would announce anyway. */
+    <span
+      aria-sort={on ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
+      className={align === "right" ? "text-right" : undefined}
+    >
+      <button
+        type="button"
+        className={`journal-sort ${on ? "is-on" : ""}`}
+        onClick={() => onSort(sortKey)}
+      >
+        {label}
+        <span aria-hidden="true" className="journal-sort-arrow">
+          {on && sort.dir === "asc" ? "▲" : "▼"}
+        </span>
+      </button>
+    </span>
+  );
+}
 
 export default function JournalIndex({
   entries,
@@ -24,7 +76,12 @@ export default function JournalIndex({
   /** true when rendered as a non-interactive copy inside the transition overlay */
   inert?: boolean;
 }) {
+  /* Two axes, both component state: kind above the page, subject on the tabs.
+     Not URL state — the default (whole book, newest first) is the only view
+     worth linking to. */
   const [filter, setFilter] = useState<Filter>("all");
+  const [tag, setTag] = useState<string | null>(null);
+  const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
   const { navigate } = useInkTransition();
 
   const counts = useMemo(
@@ -35,14 +92,31 @@ export default function JournalIndex({
     }),
     [entries]
   );
-  const visible = filter === "all" ? entries : entries.filter((e) => e.kind === filter);
+
+  const visible = useMemo(() => {
+    const rows = entries.filter(
+      (e) => (filter === "all" || e.kind === filter) && (!tag || e.tag === tag)
+    );
+    const cmp = SORTERS[sort.key];
+    return rows.sort((x, y) => (sort.dir === "asc" ? cmp(x, y) : -cmp(x, y)));
+  }, [entries, filter, tag, sort]);
+
+  // Clicking the same column flips it; a new column starts in the direction
+  // people expect of it — newest and longest first, but titles A → Z.
+  const toggleSort = (key: SortKey) =>
+    setSort((s) =>
+      s.key === key
+        ? { key, dir: s.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: key === "title" ? "asc" : "desc" }
+    );
+
   const pages = entries.map((e) => e.page);
   const first = book?.first ?? Math.min(...pages);
   const last = book?.last ?? Math.max(...pages);
   const ppRange = `pp. ${pad(first)} — ${pad(last)}`;
 
   return (
-    <div className="page" inert={inert}>
+    <div className={`page journal-index ${tag ? "has-subject" : ""}`} inert={inert}>
       {/* Top bar */}
       <div
         className="flex items-center justify-between flex-wrap gap-3 mb-7 pb-3.5"
@@ -87,7 +161,10 @@ export default function JournalIndex({
         </div>
       </div>
 
-      {/* Filter rail */}
+      {/* Filter rail — kind only. Subject is set on the ledger's own edge tabs,
+          which are already drawn on every row; a second row of buttons would be
+          the index's vocabulary printed twice. Order is stated by the column
+          headers below, so there is no caption for it here. */}
       <div className="flex items-center flex-wrap gap-2.5 mb-[22px]">
         <span className="mono text-[11px] tracking-[1px] uppercase text-ink-soft">filter ↦</span>
         {FILTERS.map(([k, label]) => (
@@ -101,7 +178,18 @@ export default function JournalIndex({
             <span className="mono text-[11px] opacity-70 ml-1">({counts[k]})</span>
           </button>
         ))}
-        <span className="mono text-[12px] text-ink-soft ml-auto">sorted newest → oldest</span>
+        {tag && (
+          <button
+            type="button"
+            className="journal-subject-chip"
+            title="clear subject filter"
+            onClick={() => setTag(null)}
+          >
+            <span className="faint tracking-[1px]">subject:</span>
+            {tag}
+            <span aria-hidden="true">×</span>
+          </button>
+        )}
       </div>
 
       {/* Notebook TOC panel */}
@@ -123,17 +211,50 @@ export default function JournalIndex({
           style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
         >
           <span className="text-right">pg.</span>
-          <span>title</span>
-          <span className="text-right">read</span>
-          <span className="text-right">date</span>
+          <SortHead label="title" sortKey="title" sort={sort} onSort={toggleSort} />
+          <SortHead label="read" sortKey="read" sort={sort} onSort={toggleSort} align="right" />
+          <SortHead label="date" sortKey="date" sort={sort} onSort={toggleSort} align="right" />
+          {/* `subject` is a label, never a control: the tabs' affordance can't
+              depend on hover (touch) or on the footer hint, which scrolls out of
+              view once the book is long. This names the axis permanently. */}
+          <span className="relative">
+            <span style={{ position: "absolute", right: -2, width: 90, textAlign: "center" }}>
+              subject
+            </span>
+          </span>
         </div>
+
+        {visible.length === 0 && (
+          <div className="pt-[26px] pb-[22px] px-1.5">
+            <p className="text-[19px] italic leading-[1.4] text-ink-soft mt-0 mb-2.5">
+              Nothing filed under {tag ? <b className="font-semibold">{tag}</b> : "that"}
+              {filter !== "all" && (
+                <>
+                  {" "}
+                  in <b className="font-semibold">{KIND_LABEL[filter]}</b>
+                </>
+              )}{" "}
+              yet.
+            </p>
+            <button
+              type="button"
+              className="mono text-[11px] tracking-[1px] py-[5px] px-3 border-[1.5px] border-ink rounded-full bg-paper text-ink cursor-pointer"
+              onClick={() => {
+                setFilter("all");
+                setTag(null);
+              }}
+            >
+              show the whole book
+            </button>
+          </div>
+        )}
 
         <ul className="list-none p-0 m-0">
           {visible.map((e) => (
-            <li key={e.slug} className="relative">
+            <li key={e.slug} className="journal-toc-item">
               <Link
                 href={`/journal/${e.slug}`}
-                className="journal-toc-row items-baseline relative no-underline transition-colors duration-150"
+                className="journal-toc-row items-baseline no-underline"
                 /* No aria-label: on a link it replaces the whole subtree, so it
                    was hiding the page number, kind, read time and date from
                    screen readers. The row's own text is the better name. */
@@ -147,8 +268,8 @@ export default function JournalIndex({
                     {e.title}
                   </span>
                   {/* The one place the kind is stated in words. The edge tab
-                      carries a subject now, not the bucket, so colour is
-                      otherwise the only signal — and the tab is aria-hidden. */}
+                      carries a subject, not the bucket, so its colour is
+                      otherwise the only signal. */}
                   {e.kind === "case" && (
                     <span className="mono text-[9px] tracking-[2px] uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
                       <span aria-hidden="true">★ </span>case study
@@ -167,24 +288,23 @@ export default function JournalIndex({
                 <span className="mono journal-toc-meta text-[11px] text-right text-ink-soft">
                   {e.dateDisplay}
                 </span>
-
-                {/* Audible now that the tab carries a subject rather than
-                    restating the bucket — it was decorative when it read
-                    "case study" next to a coral tab saying the same thing. */}
-                <span
-                  className="journal-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[90px] py-[3px] pl-2.5 pr-2"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    ...tabColors(e.kind),
-                    borderWidth: "1.2px",
-                    borderStyle: "solid",
-                    borderRight: "none",
-                    borderRadius: "3px 0 0 3px",
-                  }}
-                >
-                  {e.tag}
-                </span>
               </Link>
+
+              {/* The tab IS the subject filter — it was already drawn on every
+                  row, so filtering by subject needs no control above the page.
+                  A <button> inside an <a> is invalid and recovers differently
+                  per engine, so it sits BESIDE the Link, absolutely positioned
+                  over the row's 110px right reserve: the Link keeps all four
+                  cells and stays one click target, the tab takes its own. */}
+              <button
+                type="button"
+                className={`journal-edge-tab ${tag === e.tag ? "is-on" : ""}`}
+                style={tabAccent(e.kind)}
+                title={tag === e.tag ? `showing ${e.tag} — click to clear` : `filter to ${e.tag}`}
+                onClick={() => setTag(tag === e.tag ? null : e.tag)}
+              >
+                {e.tag}
+              </button>
             </li>
           ))}
         </ul>
@@ -193,11 +313,22 @@ export default function JournalIndex({
           className="flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
+          {/* The `subject` clause appears only when one is active, so the line
+              doubles as confirmation the tab took. */}
           <span className="mono faint text-[11px]">
-            {visible.length} entries shown · {counts.case} case studies + {counts.note} notes · pp.{" "}
-            {pad(first)}–{pad(last)}
+            {visible.length} shown
+            {tag && (
+              <>
+                {" "}
+                · subject <b className="font-medium text-ink">{tag}</b>
+              </>
+            )}
+            {" · "}
+            {counts.case} case studies + {counts.note} notes · pp. {pad(first)}–{pad(last)}
           </span>
-          <span className="text-[15px] italic text-ink-faint">tap any line to open the page ↦</span>
+          <span className="text-[15px] italic text-ink-faint">
+            tap a line to open it · tap a tab to filter ↦
+          </span>
         </div>
       </div>
 

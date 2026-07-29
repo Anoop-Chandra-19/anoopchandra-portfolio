@@ -493,10 +493,43 @@ works; scroll lock releases.
 
 ---
 
-## Phase 4 — Two-axis journal index
+## Phase 4 — Two-axis journal index (DONE, 2026-07-29)
 
 *The one place the prototype **leads** the repo, so the usual "repo wins" rule is
 suspended. Reference: `journal.jsx` + `Journal.html`'s `<style>` block.*
+
+**Divergences from the spec below, all deliberate:**
+
+- **No `app/journal-index.css`.** The rules went into `app/journal.css` — the file is
+  still small and the index rules sit next to the ledger rules they modify.
+- **Row hover moved to the `<li>`.** Once the tab left the `<Link>`, a
+  `.journal-toc-row:hover` no longer fires when you point at the tab. The rule is now
+  `.journal-toc-item:hover`, so pointing at a tab still tints its own row.
+- **`aria-sort` is on the header cell but inert.** 4d is right that it does not belong
+  on the button, but `aria-sort` is only honoured on `columnheader`/`rowheader`, and
+  this ledger is a `<ul>` of `<li>` wrapping links. Faking grid roles over them would
+  cost the rows their link semantics, which is the worse trade. The attribute is
+  correct-if-unused and carries a comment saying so.
+- **Mobile pill is absolutely positioned, not in-flow.** §05 puts its tab in a
+  `grid-area` because it lives inside the row grid; here the tab is the `<Link>`'s
+  sibling, so `grid-area` is unavailable. It stays absolute and anchors to
+  `bottom: 12px; right: 0` — the meta line — with `min-width: 0` retiring the
+  hover elongation. Visually it lands where §05's does.
+- **`tabColors` was not repurposed.** A second helper, `tabAccent`, emits `--tab-c`
+  plus the text colour, because here the tint *depth* is a state (15% rest / 34% hover)
+  and the CSS composes the background. §05's tabs are static and keep `tabColors`.
+
+**Verified** (dev server, 2026-07-29): all three sorts in both directions with the
+new-column defaults (`title`→asc, `read`/`date`→desc), exclusive `is-on` and
+`aria-sort`; both filter axes together including the empty intersection
+(`hardware` × `case studies` → 0 rows, message + reset); the reset restores both axes;
+tab order runs kind filters → sort headers → row link → row tab with no `<button>`
+inside an `<a>`; the 110px reserve holds at 1440/1280/900 (tab 90px, 22px clear of the
+last cell, 2px past the `<li>`) with header and row `1fr` resolving identically; the
+≤720px pill sits on the meta line at 720 and 393 with zero text collisions (measured
+by `Range` rects) and is the topmost element at its own centre; no horizontal overflow
+at any width. Note the book is 10 entries / 2 case studies, not 11 / 3 — that is the
+deliberate LegalRescue gap, not a sort bug.
 
 Target: `components/journal/JournalIndex.tsx` + a new `app/journal-index.css`
 (or a clearly-fenced section of `app/journal.css`).
