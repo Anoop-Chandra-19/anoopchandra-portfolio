@@ -719,7 +719,25 @@ block at the top of this phase.
 
 ---
 
-## Phase 6 — Stack, and copy sweep
+## Phase 6 — Stack, and copy sweep (DONE, 2026-07-29)
+
+**Landed.** `COLS` replaced in `components/sections/Stack.tsx`; the column notes,
+`Tally`, `CircleMark` and the section header were untouched — the design specifies no
+change to them. Verified at 1440: 13 / 9 / 10 rows, one circled item per column
+(NestJS · LLMs / RAG · CachyOS + niri), tally groups matching the year counts, the
+three cards still equal-height under `auto-fit`. typecheck / lint / build clean, all
+20 routes prerendered.
+
+**The copy sweep found nothing to change** — every string it lists was already
+correct, so it was verification only:
+
+| check | where | state |
+|---|---|---|
+| `Panacea Financial` in `.marker-highlight` + intro | `Work.tsx:190` | correct |
+| Work meta `8 entries · 2024 — now` | `Work.tsx:187` — computed, not written | correct |
+| Hero kicker `// hello.tsx — apr 29, 2026` | `Hero.tsx:12` | correct |
+| Now meta `week of apr 29, 2026` | `Now.tsx:36` — repo wins, hardcoded | correct |
+| §05 header + `see all notes & case studies →` | `Notes.tsx:13,121` | correct |
 
 **§04 Stack** (`components/sections/Stack.tsx`) — replace `COLS`:
 
