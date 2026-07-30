@@ -28,6 +28,7 @@ export default function LabShell({ exp }: { exp: LabExp }) {
 
   return (
     <main
+      id="main-content"
       className="lx-page-inner"
       style={{ "--lxa": `var(--color-${exp.accent})` } as React.CSSProperties}
     >

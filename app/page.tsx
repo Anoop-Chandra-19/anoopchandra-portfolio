@@ -5,10 +5,10 @@ import { getNotes } from "@/lib/journal";
 
 export default function Home() {
   return (
-    <div className="page">
+    <main id="main-content" className="page">
       <HomeContent journalEntries={getNotes()} />
       <SideNav />
       <MobileIndexNav />
-    </div>
+    </main>
   );
 }

@@ -104,6 +104,9 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${sourceSerif.variable} ${jetbrainsMono.variable} ${caveat.variable} antialiased`}
       >
+        <a className="skip-link mono" href="#main-content">
+          Skip to main content
+        </a>
         <HydrationTrigger />
         <LenisProvider>
           <InkTransitionProvider entries={getEntryMetas()}>{children}</InkTransitionProvider>

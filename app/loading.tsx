@@ -2,13 +2,15 @@ export default function Loading() {
   return (
     <div
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
-      style={{ background: "var(--paper)" }}
+      role="status"
+      aria-label="Loading page"
+      style={{ background: "var(--color-paper)" }}
     >
       <div
         className="accent"
         style={{
           fontSize: 96,
-          color: "var(--electric)",
+          color: "var(--color-electric)",
           lineHeight: 1,
           letterSpacing: "0.02em",
         }}

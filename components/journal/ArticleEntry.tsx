@@ -29,7 +29,7 @@ export default function ArticleEntry({
 }) {
   const hero = entry.hero ? imageDims(entry.hero) : null;
   return (
-    <div className="je">
+    <main id="main-content" className="je">
       <ReadingProgress />
       {/* Delegated over the whole entry — the [^N] refs are MDX output, so there
           is no React element for them to hang an onClick on. */}
@@ -145,6 +145,6 @@ export default function ArticleEntry({
           <div className="je-colophon">✦ © 2026 {AUTHOR} · journal · typeset by hand ✦</div>
         </footer>
       </div>
-    </div>
+    </main>
   );
 }

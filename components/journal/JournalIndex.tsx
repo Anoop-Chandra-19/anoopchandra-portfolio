@@ -109,7 +109,11 @@ export default function JournalIndex({
   const ppRange = `pp. ${pad(first)} — ${pad(last)}`;
 
   return (
-    <div className={`page journal-index ${tag ? "has-subject" : ""}`} inert={inert}>
+    <main
+      id={inert ? undefined : "main-content"}
+      className={`page journal-index ${tag ? "has-subject" : ""}`}
+      inert={inert}
+    >
       <div
         className="flex items-center justify-between flex-wrap gap-3 mb-7 pb-3.5"
         style={{ borderBottom: "1.5px dashed var(--color-ink-faint)" }}
@@ -328,6 +332,6 @@ export default function JournalIndex({
       <div style={{ marginTop: 40, textAlign: "center" }} className="mono faint">
         — © 2026 Anoopchandra Parampalli · journal · made by hand —
       </div>
-    </div>
+    </main>
   );
 }
