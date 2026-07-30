@@ -8,10 +8,13 @@ type Filter = "all" | "case" | "note";
 type SortKey = "title" | "read" | "date";
 type Sort = { key: SortKey; dir: "asc" | "desc" };
 
-const FILTERS: ReadonlyArray<[Filter, string]> = [
-  ["all", "all entries"],
-  ["case", "case studies"],
-  ["note", "notes & stories"],
+/** [key, label, phone label]. Both wordings ship and CSS hides one — the same
+ *  trick Lightbox uses for its gesture hint. Spelled out the row wraps to three
+ *  lines at 393px, which is three times what the filter is worth. */
+const FILTERS: ReadonlyArray<[Filter, string, string]> = [
+  ["all", "all entries", "all"],
+  ["case", "case studies", "case"],
+  ["note", "notes & stories", "notes"],
 ];
 
 const KIND_LABEL: Record<Exclude<Filter, "all">, string> = {
@@ -166,15 +169,20 @@ export default function JournalIndex({
           the index's vocabulary printed twice. Order is stated by the column
           headers below, so there is no caption for it here. */}
       <div className="flex items-center flex-wrap gap-2.5 mb-[22px]">
-        <span className="mono text-[11px] tracking-[1px] uppercase text-ink-soft">filter ↦</span>
-        {FILTERS.map(([k, label]) => (
+        {/* Off on a phone — with three counted pills on the row there is nothing
+            left for the word to explain, and it was the reason they wrapped. */}
+        <span className="mono journal-filter-lbl text-[11px] tracking-[1px] uppercase text-ink-soft">
+          filter ↦
+        </span>
+        {FILTERS.map(([k, label, shortLabel]) => (
           <button
             key={k}
             type="button"
             className={`journal-filter-btn ${filter === k ? "is-active" : ""}`}
             onClick={() => setFilter(k)}
           >
-            {label}{" "}
+            <span className="journal-filter-wide">{label}</span>
+            <span className="journal-filter-narrow">{shortLabel}</span>
             <span className="mono text-[11px] opacity-70 ml-1">({counts[k]})</span>
           </button>
         ))}
@@ -193,14 +201,18 @@ export default function JournalIndex({
       </div>
 
       {/* Notebook TOC panel */}
-      <div className="bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
+      {/* On a phone the box, the ruled edge and the spine stamp all come off in
+          CSS and this is a plain ruled list — a 393px screen has no width to
+          spend on 64px of gutter, and the notebook framing is already carried by
+          the cover above. */}
+      <div className="journal-toc-panel bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
         <span
           aria-hidden="true"
-          className="absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
+          className="journal-toc-rule absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
           style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
         />
         <div
-          className="mono faint absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
+          className="mono faint journal-toc-stamp absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
           style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
         >
           ✎ index — {visible.length} of {entries.length}
@@ -249,7 +261,7 @@ export default function JournalIndex({
           </div>
         )}
 
-        <ul className="list-none p-0 m-0">
+        <ul className="journal-toc-list list-none p-0 m-0">
           {visible.map((e) => (
             <li key={e.slug} className="journal-toc-item">
               <Link
@@ -270,8 +282,10 @@ export default function JournalIndex({
                   {/* The one place the kind is stated in words. The edge tab
                       carries a subject, not the bucket, so its colour is
                       otherwise the only signal. */}
+                  {/* Off on a phone: the tab is already tinted by kind there,
+                      and the badge cost the title its second line. */}
                   {e.kind === "case" && (
-                    <span className="mono text-[9px] tracking-[2px] uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
+                    <span className="mono journal-toc-case text-[9px] tracking-[2px] uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
                       <span aria-hidden="true">★ </span>case study
                     </span>
                   )}
@@ -282,11 +296,24 @@ export default function JournalIndex({
                   />
                 </span>
 
-                <span className="mono faint journal-toc-meta text-[11px] text-right text-ink-soft">
-                  {e.read}
+                {/* `display: contents` above the phone breakpoint, so the ledger
+                    grid still owns these as its read and date cells. On a phone
+                    it becomes the one meta line under the title, where the two
+                    swap into reading order — date, then how long it takes. */}
+                <span className="journal-toc-metas">
+                  <span className="mono faint journal-toc-meta text-[11px] text-right text-ink-soft">
+                    {e.read}
+                  </span>
+                  <span className="mono journal-toc-meta text-[11px] text-right text-ink-soft">
+                    {e.dateDisplay}
+                  </span>
                 </span>
-                <span className="mono journal-toc-meta text-[11px] text-right text-ink-soft">
-                  {e.dateDisplay}
+
+                {/* Phone only. A whole row is the tap target, which a thumb has
+                    no way to know without the affordance a list row carries
+                    everywhere else on a phone. */}
+                <span className="journal-toc-chev" aria-hidden="true">
+                  ›
                 </span>
               </Link>
 

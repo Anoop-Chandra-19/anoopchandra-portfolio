@@ -5,10 +5,13 @@
 // the paper. The --tk-* token hues in journal.css are hue-shifted ink, tuned for
 // #fffdf7.
 //
-// Client component only because of the copy button; the tokenizing is pure and
-// runs once per render.
+// Client component for the copy button and the overflow cue; the tokenizing is
+// pure and runs once per render.
 "use client";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+/** Slack before an edge counts as scrollable — a hair over a subpixel. */
+const EDGE_SLOP = 2;
 
 const KEYWORDS: Record<string, string> = {
   py: "def class return if elif else for while in not and or is None True False import from as with async await try except finally raise yield lambda pass break continue global nonlocal assert del self",
@@ -83,6 +86,31 @@ export default function CodeBlock({
   const lines = useMemo(() => tokenize(src, lang), [src, lang]);
   const hiSet = useMemo(() => new Set(hi ?? []), [hi]);
 
+  // The scrollbar only colours in on hover and touch has none at all, so an
+  // overflowing card needs its own cue: paper fades on whichever edge still has
+  // code behind it.
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState({ more: false, less: false });
+  const check = useCallback(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    setEdges({
+      more: el.scrollWidth - el.clientWidth - el.scrollLeft > EDGE_SLOP,
+      less: el.scrollLeft > EDGE_SLOP,
+    });
+  }, []);
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    // Mono loads with `display: swap`, so the code gets wider without the
+    // container ever resizing — which the observer alone would miss.
+    document.fonts?.ready.then(check);
+    return () => ro.disconnect();
+  }, [check]);
+
   async function copy() {
     try {
       await navigator.clipboard.writeText(src);
@@ -102,22 +130,24 @@ export default function CodeBlock({
           {copied ? "copied ✓" : "copy"}
         </button>
       </div>
-      <div className="cbody">
-        {lines.map((toks, i) => (
-          <span key={i} className={`ln${hiSet.has(i + 1) ? " hi" : ""}`}>
-            {toks.length
-              ? toks.map(([c, t], j) =>
-                  c ? (
-                    <span key={j} className={c}>
-                      {t}
-                    </span>
-                  ) : (
-                    <span key={j}>{t}</span>
-                  ),
-                )
-              : "​"}
-          </span>
-        ))}
+      <div className={`cwrap${edges.more ? " more" : ""}${edges.less ? " less" : ""}`}>
+        <div className="cbody" ref={bodyRef} onScroll={check}>
+          {lines.map((toks, i) => (
+            <span key={i} className={`ln${hiSet.has(i + 1) ? " hi" : ""}`}>
+              {toks.length
+                ? toks.map(([c, t], j) =>
+                    c ? (
+                      <span key={j} className={c}>
+                        {t}
+                      </span>
+                    ) : (
+                      <span key={j}>{t}</span>
+                    ),
+                  )
+                : "​"}
+            </span>
+          ))}
+        </div>
       </div>
       {cap && <div className="cap">{cap}</div>}
     </div>

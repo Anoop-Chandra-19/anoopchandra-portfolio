@@ -58,31 +58,39 @@ body {
 }
 
 /* ---- Scrollbar (notebook edge-tab) ---- */
-::-webkit-scrollbar {
-  width: 14px;
-  height: 14px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-paper);
-  border-left: 1px dashed var(--color-ink-faint);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-paper-2);
-  border: 1.5px solid var(--color-ink);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in oklab, var(--color-electric) 14%, var(--color-paper));
-  border-color: var(--color-electric);
-}
-::-webkit-scrollbar-corner {
-  background: var(--color-paper);
-}
-/* Firefox has no scrollbar parts API — thin ink thumb on paper track */
-@supports not selector(::-webkit-scrollbar) {
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-ink) var(--color-paper-2);
+/* Gated on a fine pointer, and the gate is the point: styling ::-webkit-scrollbar
+   at all opts the page out of the platform's overlay scrollbar, so on a phone
+   this turns a zero-width bar that fades in while you scroll into a permanent
+   14px column — 3.6% of a 390px viewport spent on something there is nothing to
+   drag with. Declaring nothing on coarse pointers hands the scrollbar back to
+   the OS, which already does appear-on-scroll-then-fade. */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-paper);
+    border-left: 1px dashed var(--color-ink-faint);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-paper-2);
+    border: 1.5px solid var(--color-ink);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--color-electric) 14%, var(--color-paper));
+    border-color: var(--color-electric);
+  }
+  ::-webkit-scrollbar-corner {
+    background: var(--color-paper);
+  }
+  /* Firefox has no scrollbar parts API — thin ink thumb on paper track */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-ink) var(--color-paper-2);
+    }
   }
 }
 
@@ -90,9 +98,13 @@ body {
    `.lenis-stopped { overflow: clip }`, which removes the scrollbar mid-flight —
    the viewport widens by the 14px scrollbar and centered layouts jump sideways.
    Keep the scrollbar rendered while locked (lenis already blocks wheel/touch
-   itself) and reserve the gutter as a general guard against overflow toggles. */
-html {
-  scrollbar-gutter: stable;
+   itself) and reserve the gutter as a general guard against overflow toggles.
+   Only classic scrollbars take layout space, so the gutter is reserved only
+   where one exists — an overlay scrollbar has nothing to reserve for. */
+@media (pointer: fine) {
+  html {
+    scrollbar-gutter: stable;
+  }
 }
 html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow-y: scroll;
@@ -326,6 +338,11 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 .work-card ul,
 .project-content ul { list-style: disc; }
 
+/* Every zoomable content image sits in one of these — the frame class the
+   caller passes (.project-media, .je-plate-media) decides how it looks, this
+   only guarantees the enlarge button has something to anchor to. */
+.zoom-wrap { position: relative; display: block; }
+
 /* §02 — the media band fills its grid column so the side rules run the card's
    full height; the copy column can't squeeze it into a ribbon. */
 .project-media {
@@ -367,7 +384,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   transform: translateY(-3px);
   transition: opacity 140ms ease, transform 140ms ease;
 }
-.project-media:hover .zoom-btn,
+.zoom-wrap:hover .zoom-btn,
 .zoom-btn:focus-visible { opacity: 1; transform: none; }
 .zoom-btn:hover { background: var(--color-ink); color: var(--color-paper); }
 /* No hover on touch, so the affordance has to be permanent there */
@@ -377,6 +394,8 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 
 @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
 
+:root { --lb-scrim: color-mix(in oklab, var(--color-ink) 88%, transparent); }
+
 .lightbox {
   position: fixed;
   inset: 0;
@@ -385,8 +404,26 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   align-items: center;
   justify-content: center;
   padding: clamp(16px, 4vw, 56px);
-  background: color-mix(in oklab, var(--color-ink) 88%, transparent);
+  background: var(--lb-scrim);
   animation: lb-in 160ms ease-out;
+}
+/* `fixed` is laid out against the viewport, which excludes the scrollbar
+   gutter — so the scrim stops short and the notebook edge-tab stays lit in a
+   bright stripe down the side of a dark overlay. The gutter cannot be covered,
+   so it gets painted instead: the same translucent scrim over the same paper
+   the page has, which composites to exactly what the scrim does. Collapsing
+   the scrollbar instead would shift the page 14px sideways (see the Lenis note
+   above). The portal is a child of <body>, so `:has()` needs no state in JS. */
+html:has(.lightbox) ::-webkit-scrollbar-track,
+html:has(.lightbox) ::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--lb-scrim), var(--lb-scrim)), var(--color-paper);
+  border-color: transparent;
+}
+@supports not selector(::-webkit-scrollbar) {
+  html:has(.lightbox) {
+    scrollbar-color: color-mix(in oklab, var(--color-ink) 88%, var(--color-paper))
+      color-mix(in oklab, var(--color-ink) 88%, var(--color-paper));
+  }
 }
 /* The gesture surface. `touch-action: none` hands every touch to the pinch/pan
    handlers — the page underneath is scroll-locked while this is open anyway —
@@ -417,6 +454,11 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .lightbox-stage.is-gesturing img { transition: none; }
+/* The pointer is the whole affordance for mouse zoom — there is no pinch to
+   discover it with, so the cursor has to say which way the next click goes. */
+.lightbox img { cursor: zoom-in; }
+.lightbox-stage.is-zoomed img { cursor: zoom-out; }
+.lightbox-stage.is-zoomed.is-gesturing img { cursor: grabbing; }
 .lightbox-bar {
   position: absolute;
   left: 0;
@@ -444,11 +486,23 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 }
 .lightbox-bar button:hover { background: var(--color-paper); color: var(--color-ink); }
 .lightbox-btns { display: flex; flex-shrink: 0; gap: 8px; margin-left: auto; }
-/* Zoom is a touch gesture, so the instruction only exists where it can be
-   followed — there is nothing a mouse can do with it. */
-.lightbox-hint { display: none; opacity: 0.65; font-size: 10px; }
+/* Plate captions are prose, and the image is sized against a one- or two-line
+   bar — clamp so a long caption can't grow the bar up over the plate. */
+.lightbox-cap {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-width: 0;
+  overflow: hidden;
+}
+.lightbox-cap p { margin: 0; font: inherit; letter-spacing: inherit; color: inherit; }
+/* Both pointers can zoom now, so the hint always shows and only the wording
+   switches — each variant ships and the other is hidden. */
+.lightbox-hint { opacity: 0.65; font-size: 10px; }
+.hint-touch { display: none; }
 @media (hover: none) {
-  .lightbox-hint { display: inline; }
+  .hint-touch { display: inline; }
+  .hint-mouse { display: none; }
 }
 /* The bar wraps rather than squeezing the caption to nothing once the hint and
    the reset button join it on a phone. */

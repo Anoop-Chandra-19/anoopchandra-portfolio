@@ -1,11 +1,13 @@
-// Maps MDX → the "Annotated Manuscript" entry blocks. All server-safe
-// (works with next-mdx-remote/rsc). Section numbers (✎ §NN) and plate
-// numbers auto-increment via CSS counters defined in journal.css —
+// Maps MDX → the "Annotated Manuscript" entry blocks. Every component here
+// renders on the server (next-mdx-remote/rsc); the interactive bits are
+// client leaves it mounts, never this module. Section numbers (✎ §NN) and
+// plate numbers auto-increment via CSS counters defined in journal.css —
 // authors never number by hand.
-import Image from "next/image";
 import type { ComponentPropsWithoutRef, ReactElement } from "react";
 import type { MDXComponents } from "mdx/types";
 import CodeBlock from "@/components/journal/CodeBlock";
+import ZoomableImage from "@/components/ui/ZoomableImage";
+import { imageDims } from "@/lib/image-dims";
 
 /* ---- custom blocks authored directly in MDX ---- */
 
@@ -54,13 +56,28 @@ function Hl({ children }: { children: React.ReactNode }) {
 }
 
 // <Figure src alt>caption…</Figure> — a taped "plate". The tab text
-// ("plate 00N") is filled by the CSS counter, so don't number it.
+// ("plate 00N") is filled by the CSS counter, so don't number it. The plate
+// zooms like every other content image; the caption rides into the lightbox
+// bar, so a plate reads the same enlarged as it does in the column.
+//
+// Dimensions are read off the file, never authored: a plate is written as one
+// line of MDX, and a hand-typed pair that disagrees with the image reserves a
+// box of the wrong shape for it to sit in.
 function Figure({ src, alt, children }: { src: string; alt: string; children?: React.ReactNode }) {
+  const { w, h } = imageDims(src);
   return (
     <figure className="je-plate">
       <span className="je-tape" aria-hidden="true" />
       <span className="je-plate-tab auto" aria-hidden="true" />
-      <Image src={src} alt={alt} width={1100} height={620} />
+      <ZoomableImage
+        src={src}
+        alt={alt}
+        caption={children ?? alt}
+        width={w}
+        height={h}
+        sizes="(max-width: 880px) 100vw, 820px"
+        className="je-plate-media"
+      />
       {children ? <figcaption>{children}</figcaption> : null}
     </figure>
   );

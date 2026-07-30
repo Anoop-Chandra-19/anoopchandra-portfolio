@@ -10,6 +10,9 @@
 import { useEffect, useState } from "react";
 import type { Section } from "@/lib/journal-meta";
 
+/** A heading counts as reached once it crosses this far down the viewport. */
+const ACTIVE_LINE = 130;
+
 export default function SectionRail({ sections }: { sections: Section[] }) {
   const [active, setActive] = useState(0);
 
@@ -19,8 +22,16 @@ export default function SectionRail({ sections }: { sections: Section[] }) {
       let cur = 0;
       sections.forEach((s, i) => {
         const el = document.getElementById(s.id);
-        if (el && el.getBoundingClientRect().top <= 130) cur = i;
+        if (el && el.getBoundingClientRect().top <= ACTIVE_LINE) cur = i;
       });
+      // The last section is usually shorter than the viewport, and everything
+      // after the entry — related, prev/next, footer — is taller still, so its
+      // heading can stop short of the line and never light up. At the bottom of
+      // the page you are in the last section whatever the arithmetic says.
+      const doc = document.documentElement;
+      if (window.scrollY + window.innerHeight >= doc.scrollHeight - 2) {
+        cur = sections.length - 1;
+      }
       setActive(cur);
     }
     window.addEventListener("scroll", onScroll, { passive: true });

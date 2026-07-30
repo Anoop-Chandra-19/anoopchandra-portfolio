@@ -9,14 +9,21 @@ import type { JournalEntryMeta, Section } from "@/lib/journal-meta";
 export type { JournalEntryMeta, Section };
 export { pad, tabColors } from "@/lib/journal-meta";
 
-/** Mirrors github-slugger closely enough for our headings: lowercase, strip
- *  anything that isn't a word char/space/hyphen, spaces → hyphens. */
+/** Mirrors github-slugger, which is what rehype-slug stamps on <h2 id>: lowercase,
+ *  strip anything that isn't a word char/space/hyphen, spaces → hyphens.
+ *
+ *  One space per hyphen, NOT `\s+` — github-slugger substitutes each space
+ *  individually, so "Notes — on eval" keeps the two spaces the stripped em dash
+ *  left behind and slugs to `notes--on-eval` with a double hyphen. Collapsing
+ *  the run here produces an id that exists nowhere in the DOM: every rail link
+ *  for a heading with punctuation in it goes dead, and the scroll-spy freezes on
+ *  the last section it can still resolve. */
 function slugify(text: string): string {
   return text
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-");
+    .replace(/\s/g, "-");
 }
 
 export type JournalEntry = JournalEntryMeta & {
@@ -184,11 +191,18 @@ export function getRelated(meta: JournalEntryMeta): JournalEntryMeta[] {
  *  client-side DOM scraping. */
 export function getSections(entry: JournalEntry): Section[] {
   const out: Section[] = [];
+  // github-slugger suffixes a repeat with -1, -2, … and rehype-slug stamps that
+  // onto the DOM, so two headings with the same words have to be counted here
+  // too or the second one's rail link points at the first one's heading.
+  const seen = new Map<string, number>();
   const re = /^##\s+(.+)$/gm;
   let m: RegExpExecArray | null;
   while ((m = re.exec(entry.body))) {
     const title = m[1].trim();
-    out.push({ n: out.length + 1, id: slugify(title), title });
+    const base = slugify(title);
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    out.push({ n: out.length + 1, id: n ? `${base}-${n}` : base, title });
   }
   return out;
 }

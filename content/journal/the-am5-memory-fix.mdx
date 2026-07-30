@@ -13,13 +13,13 @@ And then nothing booted.
 
 ## What actually happened
 
-AM5's memory controller is fine with 2x DIMMs at the rated EXPO speed. With 4x DIMMs, it falls off a cliff — officially supported up to DDR5-3600 in some configurations, and even that is generous. The system was POSTing fine at JEDEC speeds; EXPO at 6000 was hard-failing into a memtest loop.
+AM5's memory controller is fine with 2x DIMMs at the rated EXPO speed. With 4x DIMMs, it falls off a cliff — officially supported up to DDR5-3600 in some configurations,[^1] and even that is generous. The system was POSTing fine at JEDEC speeds; EXPO at 6000 was hard-failing into a memtest loop.
 
 <Callout>TL;DR — 4 sticks of DDR5 on AM5 is not a supported config at advertised speeds. Pick 2 sticks of higher density, or accept JEDEC.</Callout>
 
 ## The fix
 
-I returned the second kit and got a single 2x32GB kit instead. 64GB total, EXPO enabled, boots clean every time. The 'just buy more sticks' instinct from DDR4 doesn't carry over.
+I returned the second kit and got a single 2x32GB kit instead. 64GB total,[^2] EXPO enabled, boots clean every time. The 'just buy more sticks' instinct from DDR4 doesn't carry over.
 
 ```
 # what I should have bought first time:
@@ -29,3 +29,7 @@ G.Skill Trident Z5 — 2x32GB DDR5-6000 CL30
 ```
 
 Lesson: density > stick count on AM5. Always.
+
+[^1]: AMD's QVL lists 4x DIMM support at DDR5-3600 on most AM5 boards — under half what the kit is rated for.
+
+[^2]: Two 32GB sticks also leaves two slots empty, which is the only upgrade path that doesn't mean `rebuying` the lot.

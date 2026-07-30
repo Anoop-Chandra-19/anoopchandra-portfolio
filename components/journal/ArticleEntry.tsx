@@ -1,8 +1,7 @@
 // Replaces ArticleSpread. Server component — renders the masthead, the hero
-// plate, the MDX body, and prev/next. No JS except the tiny <ReadingProgress/>
-// client component.
+// plate, the MDX body, and prev/next. The only JS is the client leaves it
+// mounts — <ReadingProgress/>, <SectionRail/>, <FootnoteSheet/>.
 import Link from "next/link";
-import Image from "next/image";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeMdxCodeProps from "rehype-mdx-code-props";
 import rehypeSlug from "rehype-slug";
@@ -10,8 +9,11 @@ import remarkGfm from "remark-gfm";
 import type { JournalEntry, JournalEntryMeta, Section } from "@/lib/journal";
 import { pad } from "@/lib/journal-meta";
 import { mdxComponents } from "@/components/journal/mdx-components";
+import FootnoteSheet from "@/components/journal/FootnoteSheet";
 import ReadingProgress from "@/components/journal/ReadingProgress";
 import SectionRail from "@/components/journal/SectionRail";
+import ZoomableImage from "@/components/ui/ZoomableImage";
+import { imageDims } from "@/lib/image-dims";
 
 const AUTHOR = "Anoopchandra Parampalli";
 
@@ -28,9 +30,14 @@ export default function ArticleEntry({
   sections: Section[];
   related: JournalEntryMeta[];
 }) {
+  // Read off the file, like an inline plate's — see mdx-components' <Figure>.
+  const hero = entry.hero ? imageDims(entry.hero) : null;
   return (
     <div className="je">
       <ReadingProgress />
+      {/* Delegated over the whole entry — the [^N] refs are MDX output, so there
+          is no React element for them to hang an onClick on. */}
+      <FootnoteSheet />
       <div className="je-inner">
         <nav className="je-top">
           <Link className="je-back" href="/journal">← back to index</Link>
@@ -59,16 +66,19 @@ export default function ArticleEntry({
           </div>
         </header>
 
-        {entry.hero && (
+        {entry.hero && hero && (
           <figure className="je-plate je-hero">
             <span className="je-tape" aria-hidden="true" />
             {/* hero is plate 000; inline <Figure> plates auto-count from 001 */}
             <span className="je-plate-tab">plate 000</span>
-            <Image
+            <ZoomableImage
               src={entry.hero}
               alt={entry.heroAlt ?? entry.title}
-              width={1100}
-              height={620}
+              caption={entry.heroCaption ?? entry.title}
+              width={hero.w}
+              height={hero.h}
+              sizes="(max-width: 880px) 100vw, 820px"
+              className="je-plate-media"
               priority
             />
             {entry.heroCaption && <figcaption>{entry.heroCaption}</figcaption>}

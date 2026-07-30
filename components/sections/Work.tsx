@@ -180,6 +180,8 @@ function ProjectMedia({ p }: { p: Project }) {
       caption={p.t}
       width={p.imgW}
       height={p.imgH}
+      sizes="(max-width: 1000px) 100vw, 45vw"
+      className="project-media"
       fit={p.imgFit}
     />
   );
