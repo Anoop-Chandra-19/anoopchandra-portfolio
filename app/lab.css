@@ -152,6 +152,13 @@ body:has([data-lab-root]) {
   opacity: 0.4;
   cursor: not-allowed;
 }
+.lx-btn:focus-visible,
+.lx-kbtn:focus-visible,
+.lx-kfield:focus-visible,
+.lx-cpt:focus-visible {
+  outline: 3px solid var(--lxa, var(--color-electric));
+  outline-offset: 3px;
+}
 
 /* Doodle */
 .lx-canvaswrap {
@@ -323,6 +330,10 @@ body:has([data-lab-root]) {
   color: var(--color-ink);
   outline: none;
 }
+.lx-inputrow:focus-within {
+  outline: 3px solid var(--lxa, var(--color-teal));
+  outline-offset: 3px;
+}
 .lx-tokens {
   display: flex;
   flex-wrap: wrap;
@@ -381,6 +392,7 @@ body:has([data-lab-root]) {
 /* K-means and perceptron */
 .lx-kfield {
   position: relative;
+  container-type: inline-size;
   aspect-ratio: 1;
   width: 100%;
   background-size: 24px 24px;
@@ -395,6 +407,16 @@ body:has([data-lab-root]) {
   transform: translate(-50%, -50%);
   transition: background 0.3s;
 }
+.lx-cpt {
+  padding: 0;
+  cursor: pointer;
+}
+.lx-cpt::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+}
 
 .lx-kcent {
   position: absolute;
@@ -407,8 +429,12 @@ body:has([data-lab-root]) {
   pointer-events: none;
 }
 .lx-kfield-hint {
-  font-size: 13px;
-  line-height: 1.65;
+  width: calc(100% - 32px);
+  font-size: clamp(10px, 2.5cqw, 13px);
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 .lx-krow {
   display: flex;
@@ -420,7 +446,7 @@ body:has([data-lab-root]) {
 .lx-kbtn {
   width: 34px;
   height: 34px;
-  transition: all 0.12s;
+  transition: transform 0.12s, background 0.12s, border-color 0.12s, color 0.12s;
 }
 /* The auto-repeating epoch stepper needs a held state, not only hover. */
 .lx-kbtn:active:not(:disabled) {

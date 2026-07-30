@@ -52,14 +52,44 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
   const [k, setK] = useState(3);
   const [running, setRunning] = useState(false);
   const [field, setField] = useState<Field>({ pts: [], cents: [], iter: 0, done: false });
+  const [cursor, setCursor] = useState<Cent>({ x: 0.5, y: 0.5 });
+  const [isKeyboardCursorActive, setIsKeyboardCursorActive] = useState(false);
 
-  const add = (e: React.PointerEvent) => {
-    if (running) return;
-    const r = fieldRef.current!.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top) / r.height;
-    if (x < 0 || x > 1 || y < 0 || y > 1) return;
+  const addPoint = (x: number, y: number) => {
+    if (running || x < 0 || x > 1 || y < 0 || y > 1) return;
     setField((f) => ({ ...f, pts: [...f.pts, { x, y, c: -1 }], done: false }));
+  };
+
+  const add = (event: React.PointerEvent) => {
+    setIsKeyboardCursorActive(false);
+    const fieldElement = fieldRef.current;
+    if (!fieldElement) return;
+    const rect = fieldElement.getBoundingClientRect();
+    addPoint((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
+  };
+
+  const moveCursor = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (running) return;
+    const amount = event.shiftKey ? 0.1 : 0.05;
+    const movement: Partial<Cent> = {};
+    if (event.key === "ArrowLeft") movement.x = -amount;
+    else if (event.key === "ArrowRight") movement.x = amount;
+    else if (event.key === "ArrowUp") movement.y = -amount;
+    else if (event.key === "ArrowDown") movement.y = amount;
+    else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setIsKeyboardCursorActive(true);
+      addPoint(cursor.x, cursor.y);
+      return;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    setIsKeyboardCursorActive(true);
+    setCursor((current) => ({
+      x: Math.min(0.97, Math.max(0.03, current.x + (movement.x ?? 0))),
+      y: Math.min(0.97, Math.max(0.03, current.y + (movement.y ?? 0))),
+    }));
   };
 
   const scatter = () => {
@@ -110,7 +140,17 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
   return (
     <div className="lx-body lx-kbody">
       <div className="lx-panel">
-        <div ref={fieldRef} className="lx-kfield" onPointerDown={add}>
+        <div
+          ref={fieldRef}
+          className="lx-kfield"
+          role="application"
+          tabIndex={0}
+          aria-label="K-means point field. Use arrow keys to move the cursor; press Enter or Space to place a point."
+          aria-disabled={running}
+          onBlur={() => setIsKeyboardCursorActive(false)}
+          onKeyDown={moveCursor}
+          onPointerDown={add}
+        >
           {pts.map((p, i) => (
             <span
               key={i}
@@ -131,16 +171,30 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
               ✕
             </span>
           ))}
-          {!pts.length && (
-            <span className="lx-kfield-hint">click anywhere to drop points ··· or scatter ↓</span>
+          {isKeyboardCursorActive && !running && (
+            <span
+              className="lx-kcent"
+              aria-hidden="true"
+              style={{ left: `${cursor.x * 100}%`, top: `${cursor.y * 100}%`, color: `var(--color-${accent})` }}
+            >
+              +
+            </span>
           )}
+          {!pts.length && (
+            <span className="lx-kfield-hint">click to place points · focus + arrows to move · enter to place</span>
+          )}
+        </div>
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {`${pts.length} points placed. Cursor at ${Math.round(cursor.x * 100)}, ${Math.round(cursor.y * 100)} percent.`}
         </div>
         <div className="lx-krow">
           <span className="mono faint">k =</span>
           {[2, 3, 4].map((n) => (
             <button
               key={n}
+              type="button"
               className={"lx-kbtn" + (k === n ? " on" : "")}
+              aria-pressed={k === n}
               disabled={running}
               onClick={() => setK(n)}
               style={k === n ? ({ "--lxa": `var(--color-${accent})` } as React.CSSProperties) : undefined}
@@ -179,6 +233,11 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
               <span className="faint">· {pts.filter((p) => p.c === i).length} pts</span>
             </span>
           ))}
+        </div>
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {done
+            ? `K-means complete. ${pts.length} points grouped into ${cents.length} clusters in ${iter} steps.`
+            : ""}
         </div>
       </div>
     </div>

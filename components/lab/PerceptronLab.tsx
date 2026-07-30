@@ -19,6 +19,7 @@ const MIN_MS = 1400;
 const MAX_MS = 6500;
 
 type Pt = { x: number; y: number; l: 0 | 1 };
+type Cursor = { x: number; y: number };
 type W = [number, number, number]; // bias, x, y
 type Key = { w: W; epoch: number };
 type Playback = { keys: Key[]; path: W[]; cum: number[]; total: number; T: number };
@@ -115,6 +116,9 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
   const [conv, setConv] = useState(-1);
   const [training, setTraining] = useState(false);
   const [epochs, setEpochs] = useState(EPOCHS);
+  const epochsRef = useRef(EPOCHS);
+  const [cursor, setCursor] = useState<Cursor>({ x: 0.5, y: 0.5 });
+  const [isKeyboardCursorActive, setIsKeyboardCursorActive] = useState(false);
   const playRef = useRef<Playback | null>(null);
 
   // epochs stepper with press-and-hold auto-repeat (accelerating), so getting
@@ -126,12 +130,22 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
       holdRef.current = null;
     }
   };
-  const startHold = (d: number) => {
-    if (training) return;
-    setEpochs((n) => Math.max(MIN_EPOCHS, Math.min(MAX_EPOCHS, n + d)));
+  const adjustEpochs = (difference: number): boolean => {
+    if (training) return false;
+    const next = Math.max(MIN_EPOCHS, Math.min(MAX_EPOCHS, epochsRef.current + difference));
+    if (next === epochsRef.current) return false;
+    epochsRef.current = next;
+    setEpochs(next);
+    return true;
+  };
+  const startHold = (difference: number) => {
+    if (!adjustEpochs(difference)) return;
     let delay = 320;
     const tick = () => {
-      setEpochs((n) => Math.max(MIN_EPOCHS, Math.min(MAX_EPOCHS, n + d)));
+      if (!adjustEpochs(difference)) {
+        holdRef.current = null;
+        return;
+      }
       delay = Math.max(45, delay - 55);
       holdRef.current = setTimeout(tick, delay);
     };
@@ -139,21 +153,48 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
   };
   useEffect(() => endHold, []);
 
-  const add = (e: React.PointerEvent) => {
-    if (training) return;
-    const r = fieldRef.current!.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top) / r.height;
-    if (x < 0 || x > 1 || y < 0 || y > 1) return;
-    setPts((p) => [...p, { x, y, l: cls }]);
+  const addPoint = (x: number, y: number) => {
+    if (training || x < 0 || x > 1 || y < 0 || y > 1) return;
+    setPts((points) => [...points, { x, y, l: cls }]);
     setW(null);
     setDw(null);
   };
 
-  const flip = (i: number, e: React.PointerEvent) => {
-    e.stopPropagation();
+  const add = (event: React.PointerEvent) => {
+    setIsKeyboardCursorActive(false);
+    const fieldElement = fieldRef.current;
+    if (!fieldElement) return;
+    const rect = fieldElement.getBoundingClientRect();
+    addPoint((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height);
+  };
+
+  const moveCursor = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget || training) return;
+    const amount = event.shiftKey ? 0.1 : 0.05;
+    const movement: Partial<Cursor> = {};
+    if (event.key === "ArrowLeft") movement.x = -amount;
+    else if (event.key === "ArrowRight") movement.x = amount;
+    else if (event.key === "ArrowUp") movement.y = -amount;
+    else if (event.key === "ArrowDown") movement.y = amount;
+    else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setIsKeyboardCursorActive(true);
+      addPoint(cursor.x, cursor.y);
+      return;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    setIsKeyboardCursorActive(true);
+    setCursor((current) => ({
+      x: Math.min(0.97, Math.max(0.03, current.x + (movement.x ?? 0))),
+      y: Math.min(0.97, Math.max(0.03, current.y + (movement.y ?? 0))),
+    }));
+  };
+
+  const flip = (index: number) => {
     if (training) return;
-    setPts((p) => p.map((q, j) => (j === i ? { ...q, l: q.l ? 0 : 1 } : q)));
+    setPts((points) => points.map((point, pointIndex) => (pointIndex === index ? { ...point, l: point.l ? 0 : 1 } : point)));
     setW(null);
     setDw(null);
   };
@@ -300,7 +341,17 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
   return (
     <div className="lx-body lx-kbody">
       <div className="lx-panel">
-        <div ref={fieldRef} className="lx-kfield" onPointerDown={add}>
+        <div
+          ref={fieldRef}
+          className="lx-kfield"
+          role="application"
+          tabIndex={0}
+          aria-label={`Perceptron point field. Current class ${cls ? "B" : "A"}. Use arrow keys to move the cursor; press Enter or Space to place a point.`}
+          aria-disabled={training}
+          onBlur={() => setIsKeyboardCursorActive(false)}
+          onKeyDown={moveCursor}
+          onPointerDown={add}
+        >
           {reg && (
             <svg className="lx-cbnd" viewBox="0 0 1 1" preserveAspectRatio="none">
               {reg.poly.length > 2 && (
@@ -324,10 +375,17 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
             </svg>
           )}
           {pts.map((p, i) => (
-            <span
+            <button
               key={i}
+              type="button"
               className="lx-kpt lx-cpt"
-              onPointerDown={(e) => flip(i, e)}
+              aria-label={`Point ${i + 1}, class ${p.l ? "B" : "A"}. Activate to flip its class.`}
+              disabled={training}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+                setIsKeyboardCursorActive(false);
+              }}
+              onClick={() => flip(i)}
               style={{
                 left: `${p.x * 100}%`,
                 top: `${p.y * 100}%`,
@@ -335,16 +393,35 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
               }}
             />
           ))}
-          {!pts.length && (
-            <span className="lx-kfield-hint">
-              click to place points ··· switch colour below ··· click a point to flip it
+          {isKeyboardCursorActive && !training && (
+            <span
+              className="lx-kcent"
+              aria-hidden="true"
+              style={{
+                left: `${cursor.x * 100}%`,
+                top: `${cursor.y * 100}%`,
+                color: `var(--color-${CLASS_COLORS[cls]})`,
+              }}
+            >
+              +
             </span>
           )}
+          {!pts.length && (
+            <span className="lx-kfield-hint">
+              click to place points · focus + arrows to move · enter to place · activate a point to flip
+            </span>
+          )}
+        </div>
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {`${pts.length} points placed. Cursor at ${Math.round(cursor.x * 100)}, ${Math.round(cursor.y * 100)} percent. Current class ${cls ? "B" : "A"}.`}
         </div>
         <div className="lx-krow">
           <span className="mono faint">class</span>
           <button
+            type="button"
             className="lx-cswatch mono"
+            aria-label={`Current point class ${cls ? "B" : "A"}. Activate to switch class.`}
+            aria-pressed={cls === 1}
             disabled={training}
             onClick={() => setCls((c) => (c ? 0 : 1))}
             style={{ background: `var(--color-${CLASS_COLORS[cls]})` }}
@@ -366,22 +443,36 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
         <div className="lx-krow">
           <span className="mono faint">epochs</span>
           <button
+            type="button"
             className="lx-kbtn"
-            aria-label="fewer epochs"
-            disabled={training}
-            onPointerDown={() => startHold(-1)}
+            aria-label="Fewer epochs"
+            disabled={training || epochs <= MIN_EPOCHS}
+            onClick={(event) => {
+              if (event.detail === 0) adjustEpochs(-1);
+            }}
+            onPointerDown={(event) => {
+              if (event.button === 0) startHold(-1);
+            }}
             onPointerUp={endHold}
             onPointerLeave={endHold}
             onPointerCancel={endHold}
           >
             −
           </button>
-          <span className="lx-epn mono">{epochs}</span>
+          <output className="lx-epn mono" aria-label="Epoch count">
+            {epochs}
+          </output>
           <button
+            type="button"
             className="lx-kbtn"
-            aria-label="more epochs"
-            disabled={training}
-            onPointerDown={() => startHold(1)}
+            aria-label="More epochs"
+            disabled={training || epochs >= MAX_EPOCHS}
+            onClick={(event) => {
+              if (event.detail === 0) adjustEpochs(1);
+            }}
+            onPointerDown={(event) => {
+              if (event.button === 0) startHold(1);
+            }}
             onPointerUp={endHold}
             onPointerLeave={endHold}
             onPointerCancel={endHold}
@@ -429,6 +520,13 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
               : `didn't converge in ${epochs} pass${epochs === 1 ? "" : "es"} — give it more epochs to keep going.`}
           </div>
         )}
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {w && !training
+            ? `Training complete. ${Math.round(acc * 100)} percent accuracy. ${
+                conv >= 0 ? `Converged at epoch ${conv + 1}.` : "The model did not converge."
+              }`
+            : ""}
+        </div>
       </div>
     </div>
   );
