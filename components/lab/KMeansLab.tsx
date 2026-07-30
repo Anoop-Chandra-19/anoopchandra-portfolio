@@ -88,7 +88,6 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
   const start = () => {
     setField((f) => {
       if (f.pts.length < k) return f;
-      // seed centroids from k distinct points
       const idx = [...f.pts.keys()].sort(() => Math.random() - 0.5).slice(0, k);
       setRunning(true);
       return { pts: f.pts, cents: idx.map((i) => ({ x: f.pts[i].x, y: f.pts[i].y })), iter: 0, done: false };

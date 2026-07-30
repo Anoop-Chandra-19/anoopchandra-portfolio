@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
-/* ---- Wireframe paper aesthetic (cream + ink) ---- */
-/* Declared in @theme so Tailwind generates utilities (bg-paper, text-electric, …) */
+/* Theme tokens exposed to Tailwind utilities. */
 @theme {
   --color-paper: #fdfaf2;
   --color-paper-2: #f5f0e1;
@@ -18,10 +17,7 @@
 
 * { box-sizing: border-box; }
 
-/* The root font-size is the rem basis for ~170 Tailwind spacing and text
-   utilities, so it is frozen at 17px and does NOT carry the reading size.
-   Changing it here would silently rescale every margin on the site. The
-   reading size lives on <body>. */
+/* Keep html at 17px: it is Tailwind's rem basis; body owns the reading size. */
 html, body {
   margin: 0;
   padding: 0;
@@ -31,15 +27,11 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* `--font-display` and `--font-body` are the same family — Source Serif 4 does
-   both jobs. Two names because they are two roles: if the display cut ever
-   diverges from the text cut, it is one line. next/font puts its variables on
-   <body>, so the alias lives here too. */
+/* next/font variables live on body; keep the role alias here. */
 body {
   --font-body: var(--font-display);
   font-family: var(--font-body);
-  /* v3 base: 18/1.65. opsz rides font-size, so large headings get the display
-     cut for free — never pin it with font-variation-settings. */
+
   font-size: 18px;
   line-height: 1.65;
   letter-spacing: 0;
@@ -53,17 +45,11 @@ body {
 }
 
 @media (max-width: 900px) {
-  /* no left rail, and nothing pinned to the bottom edge to clear */
+
   body { padding-left: 0; }
 }
 
-/* ---- Scrollbar (notebook edge-tab) ---- */
-/* Gated on a fine pointer, and the gate is the point: styling ::-webkit-scrollbar
-   at all opts the page out of the platform's overlay scrollbar, so on a phone
-   this turns a zero-width bar that fades in while you scroll into a permanent
-   14px column — 3.6% of a 390px viewport spent on something there is nothing to
-   drag with. Declaring nothing on coarse pointers hands the scrollbar back to
-   the OS, which already does appear-on-scroll-then-fade. */
+/* Fine-pointer gating avoids forcing permanent WebKit scrollbars on touch devices. */
 @media (pointer: fine) {
   ::-webkit-scrollbar {
     width: 14px;
@@ -85,7 +71,7 @@ body {
   ::-webkit-scrollbar-corner {
     background: var(--color-paper);
   }
-  /* Firefox has no scrollbar parts API — thin ink thumb on paper track */
+
   @supports not selector(::-webkit-scrollbar) {
     html {
       scrollbar-width: thin;
@@ -94,13 +80,7 @@ body {
   }
 }
 
-/* Lenis scroll-lock (ink transition): the package css sets
-   `.lenis-stopped { overflow: clip }`, which removes the scrollbar mid-flight —
-   the viewport widens by the 14px scrollbar and centered layouts jump sideways.
-   Keep the scrollbar rendered while locked (lenis already blocks wheel/touch
-   itself) and reserve the gutter as a general guard against overflow toggles.
-   Only classic scrollbars take layout space, so the gutter is reserved only
-   where one exists — an overlay scrollbar has nothing to reserve for. */
+/* Keep classic scrollbar width stable while Lenis locks scrolling. */
 @media (pointer: fine) {
   html {
     scrollbar-gutter: stable;
@@ -110,17 +90,9 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow-y: scroll;
 }
 
-/* These are DEFAULTS, so they belong in a cascade layer that Tailwind
-   utilities out-rank. Unlayered, they silently beat every `text-…` and
-   `leading-…` class in the markup — `@layer utilities` loses to unlayered CSS
-   in Tailwind v4 regardless of specificity. Keep every element-level type rule
-   below (including the ones inside media queries) inside `@layer base`, or the
-   sizes written next to the markup stop meaning anything. */
+/* Keep element defaults layered so Tailwind utilities can override them. */
 @layer base {
-  /* Hierarchy is carried by weight and size, not by swapping typefaces. 600 is
-     the ceiling: the old build ran 700 nearly everywhere, so emphasis had
-     nowhere left to go. Tracking tightens as the face grows — −0.008em at 21px
-     through −0.022em at 72px. */
+
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 600;
@@ -134,9 +106,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   h3 { font-size: 28px; line-height: 1.18; letter-spacing: -0.012em; }
   h4 { font-size: 21px; line-height: 1.25; letter-spacing: -0.008em; margin-bottom: 8px; }
 
-  /* Regular is the default: anything at reading size is 400. 600 is reserved
-     for headings, <strong>, and deliberate lead-ins — size is not a licence to
-     go bold. */
   p, li, blockquote { font-weight: 400; }
   strong, b { font-weight: 600; }
 
@@ -144,26 +113,19 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   a { color: var(--color-ink); }
 }
 
-/* Measure is a type decision, so it lives with the type: 66ch on the site,
-   64ch in the journal, 42ch for mono output. */
 .section > p { max-width: 66ch; }
 
-/* Role helpers. Layered for the same reason as the element rules: they set a
-   role's default size, and the markup must be able to say "this one is 10px".
-   Chrome sizes span 8.5–14px, so that override has to work. */
+/* Keep role defaults layered so local Tailwind sizes can override them. */
 @layer components {
   .mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.2px; }
-  /* `.hand` is a legacy name for the display face: it marked type that was set
-     in handwriting when handwriting was the text face. Under v3 that type is
-     reading type, so the class points at the serif. Handwriting proper is
-     `.accent`, applied only where it decorates. */
+
   .hand { font-family: var(--font-display); }
   .accent { font-family: var(--font-accent); font-weight: 600; }
   .tiny { font-size: 13px; color: var(--color-ink-soft); }
   .faint { color: var(--color-ink-faint); }
 }
 
-/* ---- Hand-drawn box primitives ---- */
+/* Shared primitives */
 .sketch-box {
   position: relative;
   border: 2px solid var(--color-ink);
@@ -171,9 +133,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   padding: 18px;
   border-radius: 6px;
 }
-/* Quieter than v2: the tilts and the double outline were tuned to sit beside
-   handwriting, where they read as one more informal signal. Against serif they
-   all fire at once and read as misalignment. Same signals, lower volume. */
+
 .sketch-box.tilt-l { transform: rotate(-0.25deg); }
 .sketch-box.tilt-r { transform: rotate(0.2deg); }
 
@@ -188,9 +148,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   transform: rotate(0.4deg);
 }
 
-/* A baseline band, not a block. The old 55%→95% band was tuned to Kalam's
-   small x-height; against serif letterforms it crosses the middle of the word
-   and reads as a strikethrough. 84%→96% puts it under the baseline. */
 .marker-highlight {
   background: linear-gradient(180deg, transparent 84%, var(--color-coral) 84%, var(--color-coral) 96%, transparent 96%);
   padding: 0 1px;
@@ -218,7 +175,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 .chip.teal     { background: color-mix(in oklab, var(--color-teal) 18%, white);     border-color: var(--color-teal); }
 .chip.navy     { background: color-mix(in oklab, var(--color-navy) 12%, white);     border-color: var(--color-navy); }
 
-/* ---- Placeholder image (striped) ---- */
 .ph {
   position: relative;
   background: repeating-linear-gradient(45deg, transparent 0 8px, rgba(0,0,0,0.07) 8px 9px);
@@ -243,9 +199,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   pointer-events: none;
 }
 
-/* ---- Annotations / margin notes ---- */
-/* Caveat's x-height runs ~25% small, so 21px sits optically at ~16px. That is
-   the floor — never smaller. */
 .note {
   font-family: var(--font-accent);
   font-weight: 600;
@@ -259,7 +212,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 .note.teal { color: var(--color-teal); }
 .note.navy { color: var(--color-navy); }
 
-/* ---- Layout shell ---- */
+/* Layout shell */
 .page {
   max-width: 1280px;
   margin: 0 auto;
@@ -312,39 +265,23 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   font-size: 18px;
 }
 
-/* ---- Section pieces with a desktop-only flourish ---- */
-/* These live in CSS (rather than inline styles) so the mobile pass can undo
-   them declaratively. Per-instance values ride custom properties. */
-
-/* §01 — each Now card sits at its own slight angle */
 .now-card { transform: rotate(var(--rot, 0deg)); }
 
-/* §02 — project slabs alternate which side the image sits on */
 .project-slab { grid-template-columns: var(--slab-cols, 1.4fr 1fr); }
 
-/* §02 — number/kind/status rail beside the body */
 .work-card,
 .minor-row { grid-template-columns: minmax(150px, 190px) 1fr; }
 
-/* §02 — the status stamp reads as pressed on, not typeset */
 .work-status { transform: rotate(-2.5deg); }
 
 .also-list > li { grid-template-columns: 20px 1fr; }
 
-/* Preflight strips list markers site-wide. These two lists want them back —
-   they're indented 18px, and an indent with nothing in it reads as a stray
-   paragraph rather than a list. (The also-list opts out on purpose: its dash
-   is drawn in the markup.) */
+/* Tailwind preflight removes list markers; restore them for semantic work lists. */
 .work-card ul,
 .project-content ul { list-style: disc; }
 
-/* Every zoomable content image sits in one of these — the frame class the
-   caller passes (.project-media, .je-plate-media) decides how it looks, this
-   only guarantees the enlarge button has something to anchor to. */
 .zoom-wrap { position: relative; display: block; }
 
-/* §02 — the media band fills its grid column so the side rules run the card's
-   full height; the copy column can't squeeze it into a ribbon. */
 .project-media {
   position: relative;
   display: flex;
@@ -356,8 +293,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   border-right: 2px solid var(--color-ink);
   overflow: hidden;
 }
-/* Dark UI shots mount as plates on paper-2 rather than bleeding to the edge —
-   two dark blocks on one page kills the paper. */
+
 .project-media[data-fit="contain"] { padding: 20px; }
 .project-media img { display: block; width: 100%; height: 100%; }
 .project-media[data-fit="contain"] img { object-fit: contain; }
@@ -387,11 +323,12 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 .zoom-wrap:hover .zoom-btn,
 .zoom-btn:focus-visible { opacity: 1; transform: none; }
 .zoom-btn:hover { background: var(--color-ink); color: var(--color-paper); }
-/* No hover on touch, so the affordance has to be permanent there */
+/* Keep the zoom affordance visible where hover is unavailable. */
 @media (hover: none) {
   .zoom-btn { opacity: 1; transform: none; }
 }
 
+/* Image lightbox */
 @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
 
 :root { --lb-scrim: color-mix(in oklab, var(--color-ink) 88%, transparent); }
@@ -407,13 +344,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   background: var(--lb-scrim);
   animation: lb-in 160ms ease-out;
 }
-/* `fixed` is laid out against the viewport, which excludes the scrollbar
-   gutter — so the scrim stops short and the notebook edge-tab stays lit in a
-   bright stripe down the side of a dark overlay. The gutter cannot be covered,
-   so it gets painted instead: the same translucent scrim over the same paper
-   the page has, which composites to exactly what the scrim does. Collapsing
-   the scrollbar instead would shift the page 14px sideways (see the Lenis note
-   above). The portal is a child of <body>, so `:has()` needs no state in JS. */
+/* Paint the reserved scrollbar gutter because a fixed scrim cannot cover it. */
 html:has(.lightbox) ::-webkit-scrollbar-track,
 html:has(.lightbox) ::-webkit-scrollbar-thumb {
   background: linear-gradient(var(--lb-scrim), var(--lb-scrim)), var(--color-paper);
@@ -425,9 +356,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
       color-mix(in oklab, var(--color-ink) 88%, var(--color-paper));
   }
 }
-/* The gesture surface. `touch-action: none` hands every touch to the pinch/pan
-   handlers — the page underneath is scroll-locked while this is open anyway —
-   and `overflow: hidden` keeps a zoomed plate clipped to the stage. */
+/* touch-action delegates pinch and pan to the lightbox handlers. */
 .lightbox-stage {
   display: flex;
   align-items: center;
@@ -438,25 +367,19 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   touch-action: none;
 }
 .lightbox img {
-  /* auto on both axes, or the width/height attributes act as specified sizes and
-     the two max-* clamps shrink each axis independently — which distorts the box
-     and letterboxes paper down the sides of the plate. */
+  /* Keep both axes auto so max-size clamps preserve the image aspect ratio. */
   width: auto;
   height: auto;
   max-width: 100%;
   max-height: calc(100vh - 140px);
-  /* No paper backdrop: these plates are dark UI carrying transparent pixels, and
-     a cream fill behind them punches holes of paper through the shot. */
+
   border: 2px solid var(--color-ink);
   box-shadow: 8px 8px 0 rgb(0 0 0 / 0.35);
-  /* Settling after a pinch or a double-tap is CSS; the component only writes the
-     transform, and drops the easing mid-gesture so the plate tracks the finger. */
+
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: zoom-in;
 }
 .lightbox-stage.is-gesturing img { transition: none; }
-/* The pointer is the whole affordance for mouse zoom — there is no pinch to
-   discover it with, so the cursor has to say which way the next click goes. */
-.lightbox img { cursor: zoom-in; }
 .lightbox-stage.is-zoomed img { cursor: zoom-out; }
 .lightbox-stage.is-zoomed.is-gesturing img { cursor: grabbing; }
 .lightbox-bar {
@@ -486,8 +409,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 }
 .lightbox-bar button:hover { background: var(--color-paper); color: var(--color-ink); }
 .lightbox-btns { display: flex; flex-shrink: 0; gap: 8px; margin-left: auto; }
-/* Plate captions are prose, and the image is sized against a one- or two-line
-   bar — clamp so a long caption can't grow the bar up over the plate. */
+
 .lightbox-cap {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -496,16 +418,14 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   overflow: hidden;
 }
 .lightbox-cap p { margin: 0; font: inherit; letter-spacing: inherit; color: inherit; }
-/* Both pointers can zoom now, so the hint always shows and only the wording
-   switches — each variant ships and the other is hidden. */
+
 .lightbox-hint { opacity: 0.65; font-size: 10px; }
 .hint-touch { display: none; }
 @media (hover: none) {
   .hint-touch { display: inline; }
   .hint-mouse { display: none; }
 }
-/* The bar wraps rather than squeezing the caption to nothing once the hint and
-   the reset button join it on a phone. */
+
 @media (max-width: 560px) {
   .lightbox-bar { flex-wrap: wrap; row-gap: 6px; }
 }
@@ -515,12 +435,9 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .lightbox img { transition: none; }
 }
 
-/* §05 — the index reads as a ledger: page no. / title / read / date */
 .notes-header,
 .notes-row { grid-template-columns: 44px 1fr 90px 64px; }
 
-/* §05 — the tag reads as a notebook edge tab: open on the right, tucked into
-   the page edge. Only its colour is set inline. */
 .notes-edge-tab {
   font-family: var(--font-mono);
   border: 1.2px solid;
@@ -528,23 +445,11 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   border-radius: 3px 0 0 3px;
 }
 
-/* §06 — the postcard lies slightly askew on the desk */
 .postcard { transform: rotate(-0.6deg); }
 
-/* ============================================================ */
-/* ---- Mobile / responsive ----                                */
-/* ============================================================ */
-/* The design's phone frame is 393px wide, but that's a canvas, not a target:
-   everything below is fluid and verified from ~320px through the tablet range.
-   Section treatments are ported from the design's `m-*` classes onto the
-   existing desktop markup — same components, one code path. */
+/* Responsive layout */
 
-/* §02 ships both the desktop sentence and its condensed phone variant and hides
-   one, which keeps the section a Server Component. Only `display: none` is set,
-   never a shown value — the visible variant keeps whatever display its own
-   utilities give it (`grid` on the bullet lists, `flex` on the tag rows).
-   Unlayered, so it outranks those Tailwind utilities. 720px is where the cards
-   go single-column, so copy and layout switch together. */
+/* Keep visibility rules unlayered so they override Tailwind display utilities. */
 @media (min-width: 721px) {
   .narrow-only { display: none; }
 }
@@ -552,8 +457,6 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .wide-only { display: none; }
 }
 
-/* The intermediate step lands on the scale's own buckets — 36 is the smallest
-   h2 and 25 an h3 — rather than on an arbitrary fraction of the desktop size. */
 @media (max-width: 1100px) {
   @layer base {
     h1 { font-size: 60px; }
@@ -564,40 +467,24 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .section { margin: 64px 0; }
 }
 
-/* ---- Tablet: the two-up project slabs run out of room first ---- */
-/* 1000, not 820: the 1.4fr/1fr split leaves the copy column ~230px of inner
-   measure below a ~1050px viewport, which is a text ribbon, not a column. */
 @media (max-width: 1000px) {
   .project-slab { grid-template-columns: 1fr; }
-  /* Image on top for every slab, whichever side it takes at desktop. The
-     slab's side borders become a single rule between image and copy. */
+
   .project-media {
     order: 1;
     border: none;
     border-bottom: 2px solid var(--color-ink);
     min-height: 200px;
   }
-  /* Stacked, the band sizes to the plate instead of stretching a short image
-     across a tall row. */
+
   .project-media img { height: auto; }
   .project-content { order: 2; padding: 24px; }
   .project-content h3 { font-size: 24px; }
 }
 
 @media (max-width: 720px) {
-  /* ---- type scale + shell ---- */
-  /* Mobile re-tunes, it does not rescale. The old sizes were fitted to
-     handwriting, which reads ~25% smaller than serif at the same px, so
-     headings step DOWN (~0.78×) and body steps UP. No clamps: the phone is one
-     width band, and a clamp here only re-introduces the fluid sizes the scale
-     replaced. Layered so the markup still wins. */
-  /* The reading size is set on <body>, unlayered, because that is where the
-     desktop rule sets it — a layered copy inside this media query loses to it
-     no matter how narrow the screen gets. (The block this replaces set
-     `html, body { font-size: 15px }` inside `@layer base`, so mobile has in
-     fact been reading at the desktop 18px the whole time.) `html` stays at its
-     17px rem basis at every width: it is what ~170 Tailwind spacing utilities
-     resolve against, and moving it would silently rescale the whole layout. */
+
+  /* Keep body unlayered and preserve html's 17px Tailwind rem basis. */
   body { font-size: 16px; line-height: 1.6; }
 
   @layer base {
@@ -614,31 +501,22 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 
   .row { flex-direction: column; gap: 14px; }
   .col { gap: 14px; }
-  /* the marker band is the same geometry at both widths — no mobile override */
-  /* Caveat's floor: 20px on the phone, one step under the desktop 21. */
+
   .note { font-size: 20px; }
-  /* chips are chrome, one step down from desktop's 12 */
+
   .chip { font-size: 11.5px; }
 
-  /* No chaotic tilts on a narrow screen — they cost horizontal room and read
-     as misalignment rather than personality at this size. */
   .sketch-box { padding: 16px; border-radius: 6px; }
   .sketch-box.tilt-l, .sketch-box.tilt-r { transform: none; }
   .chip, .chip + .chip { transform: none; }
-  /* …except the status stamp, which the design keeps pressed on at phone width
-     too, just shallower (m-work-status). It is a 9px mono label, not the body
-     copy the untilted work card exists to protect. */
+
   .work-status { transform: rotate(-1.5deg); }
-  /* …but the edge-to-edge cards keep their zero padding */
+
   .project-slab,
   .lab-card-btn .sketch-box { padding: 0; }
 
-  /* Section intro paragraph under each header. It is prose, so it steps up with
-     the body rather than shrinking away from it — `faint` already marks it as
-     secondary and doing that twice just makes it hard to read. */
   .section > p.faint { font-size: 16px; line-height: 1.6; margin-bottom: 16px; }
 
-  /* ---- section headers: number + meta on one baseline row, title below ---- */
   .section-header { flex-wrap: wrap; gap: 6px 14px; margin-bottom: 20px; padding-bottom: 8px; }
   .section-header .num { order: 1; font-size: 11px; letter-spacing: 1px; }
   .section-header .meta {
@@ -650,9 +528,6 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   }
   .section-header h2 { order: 3; flex: 1 0 100%; margin: 6px 0 0; }
 
-  /* §02's hand-drawn arrow and §06's postmark rule are desktop flourishes that
-     need horizontal room the phone doesn't have. Drop them and fall back to
-     the same number/meta/title stack. */
   .sh-arrow { margin-bottom: 20px; padding-bottom: 8px; }
   .sh-arrow-svg { display: none; }
   .sh-arrow-row { flex-wrap: wrap; gap: 6px 14px; padding-left: 0; }
@@ -665,19 +540,9 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .sh-stamp { gap: 12px; margin-bottom: 20px; }
   .sh-stamp-rule { display: none; }
   .sh-stamp-box { padding: 6px 16px 8px; }
-  /* The stamp's h2 comes down to the base h2, same as every other section
-     header — the box is the flourish, not the type. Unlayered because the
-     desktop size is a Tailwind utility (40px, a step under the base h2 so it
-     fits inside the box). */
+
   .sh-stamp-box h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.014em; }
 
-  /* ---- 00 hero: kicker, portrait, then the type stack ---- */
-  /* Desktop is a two-column grid with the portrait beside the copy; on a phone
-     the design leads with the portrait, so the columns dissolve (display:
-     contents) into one ordered flex stack. */
-  /* The hero owns the landing screen: it fills the viewport minus the page's own
-     top padding, and the stack centres in whatever height is left over. svh (not
-     vh) so a visible mobile URL bar doesn't push the status line off-screen. */
   .hero-section {
     min-height: calc(100svh - 26px);
     margin-top: 0;
@@ -688,52 +553,36 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   }
   .hero-grid { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
   .hero-text { display: contents; }
-  .hero-kicker   { order: 1; padding-right: 116px; font-size: 10px; letter-spacing: 3px; } /* clears the index chip */
-  /* The portrait is the section's shock absorber: it takes as much room as the
-     viewport allows so the stack below it still lands above the fold on short
-     phones. */
+  .hero-kicker   { order: 1; padding-right: 116px; font-size: 10px; letter-spacing: 3px; }
+
   .hero-portrait { order: 2; width: min(300px, 74vw, 34svh); margin: 18px auto 22px; }
-  /* The hero title is the site's only fluid type, and a Tailwind clamp sets it
-     — which out-ranks `@layer base`. Restating it here (unlayered) is what
-     lands the mobile h1 on 42 and lets the narrow-phone block reach it at all. */
+
   .hero-title    { order: 3; margin: 0 0 4px; font-size: 42px; line-height: 1.03; }
-  /* the dek: italic, regular, one step under body's neighbours — 400 always */
+
   .hero-tagline  { order: 4; margin-top: 12px; font-size: 17px; line-height: 1.55; }
   .hero-lede     { order: 5; margin-top: 16px; font-size: 16px; line-height: 1.62; }
   .hero-chips    { order: 6; margin-top: 18px; gap: 8px; }
   .hero-status   { order: 7; margin-top: 20px; font-size: 10.5px; letter-spacing: 0.5px; }
   .hero-portrait-box { width: 100%; }
-  /* The note rides the portrait's own corner — with the wrapper shrunk to the
-     portrait, "right/left" are its edges rather than the page's. */
+
   .hero-note-a { top: -10px; left: -10px; right: auto; }
-  /* "↗ that's me" is redundant once the portrait leads the section */
+
   .hero-note-b { display: none; }
 
-  /* ---- 01 now ---- */
   .now-well { padding: 18px; border-radius: 8px; }
   .now-card { transform: none; }
 
-  /* ---- 02 work ---- */
-  /* Every card heading collapses onto the base h3 here — 24 / 25 / 30 is a
-     desktop hierarchy that needs three columns of width to read as one. On a
-     single-column phone the cards are already ordered top to bottom, so the
-     prototype gives them all one size and lets position do the ranking.
-     Unlayered because the sizes are Tailwind utilities on the markup. */
   .work-card h3,
   .project-content h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.012em; }
   .work-card p,
   .project-content p { font-size: 16px; line-height: 1.62; }
-  /* …but not the impact line, which the design keeps a step under the summary
-     (m-impact, 14 against the section's 15). It sits out the body step-up
-     rather than taking it and then being pulled back down. */
+
   .work-card p.work-impact { font-size: 15px; line-height: 1.6; margin-top: 14px; }
 
   .role-org { font-size: 26px; }
 
   .work-card { grid-template-columns: 1fr; gap: 14px; }
-  /* Design m-work-top: the number and the status stamp share the top row and
-     the kind line runs under both. Left as a column, the rail's three parts
-     read as orphaned lines stacked above the heading. */
+
   .work-rail {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -744,7 +593,6 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .work-status { grid-area: 1 / 2; justify-self: end; margin-top: 0; font-size: 9px; }
   .work-kind   { grid-area: 2 / 1 / 3 / 3; margin: 6px 0 0; font-size: 10px; }
 
-  /* Title and year share a baseline row (m-minor-top), copy and CTA under it */
   .minor-row { grid-template-columns: 1fr; gap: 6px; padding: 12px 0; }
   .minor-head {
     display: flex;
@@ -756,9 +604,6 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 
   .also-list > li { grid-template-columns: 14px 1fr; }
 
-  /* A long group label shrinks the dashed line to nothing before it wraps
-     itself. Pinning the line's width flips that: the label wraps, the rule
-     survives. */
   .group-rule { gap: 10px; }
   .group-rule-line { flex-shrink: 0; min-width: 20px; }
 
@@ -766,21 +611,15 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .project-media img { max-height: 190px; }
   .project-content { padding: 18px; }
 
-  /* ---- 03 the lab ---- */
   .lab-card-canvas { height: 120px; }
-  /* the lift is a pointer affordance; on touch it sticks after a tap */
+
   .lab-card-btn:hover { transform: none; }
 
-  /* ---- 04 stack ---- */
-  /* the legend stacks, so its inline "·" separator has nothing to separate */
   .stack-legend { flex-direction: column; gap: 3px; font-size: 10.5px; letter-spacing: 0.5px; }
   .stack-legend-sep { display: none; }
-  /* tooling identifiers — mono, one step down from desktop's 13 */
+
   .stack-list { font-size: 12.5px; }
 
-  /* ---- 05 notes ---- */
-  /* Notebook page: narrower gutter, and each row becomes title-over-meta with
-     the page number spanning both lines in the margin. */
   .notes-book { padding: 14px 14px 12px 42px; }
   .notes-margin-rule { left: 30px; }
   .notes-index-label { display: none; }
@@ -796,8 +635,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   }
   .notes-row .notes-date  { grid-area: 1 / 1 / 3 / 2; align-self: start; padding-top: 3px; font-size: 10.5px; }
   .notes-row .notes-title { grid-area: 1 / 2 / 2 / 5; }
-  /* the title is the row's only reading type, so it steps up while the meta
-     around it steps down — the row has two lines to itself here */
+
   .notes-row .notes-title > :first-child {
     white-space: normal;
     font-size: 18px;
@@ -807,8 +645,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .notes-leader { display: none; }
   .notes-row .notes-read { grid-area: 2 / 2 / 3 / 3; text-align: left; font-size: 9.5px; letter-spacing: 0.5px; }
   .notes-row .notes-when { grid-area: 2 / 3 / 3 / 4; text-align: left; font-size: 9.5px; letter-spacing: 0.5px; }
-  /* the edge tab has no page edge to tuck into here — it becomes a pill on the
-     meta line, which is where the design puts it */
+
   .notes-edge-tab {
     position: static;
     grid-area: 2 / 4 / 3 / 5;
@@ -823,12 +660,9 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   }
   .notes-foot { margin-top: 10px; padding-top: 10px; }
 
-  /* ---- 06 say hi ---- */
-  /* The postcard stacks: message side above, dashed fold, address side below. */
   .postcard { transform: none; }
   .contact-grid { grid-template-columns: 1fr; min-height: 0; }
-  /* the postcard headline is display type on its own card, so it sits above
-     the base h2 — at the h1 size, which is where two short words belong */
+
   .contact-grid h2 { font-size: 34px; line-height: 1.03; letter-spacing: -0.018em; }
   .contact-message { padding: 26px 20px 20px; }
   .contact-colophon {
@@ -839,25 +673,17 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .postcard-divider { display: none; }
   .contact-stamps { margin-bottom: 16px; gap: 12px; }
   .contact-postmark { width: 84px; height: 84px; }
-  /* the stamp's type has to come down with the frame or "$0.42" sits on the
-     perforation */
+
   .contact-stamp { width: 74px; height: 90px; padding: 4px; }
   .contact-stamp > .accent { font-size: 20px; }
   .contact-stamp > .mono { margin-top: 4px; line-height: 1.3; }
   .contact-stamp > .mono:last-child { font-size: 10px; }
-  /* Caveat address lines: 20px is the floor, and `text-xl` lands under it once
-     the rem basis drops to 15 */
+
   .contact-addr > * { font-size: 20px; }
 }
 
-/* ---- Very narrow phones (SE-class): the notebook row runs out of room for
-   four meta columns, so the read time drops and the gutter tightens. ---- */
 @media (max-width: 360px) {
-  /* Every line wraps one step earlier here, so the hero rhythm tightens to keep
-     the whole stack on the landing screen. The h1 no longer needs its own step
-     down: 42px of serif fits "chandra." at 331px, where the old 58px clamp
-     ceiling did not — the size override this block used to carry never applied
-     to the hero anyway, since a Tailwind clamp out-ranks `@layer base`. */
+
   .hero-portrait { margin: 12px auto 16px; }
   .hero-tagline { margin-top: 10px; }
   .hero-lede { margin-top: 12px; }
@@ -873,7 +699,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   .notes-edge-tab { grid-area: 2 / 3 / 3 / 4; }
 }
 
-/* ---- Nav: desktop rail vs. mobile index chip + overlay ---- */
+/* Navigation */
 @media (max-width: 900px) {
   .side-nav-desktop { display: none !important; }
 }
@@ -903,8 +729,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 var(--color-ink);
 }
-/* tucked out of the way on downward scroll — but never out from under the
-   keyboard: a focused chip stays put */
+/* Never tuck the mobile nav trigger while keyboard-focused. */
 .m-nav-tab.tucked:not(:focus-visible) {
   transform: translateY(-70px);
   opacity: 0;
@@ -976,11 +801,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   color: var(--color-ink);
   text-decoration: none;
 }
-/* The overlay is an index, not a page — every line in it is chrome, so it
-   leaves the serif behind entirely and goes mono. This is the single biggest
-   visual change on the phone: the labels drop from 30px of display type to
-   19px of mono, which is what makes it read as a table of contents rather than
-   a second homepage. */
+
 .m-nav-ov-num { font-size: 11px; letter-spacing: 1px; color: var(--color-ink-faint); min-width: 22px; }
 .m-nav-ov-label { font-size: 19px; line-height: 1.1; font-weight: 500; letter-spacing: -0.02em; }
 .m-nav-overlay-list li.on .m-nav-ov-label { color: var(--color-electric); }

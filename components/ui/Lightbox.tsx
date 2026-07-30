@@ -177,8 +177,6 @@ export default function Lightbox({
     setGesturing(false);
     if (moved.current) return;
 
-    // A tap beside the plate dismisses, which is what the scrim did before the
-    // stage existed.
     if (!downOnPlate.current) {
       onClose();
       return;

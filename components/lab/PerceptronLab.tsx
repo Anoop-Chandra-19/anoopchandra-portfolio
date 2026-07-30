@@ -3,17 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import type { LabAccent } from "@/lib/lab-meta";
 import LabButton from "./LabButton";
 
-/* The classifier half of exp-003: a single-layer perceptron trained live on
-   the user's labelled points (lr 0.13, up to 26 epochs). Training records a
-   keyframe per weight update, then the boundary replays the whole path as a
-   single arc-length-parameterized tween — one eased timeline at constant
-   visual speed, so big corrections take longer, dead stretches take no time,
-   and the line never stutters between epochs. Coordinates are normalized
-   0..1 over the field. */
+/* A single-layer perceptron trained on normalized user points. One waypoint is
+   recorded per epoch, then replayed at constant visual speed along the smoothed
+   path. */
 
 const CLASS_COLORS = ["electric", "coral"] as const;
 const LR = 0.13;
-const EPOCHS = 26; // default cap on passes; user-adjustable
+const EPOCHS = 26;
 const MIN_EPOCHS = 1;
 const MAX_EPOCHS = 40;
 /* playback pace: ms per unit of boundary travel across the field, clamped so
@@ -239,7 +235,6 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
     setConv(convergedAt);
     setKeys(ks);
     if (total < 1e-6 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // no ceremony — land on the answer
       playRef.current = null;
       setKi(ks.length - 1);
       setDw([...final] as W);

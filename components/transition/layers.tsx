@@ -1,8 +1,5 @@
 "use client";
-// The one page copy the ink transition ever needs: home. Both effects reveal a
-// REAL route — bleed pushes the destination up front and eats holes through
-// this copy on top of it; peel grows this copy over the live origin page and
-// pushes home when it covers. Nothing is ever a partial copy of a destination.
+// Both transitions use a full home copy; neither constructs a partial destination.
 import type { JournalEntryMeta } from "@/lib/journal-meta";
 import HomeContent from "@/components/HomeContent";
 import SideNav from "@/components/nav/SideNav";

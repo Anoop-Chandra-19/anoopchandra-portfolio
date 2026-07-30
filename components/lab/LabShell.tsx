@@ -16,7 +16,6 @@ const DEMOS = {
 export default function LabShell({ exp }: { exp: LabExp }) {
   const { navigate } = useInkTransition();
 
-  // Esc peels back home, same ceremony as the ← home button
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") navigate("/", { effect: "peel" });

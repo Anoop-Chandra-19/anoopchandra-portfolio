@@ -29,7 +29,6 @@ export default function SideNav({
           <a
             key={id}
             href={`#sec-${id}`}
-            /* Colour and dash length carry the active state — no dim. */
             className={`anim-rail d-rail-${idx} flex h-[30px] items-center gap-[10px] no-underline text-ink px-[6px] rounded`}
             onClick={(e) => {
               e.preventDefault();
@@ -49,7 +48,6 @@ export default function SideNav({
               }`}
             />
             <span
-              /* Persistent nav is chrome, so it leaves the serif behind entirely. */
               className={`mono text-[11.5px] tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
                 isActive ? "text-electric translate-x-0" : "text-ink -translate-x-[1px]"
               }`}

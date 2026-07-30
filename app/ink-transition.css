@@ -1,14 +1,11 @@
-/* ============================================================ */
-/* ---- Ink-bleed / corner-peel route transition overlay ----   */
-/* ============================================================ */
+/* Ink transition overlay */
 
 .ink-overlay {
   position: fixed;
   inset: 0;
-  z-index: 300; /* above the whole page chrome */
+  z-index: 300;
 }
 
-/* One full-viewport copy of the destination page, clipped per frame */
 .ink-layer {
   position: fixed;
   inset: 0;
@@ -18,7 +15,7 @@
   visibility: hidden;
 }
 
-/* Replicates the body paper background — keep in sync with body in globals.css */
+/* Keep this paper texture synchronized with body in globals.css. */
 .ink-layer-paper {
   position: absolute;
   inset: 0;
@@ -30,7 +27,7 @@
     repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0, 0, 0, 0.018) 28px, rgba(0, 0, 0, 0.018) 29px);
 }
 
-/* Home copy mirrors the body's SideNav gutter (globals.css) */
+/* Keep this gutter and breakpoint synchronized with globals.css. */
 .ink-layer-home {
   padding-left: 140px;
 }
@@ -40,10 +37,7 @@
   }
 }
 
-/* Full-document page copy offset to the origin scroll position. The paper
-   background rides on the document (like the real body's) so the ruled lines
-   stay aligned with the content at any scroll offset — keep in sync with body
-   in globals.css. */
+/* Document-bound texture keeps ruled lines aligned while scrolling; sync with globals.css. */
 .ink-doc {
   min-height: 100vh;
   background-color: var(--color-paper);
@@ -53,8 +47,7 @@
     repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0, 0, 0, 0.018) 28px, rgba(0, 0, 0, 0.018) 29px);
 }
 
-/* Bleed origin copy: sits over the already-committed destination route from
-   frame one; the ink blobs are holes cut through it by the SVG mask below. */
+/* The SVG mask cuts reveal holes through the origin-page copy. */
 .ink-origin {
   visibility: visible;
   will-change: mask;
@@ -71,23 +64,7 @@
   visibility: hidden;
 }
 
-/* Small clipped window onto a full page copy — one per spatter satellite.
-   Sized to the spatter's max radius so only ~100px gets rasterized, not the
-   whole viewport. Position/size are set inline per spatter. */
-.ink-spatter {
-  position: fixed;
-  overflow: hidden;
-  will-change: clip-path;
-  contain: paint;
-  visibility: hidden;
-}
-
-.ink-spatter-inner {
-  position: absolute;
-}
-
-/* Pre-rendered rim gradient (2·HALO_R square, sized/positioned inline), scaled
-   to the current bleed radius via transform — compositor-only per frame. */
+/* The pre-rendered halo scales on the compositor during each frame. */
 .ink-halo {
   position: fixed;
   transform: scale(0);

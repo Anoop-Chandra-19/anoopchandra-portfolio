@@ -1,11 +1,5 @@
-// The tabbed edge of a notebook — NOT a docs sidebar. A sticky list of the
-// entry's § markers in the left gutter, active tab tinted with the accent and
-// marked by a right border. Reuses the same § numbering as the heading kickers,
-// so the numbers here match the ones in the body.
-//
-// Sections come from lib/journal.ts (a regex over the MDX source), not from
-// scraping the DOM — the slugs match what rehype-slug stamps on <h2 id>.
-// Hidden below 820px in CSS, and for entries with fewer than 3 sections.
+// Section IDs come from lib/journal.ts and match rehype-slug's rendered IDs.
+// The rail is hidden below 820px and for entries with fewer than three sections.
 "use client";
 import { useEffect, useState } from "react";
 import type { Section } from "@/lib/journal-meta";

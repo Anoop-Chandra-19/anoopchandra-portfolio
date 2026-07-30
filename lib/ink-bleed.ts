@@ -1,6 +1,4 @@
-// Pure geometry/timing for the ink-bleed / corner-peel route transition.
-// Ported from Portfolio/design_handoff_ink_bleed_transition/transition-demo-v6.jsx,
-// parameterized over the real viewport (the demo hardcoded 1000×680).
+// Ink-bleed and corner-peel geometry parameterized over the live viewport.
 
 export const FWD_MS = 1500;
 export const BACK_MS = 1100;
@@ -22,7 +20,6 @@ export const transitionMs = (effect: "bleed" | "peel", vw: number): number => {
   return small ? BACK_MS_SM : BACK_MS;
 };
 
-/** Reference viewport the spatter offsets were designed on */
 const DESIGN_MIN_DIM = 680;
 
 export const SPATTERS = [
@@ -34,7 +31,6 @@ export const SPATTERS = [
 
 export const SPATTER_BIRTHS = [0.06, 0.1, 0.14, 0.18] as const;
 
-/** Keeps spatters on-screen on small viewports (design deviation, noted in plan) */
 export const spatterScale = (vw: number, vh: number) =>
   Math.min(1, Math.min(vw, vh) / DESIGN_MIN_DIM);
 
@@ -91,7 +87,6 @@ export function blobPath(cx: number, cy: number, r: number, jitter = JITTER): st
   return noisyBlobPath(cx, cy, r, eff, 0);
 }
 
-/** Spatter blob — same noise, rotated per-spatter, tighter jitter window */
 export function spatterPath(
   cx: number,
   cy: number,
@@ -103,7 +98,6 @@ export function spatterPath(
   return noisyBlobPath(cx, cy, r, eff, seedOffset);
 }
 
-/** Bleed radius needed to cover the whole viewport from (cx, cy) */
 export const maxRadius = (cx: number, cy: number, vw: number, vh: number) =>
   Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy)) + 80;
 
@@ -136,14 +130,11 @@ function halfPlaneClip(k: number, vw: number, vh: number, keep: "gte" | "lte"): 
   return `polygon(${pts.map((p) => `${p[0].toFixed(1)}px ${p[1].toFixed(1)}px`).join(", ")})`;
 }
 
-/** The journal's remaining (un-peeled) region: x + y ≥ k */
 export const peelClip = (k: number, vw: number, vh: number) => halfPlaneClip(k, vw, vh, "gte");
 
-/** The destination's revealed region growing from the top-left: x + y ≤ k */
 export const peelClipComplement = (k: number, vw: number, vh: number) =>
   halfPlaneClip(k, vw, vh, "lte");
 
-/** Peel travel: k sweeps 0 → vw + vh + 20 */
 export const peelMaxK = (vw: number, vh: number) => vw + vh + 20;
 
 /** Geometry of the soft shadow band running along the diagonal cut x + y = k */
@@ -160,7 +151,6 @@ export function peelShadowGeom(
   return { left: k - midY - len / 2, top: midY - 12, width: len, height: 24 };
 }
 
-/** hex + alpha 0..1 → rgba() */
 export function hexA(hex: string, a: number): string {
   const h = hex.replace("#", "");
   const r = parseInt(h.slice(0, 2), 16);

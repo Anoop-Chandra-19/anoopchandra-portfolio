@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 
-// Thin coral bar at the top of the viewport. Optional — delete the import
-// in ArticleEntry to drop it. This is the only client-side JS in the entry.
 export default function ReadingProgress() {
   const [p, setP] = useState(0);
   useEffect(() => {

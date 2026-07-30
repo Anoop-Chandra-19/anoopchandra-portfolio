@@ -1,12 +1,4 @@
-// Light-on-paper fenced code, ruled like the rest of the book.
-//
-// No dark syntax theme on purpose: the architecture plates already put large
-// black rectangles on the cream, and a second dark block on the same page kills
-// the paper. The --tk-* token hues in journal.css are hue-shifted ink, tuned for
-// #fffdf7.
-//
-// Client component for the copy button and the overflow cue; the tokenizing is
-// pure and runs once per render.
+// Client component for the copy button and overflow cue.
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 

@@ -14,15 +14,7 @@ import { LenisProvider } from "@/components/LenisProvider";
 import InkTransitionProvider from "@/components/transition/InkTransitionProvider";
 import { getEntryMetas } from "@/lib/journal";
 
-/* v3 type system — three families, three jobs.
-   reading → Source Serif 4 · chrome → JetBrains Mono · aside → Caveat.
-   Hierarchy is carried by weight and size, not by swapping typefaces: a face
-   change means a change of role. See docs/typography-v3-plan.md. */
-
-/* Reading: everything you read — headings, body, deks, lists, article text.
-   The opsz axis rides font-size (`font-optical-sizing: auto`), so a 72px
-   heading gets the display cut for free. Never pin it with
-   font-variation-settings — that freezes wght and breaks the weight rules. */
+/* Keep Source Serif's optical sizing automatic; pinning opsz also freezes weight. */
 const sourceSerif = Source_Serif_4({
   variable: "--font-display",
   subsets: ["latin"],
@@ -31,8 +23,7 @@ const sourceSerif = Source_Serif_4({
   display: "swap",
 });
 
-/* Chrome: anything a machine produced, or the interface talking about itself —
-   nav, chips, labels, timestamps, code, captions, lab output. */
+/* Interface chrome uses mono. */
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
@@ -40,9 +31,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-/* Aside: decoration and marginalia only — margin notes, § markers, pull
-   quotes, the lab verdict, the postcard signature. One weight, and never
-   below 20px: Caveat's x-height runs ~25% small. */
+/* Caveat's small x-height makes 20px the minimum aside size. */
 const caveat = Caveat({
   variable: "--font-accent",
   subsets: ["latin"],
@@ -110,10 +99,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" type="image/png" />
         <StructuredData />
       </head>
-      {/* Extensions (Grammarly, password managers) stamp attributes onto <body>
-          before React hydrates, which React reports as a mismatch. This
-          suppresses only this element's own attributes — mismatches in the tree
-          below still surface. */}
+      {/* Extensions can mutate body attributes before hydration; suppression stays scoped here. */}
       <body
         suppressHydrationWarning
         className={`${sourceSerif.variable} ${jetbrainsMono.variable} ${caveat.variable} antialiased`}

@@ -1,16 +1,9 @@
-/* ============================================================ */
-/* ---- Journal (/journal + /journal/[slug]) ----               */
-/* ============================================================ */
+/* Journal index */
 
-/* Journal routes have no SideNav, so drop its 140px body gutter */
 body:has([data-journal-root]) {
   padding-left: 0;
 }
 
-/* ---- Cover banner ---- */
-/* Flat paper, not paper-2: the cover is a sheet in the same notebook, so it
-   takes the page's own stock and lets the border do the separating. The tint
-   made it read as a card sitting on top of the page. */
 .journal-cover {
   position: relative;
   background: var(--color-paper);
@@ -19,7 +12,7 @@ body:has([data-journal-root]) {
   padding: 28px 32px;
   margin-bottom: 36px;
 }
-/* the hand-drawn second outline, same idiom as the postcard's inner rule */
+
 .journal-cover::before {
   content: "";
   position: absolute;
@@ -32,12 +25,6 @@ body:has([data-journal-root]) {
   line-height: 0.95;
 }
 
-/* ---- Filter rail ---- */
-/* The design's `.variants-rail`: mono, not the reading face. These are controls,
-   and the v3 type layer takes them off the display face with an !important for
-   exactly that reason — chrome belongs to mono. A rounded rect rather than a
-   pill, so they don't read as chips; the alternating half-degree is the same
-   hand-drawn tilt the chips carry. */
 .journal-filter-btn {
   font-family: var(--font-mono);
   font-weight: 400;
@@ -58,9 +45,6 @@ body:has([data-journal-root]) {
   color: var(--color-paper);
 }
 
-/* The active subject reports itself here as one line of state rather than as a
-   seventh pressed button. Shaped like the edge tab that set it, so the state
-   and its source read as the same object. */
 .journal-subject-chip {
   display: inline-flex;
   align-items: center;
@@ -77,10 +61,6 @@ body:has([data-journal-root]) {
   cursor: pointer;
 }
 
-/* ---- Notebook TOC ---- */
-/* Header and rows share their first four tracks. The header spends its 5th
-   cell on the static `subject` label; the rows spend the same width as right
-   padding, which is the strip the edge tab is pinned over. */
 .journal-toc-header,
 .journal-toc-row {
   display: grid;
@@ -94,8 +74,7 @@ body:has([data-journal-root]) {
   grid-template-columns: 44px 1fr 90px 90px;
   padding: 14px 110px 14px 6px;
 }
-/* The hover lives on the <li>, not the <a>: the edge tab is the link's sibling
-   now, and a tab you're pointing at should still tint its own row. */
+
 .journal-toc-item {
   position: relative;
   transition: background 0.15s;
@@ -104,9 +83,6 @@ body:has([data-journal-root]) {
   background: color-mix(in oklab, var(--color-paper-2) 60%, transparent);
 }
 
-/* ---- Sortable column headers ---- */
-/* `pg.` is deliberately absent: in a book filled front to back a page number
-   only increases with time, so "by page" and "by date" are one ordering. */
 .journal-sort {
   display: inline-flex;
   align-items: center;
@@ -130,14 +106,6 @@ body:has([data-journal-root]) {
 .journal-sort-arrow { opacity: 0.35; }
 .journal-sort.is-on .journal-sort-arrow { opacity: 1; }
 
-/* ---- Edge tab = the subject filter ---- */
-/* Pinned past the panel's clipped right edge and ELONGATED leftward on hover
-   and when active — never slid. Sliding detaches the right edge from the page
-   and turns the bookmark into a floating chip with a missing border. 90 → 96 →
-   100px against the row's 110px reserve, so ~10px of paper always survives:
-   reaching the date column reads as crowding it, not as emerging.
-   Only the hue arrives inline (`--tab-c`, from `tabAccent`) — the tint DEPTH is
-   a state, so hover deepens it here, the same tint-the-paper move the row makes. */
 .journal-edge-tab {
   position: absolute;
   right: -2px;
@@ -170,18 +138,15 @@ body:has([data-journal-root]) {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
-/* After :hover on purpose — equal specificity, so an active tab under the
-   cursor keeps its full width and its solid ink shadow. */
+/* Keep this after hover: equal specificity lets the active state win. */
 .journal-edge-tab.is-on {
   --tab-w: 100px;
   --tab-shadow: -2px 2px 0 var(--color-ink);
   font-weight: 500;
 }
-/* unmatched tabs recede, so the book reads as flipped-to-a-section */
+
 .journal-index.has-subject .journal-edge-tab:not(.is-on) { opacity: 0.45; }
 
-/* The meta pair is two ledger cells on a wide screen and one line of chrome on
-   a narrow one, so the wrapper is transparent to the grid until it isn't. */
 .journal-toc-metas {
   display: contents;
 }
@@ -193,9 +158,7 @@ body:has([data-journal-root]) {
 }
 
 @media (max-width: 720px) {
-  /* The notebook framing comes off: at 393px the 64px spine gutter is a fifth
-     of the screen, and the cover above has already said "notebook" once. What
-     is left is the design's phone index — a 2px-ruled list of rows. */
+
   .journal-toc-panel {
     background: none;
     border: 0;
@@ -213,7 +176,7 @@ body:has([data-journal-root]) {
   .journal-toc-list {
     border-top: 2px solid var(--color-ink);
   }
-  /* 20px of right reserve is the chevron's column; the tab is pinned inside it. */
+
   .journal-toc-row {
     grid-template-columns: 44px 1fr;
     grid-template-areas:
@@ -232,8 +195,7 @@ body:has([data-journal-root]) {
     grid-area: title;
     flex-wrap: wrap;
   }
-  /* the title span carries no role class — it is the row's reading type by
-     position, so target it structurally rather than by a class it never had */
+  /* The title span has no role class; target it structurally. */
   .journal-toc-title > :first-child {
     white-space: normal;
     font-size: 18px;
@@ -241,7 +203,7 @@ body:has([data-journal-root]) {
     letter-spacing: -0.01em;
     flex: 0 1 100%;
   }
-  /* Right padding is the tab's berth — the meta text must never slide under it. */
+
   .journal-toc-metas {
     display: flex;
     grid-area: meta;
@@ -253,8 +215,7 @@ body:has([data-journal-root]) {
   .journal-toc-row .journal-toc-meta {
     text-align: left;
   }
-  /* Read time is first in the DOM because the ledger's columns run that way;
-     read aloud it comes second — you ask when before you ask how long. */
+
   .journal-toc-metas > .journal-toc-meta:first-child {
     order: 2;
   }
@@ -276,13 +237,7 @@ body:has([data-journal-root]) {
     font-size: 17px;
     color: var(--color-ink-faint);
   }
-  /* The tab is the only subject control, so it cannot go away here. With the
-     row reflowed there is no page edge left to tuck into, so it becomes a pill
-     at the end of the meta line — the same move §05's rows make — and the 110px
-     reserve goes with it. `min-width: 0` also retires the elongation: a pill
-     that isn't pinned has nothing to emerge from, and tint plus shadow still
-     carry state. Kind is the tint, which is the only place a phone row says
-     case-vs-note now that the ★ badge is off. */
+
   .journal-edge-tab {
     top: auto;
     bottom: 11px;
@@ -296,15 +251,13 @@ body:has([data-journal-root]) {
     letter-spacing: 1px;
     text-transform: uppercase;
   }
-  /* the rotated corner stamp collides with the kicker text on small covers */
+
   .journal-cover .journal-cover-stamp {
     position: static;
     display: inline-block;
     margin-top: 14px;
   }
-  /* The cover is a masthead, so its h1 sits a step under the site h1 rather
-     than on it — 42px of "The Journal" and 40px read the same, but 40 leaves
-     the dek room to stay on two lines. */
+
   .journal-cover { padding: 20px 18px; }
   .journal-cover h1 { font-size: 40px; line-height: 1.02; letter-spacing: -0.02em; }
   .journal-cover > p { font-size: 17px; line-height: 1.5; }
@@ -314,47 +267,30 @@ body:has([data-journal-root]) {
   .journal-filter-narrow { display: inline; }
 }
 
-/* ============================================================ */
-/* ---- Journal entry — "The Annotated Manuscript" ----          */
-/* ============================================================ */
-/* Serif reading column on the ruled paper; personality lives in
-   the chrome (ledger header, stamps, marker highlights, hand
-   section-numbers, taped plates). Section numbers (✎ §NN) and
-   plate numbers auto-increment via CSS counters — authors never
-   number by hand. Hero is plate 000, set in ArticleEntry. */
+/* Journal entry */
 
-/* One measure for the whole reading column. 64ch at the journal's 20px
-   reading size resolves to 640px — kept in px, not ch, because `ch` resolves
-   against each element's OWN size, which would put the h3s at 763px and the
-   lists at 614px and leave the column edge ragged. */
-/* Accent text under ~14px is mixed toward ink before it is drawn: coral is
-   ~2.6:1 on cream — right for rules, borders, tints and bullets, illegible for
-   9–11px mono. Pure --accent = graphics; --accent-ink = small text
-   (63% mix ≈ 5:1, and it holds if the accent is ever re-tuned lighter). */
+/* A fixed measure keeps mixed-size article elements on one column edge. */
+/* Use --accent-ink for small text; pure --accent is reserved for graphics. */
 .je{font-family:var(--font-display);color:var(--color-ink);--je-measure:640px;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink));
   --rail:132px;--colgap:30px;--col:640px;--side-w:330px;--side-gap:34px;
-  /* code tokens — light-on-paper, tuned for cream */
+
   --tk-key:oklch(.47 .17 305);--tk-str:oklch(.46 .10 168);--tk-num:oklch(.5 .14 38);
   --tk-fn:oklch(.44 .11 252);
   --tk-com:color-mix(in oklab,var(--color-ink) 44%,var(--color-paper));
   --tk-pn:color-mix(in oklab,var(--color-ink) 66%,var(--color-paper))}
 .je-plate{counter-increment:plate}
-/* decimal-leading-zero only pads to 2 digits (01, 02…10…) — the hero plate
-   is hardcoded "plate 000" (3 digits), so inline plates need their own
-   3-digit style to match instead of drifting to "plate 01". */
+/* Built-in decimal-leading-zero pads only to two digits. */
 @counter-style plate-pad{system:extends decimal;pad:3 "0"}
 .je-plate-tab.auto::before{content:"plate " counter(plate,plate-pad)}
 
 .je-progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);z-index:50}
 .je-inner{position:relative;width:1280px;max-width:100%;margin:0 auto;padding:44px 40px 100px}
 
-/* top nav */
 .je-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:16px;border-bottom:1.5px dashed var(--color-ink-faint);margin-bottom:38px}
 .je-back{font-family:var(--font-mono);font-size:12px;letter-spacing:.4px;color:var(--color-ink);text-decoration:none;border:1.5px solid var(--color-ink);border-radius:999px;padding:6px 14px;background:var(--color-paper)}
 .je-back:hover{background:var(--color-ink);color:var(--color-paper)}
 .je-topmeta{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint)}
 
-/* masthead */
 .je-mast{max-width:860px;margin-bottom:36px}
 .je-ledger{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);padding:8px 0;border-top:2px solid var(--color-ink);border-bottom:1px solid var(--color-ink);margin-bottom:22px}
 .je-ledger .dash{flex:0 0 auto;width:16px;height:1px;background:var(--color-ink-faint)}
@@ -368,33 +304,24 @@ body:has([data-journal-root]) {
 .je-bsub{color:var(--color-ink-soft)}
 .je-grow{flex:1}
 
-/* plates (hero + figures) */
 .je-plate{position:relative;background:#fffdf7;border:1px solid var(--color-ink);box-shadow:0 8px 22px rgba(0,0,0,.12);padding:14px 14px 12px;margin:0 0 40px;max-width:820px}
 .je-hero{margin-bottom:46px}
 .je-plate img{display:block;width:100%;max-height:420px;object-fit:contain;background:var(--color-paper-2)}
 .je-plate-tab{position:absolute;top:-11px;left:18px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-paper);background:var(--color-ink);padding:3px 9px;border-radius:3px}
 .je-plate figcaption{font-family:var(--font-mono);font-size:11px;line-height:1.55;color:var(--color-ink-faint);margin-top:11px;padding-left:14px;border-left:2px solid var(--accent)}
 .je-tape{position:absolute;top:-12px;right:26px;width:74px;height:24px;background:rgba(216,182,120,.5);border:1px solid rgba(0,0,0,.06);transform:rotate(17deg)}
-/* The plate's top-right corner belongs to the tape, so the enlarge button
-   takes the bottom-right of the image instead of the shared default. */
+
 .je-plate-media .zoom-btn{top:auto;bottom:10px}
 
-/* body — reading column + red margin rule */
-/* Three-band notebook page:
-     [ § rail ] [ reading column ] [ live right margin ]
-   The rail carries section tabs, the column carries load-bearing prose, the
-   margin carries commentary and footnotes. */
 .je-body{position:relative;width:100%;max-width:min(100%,calc(var(--rail) + var(--colgap) + var(--col)));padding-left:calc(var(--rail) + var(--colgap));counter-reset:sec plate}
 .je-rule{position:absolute;left:var(--rail);top:-4px;bottom:60px;width:1.4px;background:color-mix(in oklab,var(--accent) 72%,transparent);opacity:.65}
 
-/* ---- § rail: the tabbed edge of a notebook, not a docs sidebar ---- */
 .je-secnav{position:absolute;left:0;top:0;bottom:0;width:var(--rail)}
 .je-secnav-in{position:sticky;top:26px;display:flex;flex-direction:column;gap:1px}
 .je-secnav .hd{font-family:var(--font-mono);font-size:8.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--color-ink-faint);text-align:right;padding:0 13px 9px 0}
 .je-secnav a{display:block;text-align:right;text-decoration:none;padding:6px 11px 7px 4px;border-right:2px solid transparent;border-radius:3px 0 0 3px;transition:background .15s,color .15s,border-color .15s}
 .je-secnav a .n{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:1.4px;color:var(--color-ink-faint)}
-/* 20px is Caveat's floor, so the clamp goes to 4 lines to keep the longer
-   titles whole in a 132px rail */
+
 .je-secnav a .t{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-family:var(--font-accent);font-weight:600;font-size:20px;line-height:1.22;padding-bottom:2px;margin-top:1px;color:color-mix(in oklab,var(--color-ink) 55%,var(--color-paper))}
 .je-secnav a:hover{background:color-mix(in oklab,var(--color-paper-2) 70%,transparent)}
 .je-secnav a:hover .t{color:var(--color-ink)}
@@ -402,65 +329,47 @@ body:has([data-journal-root]) {
 .je-secnav a.on .n{color:var(--accent-ink)}
 .je-secnav a.on .t{color:var(--color-ink)}
 
-/* ---- <Side>: commentary in the live right margin. Caveat, no box, no label,
-        no tint — the rule of the page is "boxes get serif, Caveat gets no box".
-        A dotted box around handwriting is two metaphors fighting. ---- */
 .je-side{float:right;clear:right;position:relative;width:var(--side-w);margin:5px calc(-1 * (var(--side-w) + var(--side-gap))) 18px var(--side-gap);font-family:var(--font-accent);font-weight:600;font-size:21px;line-height:1.3;color:color-mix(in oklab,var(--color-ink) 68%,var(--color-paper))}
 .je-side::before{content:"";position:absolute;left:calc(6px - var(--side-gap));top:14px;width:18px;height:1.2px;background:color-mix(in oklab,var(--accent) 70%,transparent)}
-/* footnotes live in the margin too — serif, numbered, quieter than a <Side> */
+
 .je-side.is-fn{font-family:var(--font-display);font-weight:400;font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
 .je-side.is-fn .n{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-right:7px}
-/* Footnote bodies at the end of the column. The design lifts these into the
-   right margin as .je-side.is-fn; remark-gfm emits them as one list at the end,
-   so this is the handoff's documented fallback — same type, same accent, in the
-   column rather than beside it. The refs still open them in place. */
+/* remark-gfm emits one terminal footnote list; this is the in-column fallback. */
 .je-fnlist{clear:right;margin:38px 0 0;padding-top:14px;border-top:1px dashed var(--color-ink-faint);max-width:var(--je-measure);font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
 .je-fnlist h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .je-fnlbl{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);margin-bottom:10px}
-/* The list rides .je-ol's counter; only the geometry changes for 15px type. */
+
 .je-fnlist ol{margin:0;padding-left:0}
 .je-fnlist li{font-size:15px;line-height:1.5;margin-bottom:8px;padding-left:28px}
 .je-fnlist li::before{top:3px;font-size:11px}
 .je-fnlist p{font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
-/* Landing on a note should say so — this is the only way to tell which of six
-   you jumped to. Same tint the highlighted code line uses. */
+
 .je-fnlist li:target{background:color-mix(in oklab,var(--accent) 12%,transparent);border-radius:3px}
 .je-fnlist li:target::before{color:var(--color-ink)}
-/* Both ends of the jump clear the sticky progress bar and land with the note in
-   the page rather than jammed against the top edge. */
+
 .je-fnlist li,.je-fnref{scroll-margin-top:120px}
 .je-fnlist a{color:var(--accent-ink)}
-/* The ↩ walks back up to the ref. It is a control, not prose, so it drops the
-   body link's dotted rule and takes a hit area instead. */
+
 .je-fnlist a[data-footnote-backref]{border-bottom:0;padding:0 4px;text-decoration:none}
 .je-fnlist a[data-footnote-backref]:hover{color:var(--color-ink)}
 .je-fnref{font-family:var(--font-mono);font-size:.58em;font-weight:500;color:var(--accent-ink);vertical-align:super;line-height:0;padding-left:2px;text-decoration:none}
 .je-fnref a{color:inherit;text-decoration:none;border-bottom:0}
 .je-fnref a:hover{color:var(--color-ink)}
 
-/* ---- footnote sheet: the phone's stand-in for the right margin ----
-   Only ever mounted below the phone breakpoint (<FootnoteSheet/> gates on the
-   same media query), so these aren't width-scoped. It portals to <body> to
-   escape the column, which also puts it outside .je — hence its own copy of
-   the accent pair. */
+/* The mobile-only portal sits outside .je, so it redeclares article accent tokens. */
 .je-fnsheet-wrap{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink))}
-/* The scrim covers the whole viewport and the sheet sits on top of it, not just
-   the band above: cropped to the band, the sheet's rounded top corners had
-   nothing behind them and read as sharp corners against the curve. */
+
 .je-fnsheet-scrim{position:absolute;inset:0;border:0;padding:0;background:color-mix(in srgb,var(--color-ink) 26%,transparent);animation:je-fnfade .18s ease-out both;cursor:pointer}
-/* Same cascade problem as the sheet below — a finished animation would hold
-   opacity:1 and outrank the inline drag fade, so drop it once settled. */
+/* Remove animation fill after entry so inline drag styles can take over. */
 .je-fnsheet-scrim.settled{animation:none}
 .je-fnsheet{position:relative;background:var(--color-paper);border-top:1.4px solid var(--color-ink);border-radius:15px 15px 0 0;box-shadow:0 -7px 24px color-mix(in srgb,var(--color-ink) 14%,transparent);padding:9px 18px 26px;animation:je-fnup .27s cubic-bezier(.2,.85,.25,1) both;touch-action:none}
 .je-fnsheet.settled{animation:none}
 .je-fnsheet-grab{display:block;width:36px;height:3.5px;border-radius:3px;background:color-mix(in oklab,var(--color-ink) 20%,transparent);margin:0 auto 13px;cursor:grab}
 .je-fnsheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent-ink)}
-/* 44×44 target; the negative margins keep the glyph optically where it sat and
-   stop the box inflating the header row. */
+
 .je-fnsheet-x{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-13px -16px -13px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:15px;line-height:1;letter-spacing:0;color:var(--color-ink-soft);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .je-fnsheet-x:active{color:var(--color-ink)}
-/* Mirrors .je-side.is-fn: serif 15/1.5, quieter than body. The note is cloned
-   MDX, so it arrives as one or more <p>. */
+
 .je-fnsheet-body{font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
 .je-fnsheet-body p{margin:0;font-size:inherit;line-height:inherit;color:inherit}
 .je-fnsheet-body p+p{margin-top:9px}
@@ -468,14 +377,13 @@ body:has([data-journal-root]) {
 .je-fnsheet-body .n{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-right:7px}
 @keyframes je-fnup{from{transform:translateY(101%)}to{transform:translateY(0)}}
 @keyframes je-fnfade{from{opacity:0}to{opacity:1}}
+/* Article body */
 .je-body p{font-family:var(--font-display);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:var(--je-measure);color:var(--color-ink);text-wrap:pretty}
 .je-ic{font-family:var(--font-mono);font-size:.8em;background:color-mix(in oklab,var(--color-ink) 7%,var(--color-paper-2));border:1px solid var(--color-ink-faint);border-radius:3px;padding:1px 5px}
 .je-body strong{font-weight:600}
 .je-body a{color:var(--color-electric);text-decoration:none;border-bottom:1.5px dotted color-mix(in oklab,var(--color-electric) 55%,transparent)}
 .je-body a:hover{color:var(--color-ink);border-bottom-color:var(--color-ink)}
-/* Thinner than the portfolio's marker: at 20px serif a 36%-tall band sits over
-   the descenders and fights the text. A ~20% band reads as an underline
-   stroke instead. */
+
 .je-hl{background:linear-gradient(180deg,transparent 76%,color-mix(in oklab,var(--accent) 58%,#fff) 76%,color-mix(in oklab,var(--accent) 58%,#fff) 96%,transparent 96%);color:inherit;padding:0 3px}
 
 .je-h2{margin:44px 0 16px;max-width:var(--je-measure);counter-increment:sec}
@@ -487,57 +395,36 @@ body:has([data-journal-root]) {
 .je-ul{list-style:none;padding:0;margin:6px 0 24px;max-width:var(--je-measure)}
 .je-ul li{position:relative;padding-left:28px;font-family:var(--font-display);font-size:19px;line-height:1.6;margin-bottom:11px}
 .je-ul li::before{content:"";position:absolute;left:2px;top:11px;width:8px;height:8px;border:1.6px solid var(--accent);border-radius:2px;transform:rotate(45deg)}
-/* Preflight zeroes list-style, so ::marker never draws anything and a styled
-   one is dead weight — the ordinals are a counter instead. Mono and
-   accent-inked, zero-padded to match the § markers and the plate tabs: the
-   whole book numbers things the same way. */
+/* Tailwind preflight removes markers; ordered-list ordinals use a counter. */
 .je-ol{list-style:none;padding-left:2px;margin:6px 0 24px;max-width:var(--je-measure);font-family:var(--font-display);font-size:19px;line-height:1.6;counter-reset:oli}
 .je-ol li{position:relative;padding-left:32px;margin-bottom:9px;counter-increment:oli}
 .je-ol li::before{content:counter(oli,decimal-leading-zero);position:absolute;left:0;top:5px;font-family:var(--font-mono);font-size:12px;color:var(--accent-ink)}
 
-/* boxed callout: lives inline in the reading column */
-/* Load-bearing, so it stays in the column: boxed, tinted, serif at body size.
-   Quiet by default — the left bar carries the accent and the label is the only
-   coloured type. */
 .je-callout{--cal:var(--accent);position:relative;max-width:var(--je-measure);margin:26px 0;padding:15px 20px;background:color-mix(in oklab,var(--cal) 7%,var(--color-paper));border:1px solid color-mix(in oklab,var(--cal) 34%,var(--color-ink-faint));border-left:3px solid var(--cal);border-radius:3px;font-family:var(--font-display);font-weight:400;font-size:19px;line-height:1.6;color:var(--color-ink);text-wrap:pretty}
-/* Signal colours, not accents. Warning is deliberately OFF-palette: people have
-   a learned response to yellow-plus-triangle, and a warning styled to blend in
-   gets skimmed — so it is not harmonised with the accent. Tip is quiet cool ink
-   carried by the ✦ glyph. Both sit off the accent so neither can be mistaken
-   for "this entry's colour". */
+
 .je-callout.is-warning{--cal:oklch(.78 .155 85);background:color-mix(in oklab,var(--cal) 26%,var(--color-paper));border-color:color-mix(in oklab,var(--cal) 62%,var(--color-ink-faint));border-left-color:var(--cal)}
 .je-callout.is-tip{--cal:oklch(.5 .04 205);background:color-mix(in oklab,var(--cal) 5%,var(--color-paper));border-color:color-mix(in oklab,var(--cal) 30%,var(--color-ink-faint))}
-/* The label is the part that has to register fastest, so it drops toward ink:
-   pure accent at 9.5px is 2.6:1, the exact case --accent-ink exists to prevent. */
+
 .je-callout .lbl{display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:9.5px;font-weight:500;letter-spacing:2.2px;text-transform:uppercase;color:color-mix(in oklab,var(--cal) 63%,var(--color-ink));margin-bottom:8px}
 .je-callout.is-warning .lbl{color:color-mix(in oklab,var(--cal) 22%,var(--color-ink))}
 .je-callout.is-tip .lbl{color:color-mix(in oklab,var(--cal) 88%,var(--color-ink))}
 
-/* code */
-/* Light on paper, ruled like the rest of the book. NO dark syntax theme: the
-   architecture plates already put large black rectangles on the cream, and a
-   second dark block on the same page kills the paper. Token hues are
-   hue-shifted ink, tuned for #fffdf7. */
+/* Code blocks */
 .je-code{margin:28px 0;max-width:var(--je-measure);background:#fffdf7;border:1.4px solid var(--color-ink);border-radius:4px;box-shadow:2px 2px 0 color-mix(in oklab,var(--color-ink) 13%,transparent)}
 .je-code .bar{display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px dashed color-mix(in oklab,var(--color-ink) 38%,var(--color-paper));background:color-mix(in oklab,var(--color-paper-2) 62%,#fff);border-radius:3px 3px 0 0}
 .je-code .fn{font-family:var(--font-mono);font-size:11px;color:var(--color-ink)}
 .je-code .lang{font-family:var(--font-mono);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);border:1px solid color-mix(in oklab,var(--color-ink) 26%,var(--color-paper));border-radius:999px;padding:2px 8px}
 .je-code .copy{margin-left:auto;font-family:var(--font-mono);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 7px;cursor:pointer}
 .je-code .copy:hover{color:var(--color-ink);border-color:color-mix(in oklab,var(--color-ink) 30%,var(--color-paper))}
-/* A wide fence scrolls sideways inside its own card — the page never does.
-   Touch has no resting scrollbar and the pointer one only colours in on hover,
-   so the card carries its own cue: paper fades in on whichever edge still has
-   code behind it. .more / .less come from CodeBlock watching scrollLeft. */
+/* CodeBlock toggles .more/.less to expose horizontal overflow cues. */
 .je-code .cwrap{position:relative}
 .je-code .cwrap::before,.je-code .cwrap::after{content:"";position:absolute;top:0;bottom:0;width:30px;pointer-events:none;opacity:0;transition:opacity .18s ease-out;z-index:1}
 .je-code .cwrap::after{right:0;background:linear-gradient(90deg,rgba(255,253,247,0),#fffdf7 70%)}
 .je-code .cwrap::before{left:0;background:linear-gradient(270deg,rgba(255,253,247,0),#fffdf7 70%)}
 .je-code .cwrap.more::after{opacity:1}
 .je-code .cwrap.less::before{opacity:1}
-.je-code .cbody{counter-reset:ln;overflow-x:auto;padding:12px 0;background:linear-gradient(90deg,transparent 0 42px,color-mix(in oklab,var(--accent) 40%,transparent) 42px 43px,transparent 43px)}
-/* The track stays reserved and only the thumb colours in — swapping the
-   scrollbar in on hover would reflow the card under the cursor. */
-.je-code .cbody{scrollbar-width:thin;scrollbar-color:transparent transparent;transition:scrollbar-color .18s ease-out}
+.je-code .cbody{counter-reset:ln;overflow-x:auto;padding:12px 0;background:linear-gradient(90deg,transparent 0 42px,color-mix(in oklab,var(--accent) 40%,transparent) 42px 43px,transparent 43px);scrollbar-width:thin;scrollbar-color:transparent transparent;transition:scrollbar-color .18s ease-out}
+/* Keep the scrollbar track reserved to prevent hover reflow. */
 .je-code:hover .cbody,.je-code .cbody:focus-visible{scrollbar-color:color-mix(in oklab,var(--color-ink) 28%,transparent) transparent}
 .je-code .ln{display:block;position:relative;counter-increment:ln;padding:0 18px 0 58px;font-family:var(--font-mono);font-size:13.5px;line-height:1.72;white-space:pre;color:var(--color-ink)}
 .je-code .ln::before{content:counter(ln);position:absolute;left:0;width:30px;text-align:right;font-size:11px;color:color-mix(in oklab,var(--color-ink) 32%,var(--color-paper))}
@@ -551,15 +438,11 @@ body:has([data-journal-root]) {
 .je-code .t-c{color:var(--tk-com);font-style:italic}
 .je-code .t-p{color:var(--tk-pn)}
 
-/* pull quote */
-/* Hangs 8px left into the margin rule, so it needs 8px more width to still
-   land on the column's shared right edge. */
 .je-quote{position:relative;margin:36px 0 36px -8px;max-width:calc(var(--je-measure) + 8px);padding:6px 0 6px 26px;border-left:3px solid var(--accent)}
 .je-quote p{font-family:var(--font-accent);font-weight:600;font-size:36px;line-height:1.22;color:var(--color-ink);margin:0}
 .je-quote cite{display:block;font-family:var(--font-mono);font-style:normal;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);margin-top:12px}
 
-/* MDX wraps block JSX children in <p>; undo the .je-body p serif styling
-   inside chrome blocks that set their own voice (hand callout, mono caption) */
+/* MDX wraps block JSX children in p; reset inherited article paragraph styles. */
 .je-callout p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
 .je-callout p+p{margin-top:10px}
 .je-callout p:last-child{margin-bottom:0}
@@ -567,7 +450,6 @@ body:has([data-journal-root]) {
 
 .je-end{display:flex;justify-content:space-between;clear:right;max-width:var(--je-measure);font-family:var(--font-mono);font-size:11px;color:var(--color-ink-faint);margin-top:34px;padding-top:14px;border-top:1px dashed var(--color-ink-faint)}
 
-/* footer / prev-next */
 .je-foot{margin-top:52px;padding-top:24px;border-top:2px solid var(--color-ink)}
 .je-alsolbl{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);margin-bottom:9px}
 .je-also{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
@@ -585,14 +467,12 @@ body:has([data-journal-root]) {
 .je-navcard.older{text-align:right}
 .je-colophon{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--color-ink-faint);text-align:center;margin-top:34px}
 
-/* The three bands give way one at a time: margin narrows, margin collapses,
-   rail narrows, rail hides. */
+/* Article responsive layout */
 @media (max-width:1300px){
   .je{--side-w:288px;--side-gap:26px;--col:600px;--je-measure:600px}
 }
 @media (max-width:1140px){
-  /* margin collapses: side notes fold inline as hand asides, which is what a
-     phone does anyway — one behaviour, two widths */
+
   .je-side{float:none;width:auto;margin:16px 0 20px;padding-left:16px;border-left:1.5px dashed color-mix(in oklab,var(--accent) 45%,transparent)}
   .je-side::before{display:none}
   .je-side.is-fn{padding-left:14px}
@@ -608,9 +488,7 @@ body:has([data-journal-root]) {
   .je-secnav{display:none}
   .je{--rail:26px;--colgap:14px}
 }
-/* Phone. The article keeps its one-step-larger reading size relative to the
-   site (17 vs 16, the same gap as 20 vs 18 on desktop) — the journal is where
-   you read, not where you scan. Everything framing it steps down. */
+
 @media (max-width:640px){
   .je-inner{padding:24px 18px 72px}
   .je-ledger{font-size:9px;letter-spacing:2px;gap:9px}
@@ -621,12 +499,7 @@ body:has([data-journal-root]) {
   .je-plate{padding:10px 10px 10px}
   .je-plate figcaption{font-size:10px}
   .je-tape{display:none}
-  /* 34px gutter: a 28px marker plus a 6px gap to the text. Below the rail
-     breakpoint there are no tabs left for the § marker to sit beside, so it
-     leaves the column and hangs on the rule itself — a mono bead threaded on
-     it, knocking the rule out behind its own paper background. Caveat's 20px
-     floor doesn't apply here: hanging in the gutter it is chrome, not
-     marginalia, so it takes mono at 9.5px and drops the ✎. */
+
   .je{--rail:14px;--colgap:20px}
   .je-body p{font-size:17px;line-height:1.7}
   .je-ul li,.je-ol li{font-size:17px;line-height:1.62}
@@ -639,17 +512,12 @@ body:has([data-journal-root]) {
   .je-quote cite{font-size:10px;letter-spacing:1.8px}
   .je-callout{font-size:17px;line-height:1.6;padding:13px 16px}
   .je-callout .lbl{font-size:9.5px;letter-spacing:2.2px}
-  /* 20px is Caveat's floor — the collapsed margin note may not go under it */
+
   .je-side{font-size:20px;line-height:1.36}
   .je-side.is-fn{font-size:15px;line-height:1.5}
-  /* No footnote list at the end on a phone: the entry closes on the sign-off,
-     and the sheet has already shown every note in place. The list stays in the
-     DOM because the sheet clones its bodies out of it. */
+  /* Keep the hidden list in the DOM because the mobile sheet clones its bodies. */
   .je-fnlist{display:none}
-  /* Footnotes stay refs — a citation folded inline stops being an aside and
-     becomes body text — but a bare superscript is not a thumb target, so the
-     ref becomes a pill that lifts the note into a sheet. ::after grows the
-     ~13px pill to ~31px of tap without touching line-height. */
+  /* The pseudo-element enlarges the footnote tap target without changing line height. */
   .je-fnref{position:relative;display:inline-block;vertical-align:.34em;margin:0 1px 0 2px;padding:1px 5px 1.5px;border-radius:20px;background:color-mix(in oklab,var(--accent) 20%,var(--color-paper));font-size:9.5px;line-height:1.3;cursor:pointer;-webkit-tap-highlight-color:transparent}
   .je-fnref::after{content:"";position:absolute;inset:-9px -7px}
   .je-fnref:active{background:color-mix(in oklab,var(--accent) 34%,var(--color-paper))}

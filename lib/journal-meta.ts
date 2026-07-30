@@ -26,22 +26,14 @@ export type JournalEntryMeta = {
   sub: string | null;
   hero: string | null;
   heroAlt: string | null;
-  /** mono caption under the hero plate */
   heroCaption: string | null;
   /** slugs of related entries */
   related: string[];
 };
 
-/** Edge-tab colours for the notebook ledgers (journal index + §05 Notes).
- *
- *  One notebook, one accent. Tags are a taxonomy, not a palette — an earlier
- *  pass gave every tag its own hue, and three entries side by side read as
- *  three different sites. The tab encodes the KIND, never the tag: coral for
- *  case studies, teal for notes. The tag is the text inside it.
- *
- *  Both are mixed toward ink before they're drawn — pure coral is 2.6:1 on
- *  cream and pure teal not much better, which is fine for the border but
- *  illegible for 10px mono sitting on its own tint. */
+/** Edge tabs encode kind, never tag: coral for cases and teal for notes.
+ *  Text colours mix toward ink because the pure accents lack sufficient
+ *  contrast at 10px. */
 export const tabColors = (kind: JournalEntryMeta["kind"]) =>
   kind === "case"
     ? {

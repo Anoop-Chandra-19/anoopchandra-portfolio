@@ -85,8 +85,6 @@ export default function Hero() {
           <div className="anim-stamp d-annot1 hero-note-a absolute -top-2.5 right-2.5">
             <Annotation color="coral">👋 hi!</Annotation>
           </div>
-          {/* offset in from the box corner so it meets the circle's lower-left
-              arc rather than floating in the corner gap */}
           <div className="anim-stamp d-annot2 hero-note-b absolute bottom-[7%] left-[3%]">
             <Annotation color="teal">↗ that&apos;s me</Annotation>
           </div>

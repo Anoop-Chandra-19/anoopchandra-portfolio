@@ -5,11 +5,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Lightbox from "@/components/ui/Lightbox";
 
-/** The one zoom affordance on the site: any content image gets the click-to-
- *  enlarge plate the work cards use. The caller owns the frame it sits in
- *  (`className` — .project-media, .je-plate-media, …); this only draws the
- *  image, the enlarge button and the overlay, so `.zoom-wrap`'s positioning is
- *  what the button anchors to. */
+/** The caller owns the outer frame; `.zoom-wrap` positions the enlarge button. */
 export default function ZoomableImage({
   src,
   alt,

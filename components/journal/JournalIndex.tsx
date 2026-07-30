@@ -8,9 +8,7 @@ type Filter = "all" | "case" | "note";
 type SortKey = "title" | "read" | "date";
 type Sort = { key: SortKey; dir: "asc" | "desc" };
 
-/** [key, label, phone label]. Both wordings ship and CSS hides one — the same
- *  trick Lightbox uses for its gesture hint. Spelled out the row wraps to three
- *  lines at 393px, which is three times what the filter is worth. */
+/** [key, desktop label, phone label]. Both render so CSS can select by viewport. */
 const FILTERS: ReadonlyArray<[Filter, string, string]> = [
   ["all", "all entries", "all"],
   ["case", "case studies", "case"],
@@ -45,10 +43,6 @@ function SortHead({
 }) {
   const on = sort.key === sortKey;
   return (
-    /* aria-sort belongs on the header cell, not the button — the prototype had
-       it on the button. It stays inert until this ledger is a real grid: the
-       rows are links, and faking table roles over them would cost them their
-       link semantics for an attribute nothing would announce anyway. */
     <span
       aria-sort={on ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
       className={align === "right" ? "text-right" : undefined}
@@ -73,15 +67,12 @@ export default function JournalIndex({
   inert,
 }: {
   entries: JournalEntryMeta[];
-  /** page range of the whole notebook — the last leaf, not the last entry's
-   *  first leaf, so the header states the book's real extent */
+  /** Full notebook page range, including the final entry's last leaf. */
   book?: { first: number; last: number };
-  /** true when rendered as a non-interactive copy inside the transition overlay */
+  /** Rendered as a non-interactive transition copy. */
   inert?: boolean;
 }) {
-  /* Two axes, both component state: kind above the page, subject on the tabs.
-     Not URL state — the default (whole book, newest first) is the only view
-     worth linking to. */
+  /* Kind, subject, and sort are intentionally local rather than URL state. */
   const [filter, setFilter] = useState<Filter>("all");
   const [tag, setTag] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
@@ -104,8 +95,7 @@ export default function JournalIndex({
     return rows.sort((x, y) => (sort.dir === "asc" ? cmp(x, y) : -cmp(x, y)));
   }, [entries, filter, tag, sort]);
 
-  // Clicking the same column flips it; a new column starts in the direction
-  // people expect of it — newest and longest first, but titles A → Z.
+  // New columns default to title ascending and all others descending.
   const toggleSort = (key: SortKey) =>
     setSort((s) =>
       s.key === key
@@ -120,7 +110,6 @@ export default function JournalIndex({
 
   return (
     <div className={`page journal-index ${tag ? "has-subject" : ""}`} inert={inert}>
-      {/* Top bar */}
       <div
         className="flex items-center justify-between flex-wrap gap-3 mb-7 pb-3.5"
         style={{ borderBottom: "1.5px dashed var(--color-ink-faint)" }}
@@ -140,7 +129,6 @@ export default function JournalIndex({
         </div>
       </div>
 
-      {/* Cover banner */}
       <div className="journal-cover">
         <div className="mono faint text-[11px] tracking-[3px] uppercase mb-3.5">
           a working notebook · {ppRange}
@@ -156,7 +144,6 @@ export default function JournalIndex({
           className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-[10px] tracking-[2px] uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
           style={{
             transform: "rotate(3deg)",
-            // small accent text mixes toward ink; the border stays pure coral
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
           }}
         >
@@ -164,13 +151,8 @@ export default function JournalIndex({
         </div>
       </div>
 
-      {/* Filter rail — kind only. Subject is set on the ledger's own edge tabs,
-          which are already drawn on every row; a second row of buttons would be
-          the index's vocabulary printed twice. Order is stated by the column
-          headers below, so there is no caption for it here. */}
+      {/* Kind uses the top filters; subject uses each row's edge tab. */}
       <div className="flex items-center flex-wrap gap-2.5 mb-[22px]">
-        {/* Off on a phone — with three counted pills on the row there is nothing
-            left for the word to explain, and it was the reason they wrapped. */}
         <span className="mono journal-filter-lbl text-[11px] tracking-[1px] uppercase text-ink-soft">
           filter ↦
         </span>
@@ -200,11 +182,6 @@ export default function JournalIndex({
         )}
       </div>
 
-      {/* Notebook TOC panel */}
-      {/* On a phone the box, the ruled edge and the spine stamp all come off in
-          CSS and this is a plain ruled list — a 393px screen has no width to
-          spend on 64px of gutter, and the notebook framing is already carried by
-          the cover above. */}
       <div className="journal-toc-panel bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
         <span
           aria-hidden="true"
@@ -226,9 +203,7 @@ export default function JournalIndex({
           <SortHead label="title" sortKey="title" sort={sort} onSort={toggleSort} />
           <SortHead label="read" sortKey="read" sort={sort} onSort={toggleSort} align="right" />
           <SortHead label="date" sortKey="date" sort={sort} onSort={toggleSort} align="right" />
-          {/* `subject` is a label, never a control: the tabs' affordance can't
-              depend on hover (touch) or on the footer hint, which scrolls out of
-              view once the book is long. This names the axis permanently. */}
+          {/* `subject` permanently labels the edge-tab controls. */}
           <span className="relative">
             <span style={{ position: "absolute", right: -2, width: 90, textAlign: "center" }}>
               subject
@@ -279,11 +254,7 @@ export default function JournalIndex({
                   <span className="text-[18px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
                     {e.title}
                   </span>
-                  {/* The one place the kind is stated in words. The edge tab
-                      carries a subject, not the bucket, so its colour is
-                      otherwise the only signal. */}
-                  {/* Off on a phone: the tab is already tinted by kind there,
-                      and the badge cost the title its second line. */}
+                  {/* The case badge provides a non-colour kind signal; mobile uses the tab. */}
                   {e.kind === "case" && (
                     <span className="mono journal-toc-case text-[9px] tracking-[2px] uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
                       <span aria-hidden="true">★ </span>case study
@@ -309,20 +280,13 @@ export default function JournalIndex({
                   </span>
                 </span>
 
-                {/* Phone only. A whole row is the tap target, which a thumb has
-                    no way to know without the affordance a list row carries
-                    everywhere else on a phone. */}
                 <span className="journal-toc-chev" aria-hidden="true">
                   ›
                 </span>
               </Link>
 
-              {/* The tab IS the subject filter — it was already drawn on every
-                  row, so filtering by subject needs no control above the page.
-                  A <button> inside an <a> is invalid and recovers differently
-                  per engine, so it sits BESIDE the Link, absolutely positioned
-                  over the row's 110px right reserve: the Link keeps all four
-                  cells and stays one click target, the tab takes its own. */}
+              {/* The subject button sits beside the link because nested interactive
+                  elements are invalid; absolute positioning preserves one row target. */}
               <button
                 type="button"
                 className={`journal-edge-tab ${tag === e.tag ? "is-on" : ""}`}
@@ -340,8 +304,6 @@ export default function JournalIndex({
           className="flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
-          {/* The `subject` clause appears only when one is active, so the line
-              doubles as confirmation the tab took. */}
           <span className="mono faint text-[11px]">
             {visible.length} shown
             {tag && (

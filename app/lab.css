@@ -1,13 +1,7 @@
-/* ============================================================ */
-/* ---- The Lab (/lab/[slug]) — full-page experiment bench ---- */
-/* Ported from the design handoff's lab-desktop.css (.lx-*),    */
-/* adapted to the repo's --color-* tokens. The per-experiment   */
-/* accent comes in through --lxa, set on .lx-page-inner.        */
-/* ============================================================ */
+/* Lab */
 
 @keyframes lxPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
-/* Lab routes have no SideNav, so drop its 140px body gutter */
 body:has([data-lab-root]) {
   padding-left: 0;
 }
@@ -18,7 +12,6 @@ body:has([data-lab-root]) {
   padding: 38px 40px 80px;
 }
 
-/* ---- header row: back + experiment tabs ---- */
 .lx-page-head {
   display: flex;
   justify-content: space-between;
@@ -67,7 +60,6 @@ body:has([data-lab-root]) {
   border-color: var(--lxa);
 }
 
-/* ---- title block ---- */
 .lx-head {
   border-bottom: 2px dashed color-mix(in oklab, var(--color-ink) 30%, transparent);
   padding-bottom: 16px;
@@ -107,7 +99,7 @@ body:has([data-lab-root]) {
   max-width: 640px;
 }
 
-/* ---- two-panel demo body ---- */
+/* Shared lab controls */
 .lx-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -125,23 +117,28 @@ body:has([data-lab-root]) {
   letter-spacing: 1px;
   margin-bottom: 8px;
 }
-.lx-btn {
+.lx-btn,
+.lx-kbtn {
   font-family: var(--font-mono);
   font-size: 13px;
-  padding: 9px 16px;
   border: 1.5px solid var(--color-ink);
   border-radius: 3px;
   background: var(--color-paper);
   color: var(--color-ink);
   cursor: pointer;
+}
+.lx-btn {
+  padding: 9px 16px;
   transition: transform 0.1s, background 0.14s;
   white-space: nowrap;
 }
-.lx-btn:hover:not(:disabled) {
+.lx-btn:hover:not(:disabled),
+.lx-kbtn:hover:not(:disabled) {
   transform: translate(-1px, -1px);
   box-shadow: 2px 2px 0 color-mix(in oklab, var(--color-ink) 18%, transparent);
 }
-.lx-btn.on {
+.lx-btn.on,
+.lx-kbtn.on {
   background: var(--lxa);
   border-color: var(--lxa);
   color: #fff;
@@ -150,41 +147,48 @@ body:has([data-lab-root]) {
   font-size: 12px;
   padding: 7px 13px;
 }
-.lx-btn:disabled {
+.lx-btn:disabled,
+.lx-kbtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* ---- doodle ---- */
+/* Doodle */
 .lx-canvaswrap {
   position: relative;
   width: fit-content;
   max-width: 100%;
 }
-.lx-canvas {
-  display: block;
-  max-width: 100%;
+.lx-canvas,
+.lx-kfield {
   border: 2px solid var(--color-ink);
   border-radius: 4px;
   background: #fdfaf2;
   background-image:
     linear-gradient(color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px);
-  background-size: 20px 20px;
   cursor: crosshair;
   touch-action: none;
 }
-.lx-canvas-hint {
+.lx-canvas {
+  display: block;
+  max-width: 100%;
+  background-size: 20px 20px;
+}
+.lx-canvas-hint,
+.lx-kfield-hint {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   font-family: var(--font-mono);
-  font-size: 13.5px;
-  line-height: 1.6;
   color: var(--color-ink-faint);
   pointer-events: none;
   white-space: nowrap;
+}
+.lx-canvas-hint {
+  font-size: 13.5px;
+  line-height: 1.6;
 }
 .lx-prevrow {
   display: flex;
@@ -263,7 +267,7 @@ body:has([data-lab-root]) {
   text-align: right;
 }
 
-/* ---- sentiment ---- */
+/* Sentiment */
 .lx-gauge-wrap {
   display: flex;
   flex-direction: column;
@@ -284,8 +288,7 @@ body:has([data-lab-root]) {
 .lx-needle {
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-/* The one place handwriting states a result — allowed because the number
-   beside it is authoritative. */
+
 .lx-verdict {
   font-family: var(--font-accent);
   font-weight: 600;
@@ -375,20 +378,12 @@ body:has([data-lab-root]) {
   white-space: nowrap;
 }
 
-/* ---- kmeans ---- */
+/* K-means and perceptron */
 .lx-kfield {
   position: relative;
   aspect-ratio: 1;
   width: 100%;
-  border: 2px solid var(--color-ink);
-  border-radius: 4px;
-  background: #fdfaf2;
-  background-image:
-    linear-gradient(color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px);
   background-size: 24px 24px;
-  cursor: crosshair;
-  touch-action: none;
   overflow: hidden;
 }
 .lx-kpt {
@@ -400,8 +395,7 @@ body:has([data-lab-root]) {
   transform: translate(-50%, -50%);
   transition: background 0.3s;
 }
-/* A plot marker the algorithm placed, not a label — mono, and a size down
-   from v2 because the glyph renders larger here than it did in Kalam. */
+
 .lx-kcent {
   position: absolute;
   font-family: var(--font-mono);
@@ -413,16 +407,8 @@ body:has([data-lab-root]) {
   pointer-events: none;
 }
 .lx-kfield-hint {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.65;
-  color: var(--color-ink-faint);
-  pointer-events: none;
-  white-space: nowrap;
 }
 .lx-krow {
   display: flex;
@@ -432,36 +418,16 @@ body:has([data-lab-root]) {
   flex-wrap: wrap;
 }
 .lx-kbtn {
-  font-family: var(--font-mono);
-  font-size: 13px;
   width: 34px;
   height: 34px;
-  border: 1.5px solid var(--color-ink);
-  border-radius: 3px;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  cursor: pointer;
   transition: all 0.12s;
 }
-.lx-kbtn:hover:not(:disabled) {
-  transform: translate(-1px, -1px);
-  box-shadow: 2px 2px 0 color-mix(in oklab, var(--color-ink) 18%, transparent);
-}
-/* press back down — the epochs stepper auto-repeats on hold, so it needs a
-   held state, not just a hover */
+/* The auto-repeating epoch stepper needs a held state, not only hover. */
 .lx-kbtn:active:not(:disabled) {
   transform: translate(0, 0);
   box-shadow: none;
 }
-.lx-kbtn.on {
-  background: var(--lxa);
-  border-color: var(--lxa);
-  color: #fff;
-}
-.lx-kbtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+
 .lx-krow-sp {
   flex: 1;
 }
@@ -491,7 +457,6 @@ body:has([data-lab-root]) {
   border: 1.5px solid var(--color-ink);
 }
 
-/* ---- cluster/classify mode switch + perceptron ---- */
 .lx-modes {
   display: flex;
   flex-wrap: wrap;
@@ -546,7 +511,7 @@ body:has([data-lab-root]) {
   max-width: 42ch;
 }
 
-/* ---- bench boot (model loading transcript in the output panel) ---- */
+/* Model loading transcript */
 .lx-boot {
   display: flex;
   flex-direction: column;
@@ -581,7 +546,6 @@ body:has([data-lab-root]) {
   animation: lxPulse 1s steps(2, end) infinite;
 }
 
-/* ---- aside ---- */
 .lx-aside {
   margin-top: 26px;
   border: 1.5px dashed var(--lxa);
@@ -604,7 +568,7 @@ body:has([data-lab-root]) {
   color: var(--color-ink);
 }
 
-/* ---- lab card affordance in §03 ---- */
+/* Home-page lab cards */
 .lab-card-btn {
   display: block;
   color: inherit;
@@ -616,7 +580,7 @@ body:has([data-lab-root]) {
   transform: translateY(-3px);
 }
 
-/* ---- mobile collapse (the design's own ≤760px behavior) ---- */
+/* Responsive lab layout */
 @media (max-width: 760px) {
   .lx-page-inner {
     padding: 26px 20px 70px;
@@ -633,22 +597,16 @@ body:has([data-lab-root]) {
     padding-top: 20px;
   }
 
-  /* ---- type re-tune ---- */
-  /* The head steps down; the terminal panels step down further, because mono
-     runs optically larger than serif at the same px and these are status
-     lines, not prose. The one thing that stays reading type is the predicted
-     label — it is the result, not the framing. */
   .lx-title { font-size: 34px; line-height: 1.04; letter-spacing: -0.018em; }
   .lx-blurb { font-size: 17px; line-height: 1.5; }
-  /* the aside is prose too, so it lands on the same reading size as the blurb
-     rather than staying a half-step above it */
+
   .lx-aside-body { font-size: 17px; line-height: 1.55; }
   .lx-tag { font-size: 10px; letter-spacing: 1px; }
   .lx-cap { font-size: 9.5px; letter-spacing: 1.5px; }
 
   .lx-empty { font-size: 13.5px; line-height: 1.6; }
   .lx-canvas-hint { font-size: 13px; line-height: 1.55; }
-  /* the hint is one nowrap line, and it outgrows an SE-class screen */
+
   .lx-kfield-hint {
     font-size: 12.5px;
     line-height: 1.55;
@@ -663,11 +621,12 @@ body:has([data-lab-root]) {
   .lx-g-name { font-size: 18px; line-height: 1.15; }
   .lx-g-rank, .lx-g-pct { font-size: 11.5px; }
   .lx-tok { font-size: 11.5px; }
-  /* Caveat, so 32 is a size step and not a legibility problem */
+
   .lx-verdict { font-size: 32px; line-height: 1; letter-spacing: -0.015em; }
   .lx-verdict-pct { font-size: 15px; }
 }
 
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .lx-livedot,
   .lx-boot-cursor {

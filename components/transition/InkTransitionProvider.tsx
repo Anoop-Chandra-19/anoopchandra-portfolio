@@ -83,7 +83,6 @@ export default function InkTransitionProvider({
     [transition, pathname, router, lenis]
   );
 
-  // Overlay finished animating.
   const handleComplete = useCallback(() => {
     if (!transition) return;
     if (transition.effect === "bleed") {

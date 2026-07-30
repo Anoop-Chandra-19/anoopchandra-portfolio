@@ -7,7 +7,6 @@ export default function Contact() {
       <SectionHeaderStamp num="06" title="Say Hi" meta="postcard from the workshop" />
 
       <div className="relative pt-5 pb-10">
-        {/* washi-tape strips */}
         <span
           aria-hidden="true"
           className="absolute top-0 left-[12%] w-[90px] h-[22px] opacity-70 z-[2]"
@@ -42,7 +41,6 @@ export default function Contact() {
             style={{ border: "1px solid color-mix(in oklab, var(--color-ink) 50%, transparent)" }}
           />
 
-          {/* LEFT — message side */}
           <div className="contact-message pt-11 px-9 pb-9 relative z-[2]">
             <div className="mono faint text-[10px] tracking-[3px] uppercase">
               ✎ message side
@@ -99,10 +97,8 @@ export default function Contact() {
             className="postcard-divider absolute top-4 bottom-4 left-[51.2%] w-[1.5px] bg-ink opacity-85 z-[2]"
           />
 
-          {/* RIGHT — address side */}
           <div className="contact-colophon postcard-address pt-[30px] px-9 pb-9 relative z-[2] flex flex-col">
             <div className="contact-stamps flex justify-between items-start mb-7 gap-5">
-              {/* Postmark */}
               <svg
                 viewBox="0 0 130 130"
                 width="110"
@@ -137,7 +133,6 @@ export default function Contact() {
                 <line x1="113" y1="72" x2="170" y2="72" stroke="var(--color-electric)" strokeWidth="1.2" />
               </svg>
 
-              {/* Stamp */}
               <div
                 className="contact-stamp w-[92px] h-[110px] border-[1.5px] border-ink rounded-sm relative shrink-0 p-1.5 flex flex-col items-center justify-center text-center"
                 style={{

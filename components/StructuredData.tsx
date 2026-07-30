@@ -10,7 +10,6 @@ export default function StructuredData() {
     "sameAs": [
       "https://github.com/Anoop-Chandra-19",
       "https://linkedin.com/in/anoopchandra-parampalli"
-      // Add other social profiles
     ],
     "knowsAbout": [
       "Machine Learning",

@@ -1,6 +1,4 @@
-/* ============================================================ */
-/* ---- Entrance animation (hand-drawn, plays once on mount) ---- */
-/* ============================================================ */
+/* Entrance animations */
 
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
@@ -47,9 +45,7 @@ body:not(.hydrated) .anim-portrait-img { opacity: 0; }
 body:not(.hydrated) .anim-portrait-shadow { opacity: 0; }
 body:not(.hydrated) .marker-highlight { background-size: 0% 100%; background-repeat: no-repeat; }
 
-/* The `animation` shorthand resets animation-delay, and these rules out-rank
-   the single-class .d-* rules — so the stagger delays must come in through a
-   custom property consumed here, not a competing animation-delay declaration. */
+/* The animation shorthand resets delay; use --d to avoid specificity conflicts. */
 body.hydrated .anim-swipe { animation: swipeIn 0.45s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
 body.hydrated .anim-rise  { animation: fadeRise 0.4s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
 body.hydrated .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
@@ -84,7 +80,7 @@ body.hydrated .anim-portrait-shadow {
 .d-chip2   { --d: 1.78s; }
 .d-chip3   { --d: 1.86s; }
 .d-meta    { --d: 2.10s; }
-.d-portrait{ --d: 0.20s; }
+
 .d-annot1  { --d: 1.10s; }
 .d-annot2  { --d: 1.20s; }
 .d-rail-h  { --d: 1.85s; }
@@ -96,9 +92,7 @@ body.hydrated .anim-portrait-shadow {
 .d-rail-5  { --d: 2.20s; }
 .d-rail-6  { --d: 2.26s; }
 
-/* Suppress the entrance sequence on pages pushed after an ink transition —
-   the class is added by InkTransitionProvider and stays on for the session
-   (removing it would restart the suppressed animations). */
+/* This session-long class prevents entrance animations restarting after transitions. */
 body.ink-no-anim .anim-swipe,
 body.ink-no-anim .anim-rise,
 body.ink-no-anim .anim-stamp,
@@ -110,6 +104,7 @@ body.ink-no-anim .marker-highlight {
   animation: none;
 }
 
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   body.hydrated .anim-swipe,
   body.hydrated .anim-rise,

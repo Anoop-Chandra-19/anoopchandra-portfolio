@@ -17,13 +17,11 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
 
       <div className="relative">
         <div className="notes-book bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
-          {/* Red margin rule */}
           <span
             aria-hidden="true"
             className="notes-margin-rule absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
             style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
           />
-          {/* Rotated INDEX label */}
           <div
             className="mono faint notes-index-label absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
             style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
@@ -46,8 +44,6 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
               <li key={e.slug}>
                 <Link
                   href={`/journal/${e.slug}`}
-                  // the column track lives in CSS (not inline) so the mobile pass
-                  // can re-flow the row without an !important fight
                   className="notes-row grid gap-3.5 items-baseline py-3 pr-[90px] pl-1.5 relative no-underline transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
                   /* No aria-label: on a link it replaces the whole subtree, so it
                      was hiding the page number, read time and date. */

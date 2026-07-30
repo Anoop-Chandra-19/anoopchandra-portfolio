@@ -82,7 +82,6 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
     return f;
   }, []);
 
-  /** paint what the model sees into the small preview canvas */
   const updatePreview = useCallback(() => {
     const pc = previewRef.current;
     if (!pc) return;

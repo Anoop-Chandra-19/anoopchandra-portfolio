@@ -1,6 +1,3 @@
-// Replaces ArticleSpread. Server component — renders the masthead, the hero
-// plate, the MDX body, and prev/next. The only JS is the client leaves it
-// mounts — <ReadingProgress/>, <SectionRail/>, <FootnoteSheet/>.
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeMdxCodeProps from "rehype-mdx-code-props";
@@ -30,7 +27,6 @@ export default function ArticleEntry({
   sections: Section[];
   related: JournalEntryMeta[];
 }) {
-  // Read off the file, like an inline plate's — see mdx-components' <Figure>.
   const hero = entry.hero ? imageDims(entry.hero) : null;
   return (
     <div className="je">
@@ -45,9 +41,7 @@ export default function ArticleEntry({
         </nav>
 
         <header className="je-mast">
-          {/* Neither the kind nor the tag appears here. You arrived from a
-              coloured tab that already said which bucket this is, so the pill
-              row is only what the index couldn't tell you: when, and how long. */}
+          {/* Kind and tag are intentionally omitted; the index already supplies them. */}
           <div className="je-ledger">
             <span>entry № {pad(entry.no)}</span>
             <span className="dash" /><span>the journal · vol. 02</span>

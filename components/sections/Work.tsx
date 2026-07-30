@@ -48,8 +48,6 @@ function Bullets({ items, short, className }: { items: string[]; short?: string[
   );
 }
 
-// Replaces the whole row rather than hiding individual pills: mobile both drops
-// tags and renames them ("Dexie / IndexedDB" → "Dexie").
 function TagRow({ tags, short }: { tags: string[]; short?: string[] }) {
   const row = (xs: string[], variant: string) => (
     <div className={`flex gap-1.5 flex-wrap mt-4 ${variant}`.trim()}>

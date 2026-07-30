@@ -11,7 +11,6 @@ export default function LabButton({
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  /** filled accent variant (the primary action) */
   accent?: LabAccent;
   sm?: boolean;
 }) {
