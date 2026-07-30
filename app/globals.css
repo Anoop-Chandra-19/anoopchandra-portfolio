@@ -414,6 +414,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   min-width: 0;
   overflow: hidden;
 }

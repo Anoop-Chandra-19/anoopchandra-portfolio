@@ -1,4 +1,3 @@
-"use client";
 import type { LabAccent } from "@/lib/lab-meta";
 
 export default function LabButton({

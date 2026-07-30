@@ -322,7 +322,7 @@ body:has([data-journal-root]) {
 .je-secnav a{display:block;text-align:right;text-decoration:none;padding:6px 11px 7px 4px;border-right:2px solid transparent;border-radius:3px 0 0 3px;transition:background .15s,color .15s,border-color .15s}
 .je-secnav a .n{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:1.4px;color:var(--color-ink-faint)}
 
-.je-secnav a .t{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-family:var(--font-accent);font-weight:600;font-size:20px;line-height:1.22;padding-bottom:2px;margin-top:1px;color:color-mix(in oklab,var(--color-ink) 55%,var(--color-paper))}
+.je-secnav a .t{display:-webkit-box;-webkit-line-clamp:4;line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-family:var(--font-accent);font-weight:600;font-size:20px;line-height:1.22;padding-bottom:2px;margin-top:1px;color:color-mix(in oklab,var(--color-ink) 55%,var(--color-paper))}
 .je-secnav a:hover{background:color-mix(in oklab,var(--color-paper-2) 70%,transparent)}
 .je-secnav a:hover .t{color:var(--color-ink)}
 .je-secnav a.on{background:color-mix(in oklab,var(--accent) 11%,var(--color-paper));border-right-color:var(--accent)}
