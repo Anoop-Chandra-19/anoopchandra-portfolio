@@ -1,4 +1,3 @@
-"use client";
 // Both transitions use a full home copy; neither constructs a partial destination.
 import type { JournalEntryMeta } from "@/lib/journal-meta";
 import HomeContent from "@/components/HomeContent";

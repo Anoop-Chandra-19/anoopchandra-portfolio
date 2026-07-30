@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import type { LabAccent } from "@/lib/lab-meta";
 import KMeansLab from "./KMeansLab";

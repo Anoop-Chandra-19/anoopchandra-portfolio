@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect, useState } from "react";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 import { loadModel, subscribeModel, type ModelPhase } from "@/lib/lab-models";

@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useRef, type ReactNode } from "react";
 import type { InkEffect } from "@/components/transition/InkTransitionProvider";
 import {

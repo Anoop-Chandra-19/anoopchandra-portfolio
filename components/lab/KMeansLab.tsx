@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useRef, useState } from "react";
 import type { LabAccent } from "@/lib/lab-meta";
 import LabButton from "./LabButton";
