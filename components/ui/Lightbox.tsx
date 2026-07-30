@@ -3,6 +3,7 @@ import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useLenisInstance } from "@/components/LenisProvider";
+import { useModalLifecycle } from "@/hooks/useModalLifecycle";
 
 /** Pinch ceiling. The plates are ~1700px wide against a ~360px phone stage, so
  *  6× is roughly where the source pixels run out. */
@@ -66,9 +67,18 @@ export default function Lightbox({
   height: number;
   onClose: () => void;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const lenis = useLenisInstance();
+
+  useModalLifecycle({
+    isOpen: true,
+    containerRef: dialogRef,
+    initialFocusRef: closeRef,
+    onCloseAction: onClose,
+    lenis,
+  });
 
   const [z, setZ] = useState<Zoom>(RESET);
   // Live pointers, keyed by id — two of them means a pinch.
@@ -78,20 +88,6 @@ export default function Lightbox({
   const lastTap = useRef(0);
   const moved = useRef(false);
   const downOnPlate = useRef(false);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    // Lenis drives the scroll, so `overflow: hidden` on the body would not hold it
-    lenis?.stop();
-    closeRef.current?.focus();
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      lenis?.start();
-    };
-  }, [onClose, lenis]);
 
   const settle = (n: Zoom): Zoom => {
     const r = stageRef.current?.getBoundingClientRect();
@@ -199,7 +195,14 @@ export default function Lightbox({
 
   // Portalled so the band's `overflow: hidden` can never clip the overlay
   return createPortal(
-    <div className="lightbox" role="dialog" aria-modal="true" aria-label={alt}>
+    <div
+      ref={dialogRef}
+      className="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label={alt}
+      tabIndex={-1}
+    >
       <div
         ref={stageRef}
         className={`lightbox-stage${gesturing ? " is-gesturing" : ""}${zoomed ? " is-zoomed" : ""}`}

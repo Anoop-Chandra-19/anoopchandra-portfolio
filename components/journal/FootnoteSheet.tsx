@@ -12,6 +12,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { useLenisInstance } from "@/components/LenisProvider";
+import { useModalLifecycle } from "@/hooks/useModalLifecycle";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 /** Where the design's phone treatment starts — same breakpoint as journal.css. */
 const PHONE = "(max-width: 640px)";
@@ -28,7 +30,7 @@ const OUT_MS = 170;
 /** How far down the drag has to go for the scrim to reach transparent. */
 const SCRIM_FADE_PX = 260;
 
-type Open = { id: string; label: string; ref: Element };
+type Open = { id: string; label: string; marker: Element; opener: HTMLAnchorElement };
 type Drag = { y0: number; t0: number };
 
 export default function FootnoteSheet() {
@@ -37,10 +39,20 @@ export default function FootnoteSheet() {
   const [dy, setDy] = useState(0);
   const [dragging, setDragging] = useState(false);
   const drag = useRef<Drag | null>(null);
+  const outTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const lenis = useLenisInstance();
+  const shouldReduceMotion = useReducedMotion();
 
-  const close = useCallback(() => setOpen(null), []);
+  const close = useCallback(() => {
+    if (outTimer.current) clearTimeout(outTimer.current);
+    outTimer.current = null;
+    drag.current = null;
+    setDragging(false);
+    setOpen(null);
+  }, []);
 
   // Delegated, because the refs are server-rendered MDX output — there is no
   // React element for them to carry an onClick.
@@ -57,7 +69,7 @@ export default function FootnoteSheet() {
       e.preventDefault();
       setDy(0);
       setSettled(false);
-      setOpen({ id, label: (a.textContent ?? "").trim(), ref });
+      setOpen({ id, label: (a.textContent ?? "").trim(), marker: ref, opener: a });
     };
     // Rotating to landscape or resizing past the breakpoint hands footnotes back
     // to the list, so the sheet must not be left hanging over it.
@@ -89,30 +101,45 @@ export default function FootnoteSheet() {
       (clone.firstElementChild ?? clone).prepend(num);
       el.replaceChildren(...clone.childNodes);
     }
-    open.ref.classList.add("is-on");
-    return () => open.ref.classList.remove("is-on");
+    open.marker.classList.add("is-on");
+    return () => open.marker.classList.remove("is-on");
   }, [open]);
 
   useEffect(() => {
     if (!open) return;
-    const t = setTimeout(() => setSettled(true), SETTLE_MS);
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKey);
-    // Lenis drives the scroll, so the fixed scrim alone would not hold it.
-    lenis?.stop();
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener("keydown", onKey);
-      lenis?.start();
-    };
-  }, [open, close, lenis]);
+    const timer = setTimeout(
+      () => setSettled(true),
+      shouldReduceMotion ? 0 : SETTLE_MS
+    );
+    return () => clearTimeout(timer);
+  }, [open, shouldReduceMotion]);
+
+  useEffect(
+    () => () => {
+      if (outTimer.current) clearTimeout(outTimer.current);
+    },
+    []
+  );
+
+  useModalLifecycle({
+    isOpen: open !== null,
+    containerRef: dialogRef,
+    initialFocusRef: closeRef,
+    onCloseAction: close,
+    lenis,
+    opener: open?.opener,
+  });
 
   if (!open) return null;
 
   const down = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (!settled || (e.target as Element).closest(".je-fnsheet-x")) return;
+    if (
+      !settled ||
+      !e.isPrimary ||
+      (e.pointerType === "mouse" && e.button !== 0) ||
+      (e.target as Element).closest(".je-fnsheet-x")
+    )
+      return;
     drag.current = { y0: e.clientY, t0: performance.now() };
     setDragging(true);
     try {
@@ -130,9 +157,18 @@ export default function FootnoteSheet() {
     const d = Math.max(0, e.clientY - g.y0);
     const v = d / Math.max(1, performance.now() - g.t0);
     if (d > CLOSE_PX || v > FLICK_V) {
+      if (shouldReduceMotion) {
+        close();
+        return;
+      }
       setDy(OUT_PX);
-      setTimeout(close, OUT_MS);
+      outTimer.current = setTimeout(close, OUT_MS);
     } else setDy(0);
+  };
+  const cancel = () => {
+    drag.current = null;
+    setDragging(false);
+    setDy(0);
   };
 
   return createPortal(
@@ -142,36 +178,51 @@ export default function FootnoteSheet() {
         className={`je-fnsheet-scrim${settled ? " settled" : ""}`}
         onClick={close}
         aria-label="close footnote"
-        style={{ opacity: Math.max(0, 1 - dy / SCRIM_FADE_PX) }}
+        tabIndex={-1}
+        style={{
+          opacity: Math.max(0, 1 - dy / SCRIM_FADE_PX),
+          animation: shouldReduceMotion ? "none" : undefined,
+        }}
       />
       <div
+        ref={dialogRef}
         className={`je-fnsheet${settled ? " settled" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label={`footnote ${open.label}`}
-        onPointerDown={down}
-        onPointerMove={move}
-        onPointerUp={up}
-        onPointerCancel={up}
+        tabIndex={-1}
         // Once the entry animation has played the inline transform owns the
         // sheet; before that its fill would outrank whatever we set here.
-        style={
-          settled
-            ? {
-                transform: `translateY(${dy}px)`,
-                transition: dragging ? "none" : "transform .2s cubic-bezier(.2,.8,.2,1)",
-              }
-            : undefined
-        }
+        style={{
+          transform: settled ? `translateY(${dy}px)` : undefined,
+          transition:
+            settled && !dragging && !shouldReduceMotion
+              ? "transform .2s cubic-bezier(.2,.8,.2,1)"
+              : "none",
+        }}
       >
-        <span className="je-fnsheet-grab" aria-hidden="true" />
-        <div className="je-fnsheet-head">
-          <span>footnote</span>
-          <button type="button" className="je-fnsheet-x" onClick={close} aria-label="close">
-            ✕
-          </button>
+        <div
+          className="je-fnsheet-drag"
+          onPointerDown={down}
+          onPointerMove={move}
+          onPointerUp={up}
+          onPointerCancel={cancel}
+        >
+          <span className="je-fnsheet-grab" aria-hidden="true" />
+          <div className="je-fnsheet-head">
+            <span>footnote</span>
+            <button
+              ref={closeRef}
+              type="button"
+              className="je-fnsheet-x"
+              onClick={close}
+              aria-label="close"
+            >
+              ✕
+            </button>
+          </div>
         </div>
-        <div className="je-fnsheet-body" ref={bodyRef} />
+        <div className="je-fnsheet-body" ref={bodyRef} data-lenis-prevent />
       </div>
     </div>,
     document.body
