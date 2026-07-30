@@ -22,6 +22,19 @@ export type LoadedModel = {
   wordIndex: Record<string, number> | null;
 };
 
+export type ModelOutput = tfType.Tensor | tfType.Tensor[] | tfType.NamedTensorMap;
+
+export function getModelOutputTensors(output: ModelOutput): tfType.Tensor[] {
+  if (Array.isArray(output)) return output;
+  if (typeof (output as tfType.Tensor).data === "function") return [output as tfType.Tensor];
+  return Object.values(output);
+}
+
+export function disposeModelOutput(output: ModelOutput | null): void {
+  if (!output) return;
+  new Set(getModelOutputTensors(output)).forEach((tensor) => tensor.dispose());
+}
+
 const CONFIG: Record<
   LabModelId,
   { url: string; idb: string; wordIndexUrl: string | null; warmShape: number[] }
@@ -57,10 +70,18 @@ const entries: Record<LabModelId, Entry> = {
 
 let tfPromise: Promise<typeof tfType> | null = null;
 function loadTf(): Promise<typeof tfType> {
-  return (tfPromise ??= import("@tensorflow/tfjs").then(async (tf) => {
-    await tf.ready();
-    return tf;
-  }));
+  if (!tfPromise) {
+    tfPromise = import("@tensorflow/tfjs")
+      .then(async (tf) => {
+        await tf.ready();
+        return tf;
+      })
+      .catch((error: unknown) => {
+        tfPromise = null;
+        throw error;
+      });
+  }
+  return tfPromise;
 }
 
 function report(id: LabModelId, progress: Partial<ModelProgress>) {
@@ -82,7 +103,7 @@ export function subscribeModel(id: LabModelId, fn: Listener): () => void {
 async function doLoad(id: LabModelId): Promise<LoadedModel> {
   const cfg = CONFIG[id];
   const tf = await loadTf();
-  report(id, { phase: "fetching", fraction: 0 });
+  report(id, { phase: "fetching", fraction: 0, fromCache: false });
 
   let model: tfType.GraphModel;
   try {
@@ -97,26 +118,38 @@ async function doLoad(id: LabModelId): Promise<LoadedModel> {
     model.save(cfg.idb).catch(() => {});
   }
 
-  let wordIndex: Record<string, number> | null = null;
-  if (cfg.wordIndexUrl) {
-    report(id, { phase: "wordindex" });
-    let res = await fetch(cfg.wordIndexUrl);
-    if (!res.ok) res = await fetch("/models/sentiment/word_index.json");
-    if (!res.ok) throw new Error(`word index fetch failed (${res.status})`);
-    wordIndex = await res.json();
+  try {
+    let wordIndex: Record<string, number> | null = null;
+    if (cfg.wordIndexUrl) {
+      report(id, { phase: "wordindex" });
+      let res = await fetch(cfg.wordIndexUrl);
+      if (!res.ok) res = await fetch("/models/sentiment/word_index.json");
+      if (!res.ok) throw new Error(`word index fetch failed (${res.status})`);
+      wordIndex = await res.json();
+    }
+
+    // Dummy predict compiles the WebGL shaders now instead of on the user's
+    // first real classify.
+    report(id, { phase: "warmup" });
+    let input: tfType.Tensor | null = null;
+    let output: ModelOutput | null = null;
+    try {
+      input = tf.zeros(cfg.warmShape);
+      output = model.predict(input) as ModelOutput;
+      const [firstOutput] = getModelOutputTensors(output);
+      if (!firstOutput) throw new Error("model warm-up returned no output tensors");
+      await firstOutput.data();
+    } finally {
+      input?.dispose();
+      disposeModelOutput(output);
+    }
+
+    report(id, { phase: "ready", fraction: 1 });
+    return { tf, model, wordIndex };
+  } catch (error: unknown) {
+    model.dispose();
+    throw error;
   }
-
-  // dummy predict compiles the WebGL shaders now instead of on the user's
-  // first real classify
-  report(id, { phase: "warmup" });
-  const input = tf.zeros(cfg.warmShape);
-  const out = model.predict(input) as tfType.Tensor;
-  await out.data();
-  input.dispose();
-  out.dispose();
-
-  report(id, { phase: "ready", fraction: 1 });
-  return { tf, model, wordIndex };
 }
 
 /** Idempotent: the first call starts the load, later calls share it. */

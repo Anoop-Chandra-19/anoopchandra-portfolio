@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
-import { loadModel, subscribeModel, type ModelPhase } from "@/lib/lab-models";
+import {
+  disposeModelOutput,
+  getModelOutputTensors,
+  loadModel,
+  subscribeModel,
+  type ModelOutput,
+  type ModelPhase,
+} from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
-import LabButton from "./LabButton";
+
 import BenchBoot from "./BenchBoot";
 
 /* Gauge + input UI from the design, verdict from the real IMDB LSTM
@@ -49,6 +56,7 @@ function lexiconHits(s: string): { hits: [string, number][]; matched: boolean } 
 }
 
 type Reading = { s: number; hits: [string, number][]; matched: boolean };
+type LabError = { kind: "load" | "inference"; message: string };
 
 function verdictColor(s: number): string {
   return s > 0.15 ? "var(--color-teal)" : s < -0.15 ? "var(--color-coral)" : "var(--color-ink-soft)";
@@ -64,33 +72,58 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
   const [log, setLog] = useState<{ t: string; s: number }[]>([]);
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState<ModelPhase>("idle");
+  const [error, setError] = useState<LabError | null>(null);
 
   useEffect(() => subscribeModel("sentiment", (p) => setPhase(p.phase)), []);
   useEffect(() => {
     if (isTransitionActive) return;
-    loadModel("sentiment").catch(() => {});
+    let isCancelled = false;
+    loadModel("sentiment").catch(() => {
+      if (!isCancelled) {
+        setError({ kind: "load", message: "The sentiment model could not load. Check your connection, then retry." });
+      }
+    });
+    return () => {
+      isCancelled = true;
+    };
   }, [isTransitionActive]);
 
   const run = useCallback(async () => {
     const t = text.trim();
     if (!t || busy || phase !== "ready") return;
     setBusy(true);
+    setError(null);
+    let input: import("@tensorflow/tfjs").Tensor | null = null;
+    let output: ModelOutput | null = null;
     try {
       const { tf, model, wordIndex } = await loadModel("sentiment");
-      const input = tf.tensor([tokenize(t, wordIndex!)], [1, MAX_LEN]);
-      const out = model.predict(input) as import("@tensorflow/tfjs").Tensor;
-      const raw = (await out.data())[0];
-      input.dispose();
-      out.dispose();
+      if (!wordIndex) throw new Error("The sentiment word index is unavailable.");
+      input = tf.tensor([tokenize(t, wordIndex)], [1, MAX_LEN]);
+      output = model.predict(input) as ModelOutput;
+      const [firstOutput] = getModelOutputTensors(output);
+      if (!firstOutput) throw new Error("The sentiment model returned no prediction.");
+      const raw = (await firstOutput.data())[0];
       const s = raw * 2 - 1;
       setRes({ s, ...lexiconHits(t) });
       setLog((l) => [...l.slice(-4), { t, s }]);
     } catch {
-      // load/predict failure — BenchBoot shows the error line
+      setError({
+        kind: "inference",
+        message: "The sentence could not be analyzed. Your text is still here; retry the prediction.",
+      });
     } finally {
+      input?.dispose();
+      disposeModelOutput(output);
       setBusy(false);
     }
   }, [text, busy, phase]);
+
+  const retryLoad = useCallback(() => {
+    setError(null);
+    void loadModel("sentiment").catch(() => {
+      setError({ kind: "load", message: "The sentiment model still could not load. Check your connection and retry." });
+    });
+  }, []);
 
   const s = res ? res.s : 0;
   const color = verdictColor(s);
@@ -119,22 +152,52 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             <span className="mono lx-verdict-pct">{res ? ` ${Math.round(Math.abs(s) * 100)}%` : ""}</span>
           </div>
         </div>
-        <div className="lx-inputrow">
-          <span className="mono" style={{ color: `var(--color-${accent})`, fontSize: 20 }}>$</span>
+        <form
+          className="lx-inputrow"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void run();
+          }}
+        >
+          <label
+            htmlFor="sentiment-text"
+            className="mono"
+            style={{ color: `var(--color-${accent})`, fontSize: 20 }}
+          >
+            $ review
+          </label>
           <input
+            id="sentiment-text"
+            name="sentimentText"
+            type="text"
+            autoComplete="off"
             className="lx-input"
             value={text}
-            placeholder="type a sentence to analyze…"
-            spellCheck={false}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") run();
-            }}
+            placeholder="e.g. I loved every minute…"
+            onChange={(event) => setText(event.target.value)}
           />
-          <LabButton accent={accent} onClick={run} disabled={!text.trim() || busy || phase !== "ready"}>
+          <button
+            type="submit"
+            className="lx-btn on"
+            disabled={!text.trim() || busy || phase !== "ready"}
+            style={{ "--lxa": `var(--color-${accent})` } as React.CSSProperties}
+          >
             read
-          </LabButton>
-        </div>
+          </button>
+        </form>
+        {error && (
+          <div className="lx-cnote" role="alert">
+            {error.message}{" "}
+            <button
+              type="button"
+              className="lx-btn sm"
+              disabled={busy}
+              onClick={error.kind === "load" ? retryLoad : run}
+            >
+              retry
+            </button>
+          </div>
+        )}
         {res && (
           <div className="lx-tokens">
             {res.hits.map(([w, v], i) => (
@@ -155,10 +218,17 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             none of these words are in the highlight lexicon — the needle still read the whole sentence
           </div>
         )}
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {res
+            ? `Analysis complete. ${verdictLabel(res.s)}, ${Math.round(Math.abs(res.s) * 100)} percent.`
+            : ""}
+        </div>
       </div>
       <div className="lx-panel lx-out">
         <div className="mono faint lx-cap">$ history</div>
-        {log.length === 0 ? (
+        {error?.kind === "load" ? (
+          <div className="mono lx-cnote">model unavailable — use retry above</div>
+        ) : log.length === 0 ? (
           <BenchBoot
             id="sentiment"
             num="exp-002"

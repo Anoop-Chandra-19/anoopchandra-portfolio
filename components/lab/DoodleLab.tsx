@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
-import { loadModel, subscribeModel, type ModelPhase } from "@/lib/lab-models";
+import {
+  disposeModelOutput,
+  getModelOutputTensors,
+  loadModel,
+  subscribeModel,
+  type ModelOutput,
+  type ModelPhase,
+} from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
 import LabButton from "./LabButton";
 import BenchBoot from "./BenchBoot";
@@ -21,6 +28,8 @@ const CLASS_NAMES = [
 const FIELD = 28;
 const FIELD_PAD = 3;
 
+type LabError = { kind: "load" | "inference"; message: string };
+
 export default function DoodleLab({ accent }: { accent: LabAccent }) {
   const { active: isTransitionActive } = useInkTransition();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,11 +38,20 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
   const [busy, setBusy] = useState(false);
   const [guesses, setGuesses] = useState<{ name: string; p: number }[] | null>(null);
   const [phase, setPhase] = useState<ModelPhase>("idle");
+  const [error, setError] = useState<LabError | null>(null);
 
   useEffect(() => subscribeModel("doodle", (p) => setPhase(p.phase)), []);
   useEffect(() => {
     if (isTransitionActive) return;
-    loadModel("doodle").catch(() => {});
+    let isCancelled = false;
+    loadModel("doodle").catch(() => {
+      if (!isCancelled) {
+        setError({ kind: "load", message: "The drawing model could not load. Check your connection, then retry." });
+      }
+    });
+    return () => {
+      isCancelled = true;
+    };
   }, [isTransitionActive]);
 
   /** 28×28 model input (0..255, bright strokes on black), or null if empty */
@@ -112,6 +130,8 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
     };
     const down = (e: PointerEvent) => {
       drawing = true;
+      setGuesses(null);
+      setError((current) => (current?.kind === "load" ? current : null));
       const [x, y] = pos(e);
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -152,13 +172,16 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
     const f = modelField();
     if (!f) return;
     setBusy(true);
+    setError(null);
+    let input: import("@tensorflow/tfjs").Tensor | null = null;
+    let output: ModelOutput | null = null;
     try {
       const { tf, model } = await loadModel("doodle");
-      const input = tf.tensor4d(f, [1, FIELD, FIELD, 1]);
-      const out = model.predict(input) as import("@tensorflow/tfjs").Tensor;
-      const data = await out.data();
-      input.dispose();
-      out.dispose();
+      input = tf.tensor4d(f, [1, FIELD, FIELD, 1]);
+      output = model.predict(input) as ModelOutput;
+      const [firstOutput] = getModelOutputTensors(output);
+      if (!firstOutput) throw new Error("The drawing model returned no prediction.");
+      const data = await firstOutput.data();
       setGuesses(
         Array.from(data)
           .map((p, i) => ({ name: CLASS_NAMES[i], p }))
@@ -166,11 +189,57 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
           .slice(0, 4)
       );
     } catch {
-      // load/predict failure — BenchBoot shows the error line
+      setError({
+        kind: phase === "error" ? "load" : "inference",
+        message:
+          phase === "error"
+            ? "The drawing model could not load. Check your connection, then retry."
+            : "The sketch could not be classified. Your drawing is still here; retry the prediction.",
+      });
     } finally {
+      input?.dispose();
+      disposeModelOutput(output);
       setBusy(false);
     }
-  }, [modelField]);
+  }, [modelField, phase]);
+
+  const retryLoad = useCallback(() => {
+    setError(null);
+    void loadModel("doodle").catch(() => {
+      setError({ kind: "load", message: "The drawing model still could not load. Check your connection and retry." });
+    });
+  }, []);
+
+  const drawSample = useCallback(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d")!;
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.lineWidth = 15;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#2a2a2a";
+    ctx.beginPath();
+    ctx.arc(92, 246, 52, 0, Math.PI * 2);
+    ctx.moveTo(320, 246);
+    ctx.arc(268, 246, 52, 0, Math.PI * 2);
+    ctx.moveTo(92, 246);
+    ctx.lineTo(160, 151);
+    ctx.lineTo(222, 246);
+    ctx.lineTo(92, 246);
+    ctx.moveTo(160, 151);
+    ctx.lineTo(268, 246);
+    ctx.moveTo(142, 151);
+    ctx.lineTo(184, 151);
+    ctx.moveTo(222, 246);
+    ctx.lineTo(238, 135);
+    ctx.lineTo(270, 135);
+    ctx.stroke();
+    setHas(true);
+    setGuesses(null);
+    setError((current) => (current?.kind === "load" ? current : null));
+    updatePreview();
+  }, [updatePreview]);
 
   const clear = useCallback(() => {
     const c = canvasRef.current;
@@ -178,15 +247,25 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
     c.getContext("2d")!.clearRect(0, 0, c.width, c.height);
     setHas(false);
     setGuesses(null);
+    setError((current) => (current?.kind === "load" ? current : null));
     updatePreview();
   }, [updatePreview]);
 
   return (
     <div className="lx-body">
       <div className="lx-panel">
-        <div className="mono faint lx-cap">draw here ✎</div>
+        <div id="doodle-instructions" className="mono faint lx-cap">
+          draw here ✎ · keyboard: use sample bicycle
+        </div>
         <div className="lx-canvaswrap">
-          <canvas ref={canvasRef} width={360} height={360} className="lx-canvas" />
+          <canvas
+            ref={canvasRef}
+            width={360}
+            height={360}
+            className="lx-canvas"
+            aria-label="Drawing pad"
+            aria-describedby="doodle-instructions"
+          />
           {!has && <span className="lx-canvas-hint">try a bird, bee, bicycle…</span>}
         </div>
         <div className="lx-prevrow">
@@ -198,6 +277,9 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
             <LabButton accent={accent} disabled={!has || busy || phase !== "ready"} onClick={classify}>
               ▸ classify
             </LabButton>
+            <button type="button" className="lx-btn sm" disabled={busy} onClick={drawSample}>
+              sample bicycle
+            </button>
             <LabButton sm disabled={!has} onClick={clear}>
               clear
             </LabButton>
@@ -206,7 +288,19 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
       </div>
       <div className="lx-panel lx-out">
         <div className="mono faint lx-cap">$ classify ./sketch.png</div>
-        {guesses ? (
+        {error ? (
+          <div className="lx-cnote" role="alert">
+            {error.message}{" "}
+            <button
+              type="button"
+              className="lx-btn sm"
+              disabled={busy}
+              onClick={error.kind === "load" ? retryLoad : classify}
+            >
+              retry
+            </button>
+          </div>
+        ) : guesses ? (
           <ul className="lx-guess">
             {guesses.map((g, i) => (
               <li key={g.name}>
@@ -228,6 +322,11 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
             readyHint="draw a shape, then classify ✎"
           />
         )}
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {guesses?.[0]
+            ? `Classification complete. Best match: ${guesses[0].name}, ${Math.round(guesses[0].p * 100)} percent.`
+            : ""}
+        </div>
       </div>
     </div>
   );
