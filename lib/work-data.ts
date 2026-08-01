@@ -178,7 +178,7 @@ export const PROJECTS: Project[] = [
     imgAlt:
       "fand's desktop GUI — a live temperature graph for a Ryzen 7 7800X3D and an RTX 4090, with two PWM headers and their curve cards below it.",
     imgFit: "contain",
-    d: "Fan control daemon, CLI, and GUI for Linux. No existing tool detected the NCT6799D controller on my motherboard, so I wrote one that does — a single privileged daemon owning sysfs and NVML, with a failsafe that hands control back to firmware.",
+    d: "Fan control daemon, CLI, and GUI for Linux, written to learn Rust on something with real consequences — one privileged daemon owning sysfs and NVML, driving an AIO pump on a shared header with no tachometer, with a failsafe that hands control back to firmware on every exit path.",
     bullets: [
       "Rust workspace splitting a pure curve-evaluation core (mix mode, hysteresis, ramp, unit-tested) from the privileged daemon.",
       "hwmon + NVML sensor reads, a systemd unit, and a Unix-socket protocol serving status and subscriptions to a fanctl CLI.",
