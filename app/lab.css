@@ -160,6 +160,92 @@ body:has([data-lab-root]) {
   outline-offset: 3px;
 }
 
+/* Keyboard-only viewport note */
+.lx-keymap {
+  position: fixed;
+  z-index: 20;
+  top: 50%;
+  right: 0;
+  width: 218px;
+  padding: 12px 13px 14px;
+  border: 1.5px solid var(--color-ink);
+  border-right: 0;
+  border-radius: 4px 0 0 4px;
+  background: color-mix(in oklab, var(--lxa) 7%, var(--color-paper));
+  box-shadow: -3px 3px 0 color-mix(in oklab, var(--color-ink) 14%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(calc(100% + 8px), -50%);
+  transition: opacity 0.16s ease-out, transform 0.2s ease-out, visibility 0s linear 0.2s;
+  pointer-events: none;
+}
+.lx-keymap.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%);
+  transition-delay: 0s;
+}
+.lx-keymap-title {
+  margin-bottom: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px dashed color-mix(in oklab, var(--color-ink) 25%, transparent);
+  color: var(--color-ink-soft);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.lx-keymap dl {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+.lx-keymap dl > div {
+  display: grid;
+  grid-template-columns: 102px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+.lx-keymap dt {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+.lx-keymap dt > span {
+  color: var(--color-ink-faint);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+.lx-keymap kbd {
+  min-width: 21px;
+  height: 21px;
+  padding: 2px 5px;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 58%, transparent);
+  border-radius: 2px;
+  background: var(--color-paper);
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--color-ink) 28%, transparent);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 15px;
+  text-align: center;
+}
+.lx-keymap dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  line-height: 1.3;
+}
+.lx-keymap dl > .lx-keymap-class {
+  display: none;
+}
+.lx-page-inner:has([data-lab-mode="classify"]) .lx-keymap dl > .lx-keymap-class {
+  display: grid;
+}
+
 /* Doodle */
 .lx-canvaswrap {
   position: relative;
@@ -648,6 +734,8 @@ body:has([data-lab-root]) {
   .lx-g-rank, .lx-g-pct { font-size: 11.5px; }
   .lx-tok { font-size: 11.5px; }
 
+  .lx-keymap { display: none; }
+
   .lx-verdict { font-size: 32px; line-height: 1; letter-spacing: -0.015em; }
   .lx-verdict-pct { font-size: 15px; }
 }
@@ -662,6 +750,7 @@ body:has([data-lab-root]) {
   .lx-kpt,
   .lx-kcent,
   .lx-bar-fill,
+  .lx-keymap,
   .lab-card-btn {
     transition: none;
   }

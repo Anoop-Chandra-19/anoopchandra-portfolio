@@ -107,6 +107,7 @@ function accuracy(pts: Pt[], w: W) {
 
 export default function PerceptronLab({ accent }: { accent: LabAccent }) {
   const fieldRef = useRef<HTMLDivElement>(null);
+  const pressedArrowKeysRef = useRef(new Set<string>());
   const [pts, setPts] = useState<Pt[]>([]);
   const [cls, setCls] = useState<0 | 1>(0);
   const [w, setW] = useState<W | null>(null); // final weights once playback lands
@@ -170,26 +171,42 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
 
   const moveCursor = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget || training) return;
-    const amount = event.shiftKey ? 0.1 : 0.05;
-    const movement: Partial<Cursor> = {};
-    if (event.key === "ArrowLeft") movement.x = -amount;
-    else if (event.key === "ArrowRight") movement.x = amount;
-    else if (event.key === "ArrowUp") movement.y = -amount;
-    else if (event.key === "ArrowDown") movement.y = amount;
-    else if (event.key === "Enter" || event.key === " ") {
+    const classKey = event.key.toLowerCase();
+    if (classKey === "a" || classKey === "b") {
       event.preventDefault();
+      if (event.repeat) return;
+      setCls(classKey === "a" ? 0 : 1);
+      setIsKeyboardCursorActive(true);
+      return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (event.repeat) return;
       setIsKeyboardCursorActive(true);
       addPoint(cursor.x, cursor.y);
       return;
-    } else {
-      return;
     }
+    if (!event.key.startsWith("Arrow")) return;
+
     event.preventDefault();
+    pressedArrowKeysRef.current.add(event.key);
+    const amount = event.shiftKey ? 0.1 : 0.05;
+    const horizontal = Number(pressedArrowKeysRef.current.has("ArrowRight")) - Number(pressedArrowKeysRef.current.has("ArrowLeft"));
+    const vertical = Number(pressedArrowKeysRef.current.has("ArrowDown")) - Number(pressedArrowKeysRef.current.has("ArrowUp"));
     setIsKeyboardCursorActive(true);
     setCursor((current) => ({
-      x: Math.min(0.97, Math.max(0.03, current.x + (movement.x ?? 0))),
-      y: Math.min(0.97, Math.max(0.03, current.y + (movement.y ?? 0))),
+      x: Math.min(0.97, Math.max(0.03, current.x + horizontal * amount)),
+      y: Math.min(0.97, Math.max(0.03, current.y + vertical * amount)),
     }));
+  };
+
+  const releaseCursorKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    pressedArrowKeysRef.current.delete(event.key);
+  };
+
+  const deactivateKeyboardCursor = () => {
+    pressedArrowKeysRef.current.clear();
+    setIsKeyboardCursorActive(false);
   };
 
   const flip = (index: number) => {
@@ -346,10 +363,11 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           className="lx-kfield"
           role="application"
           tabIndex={0}
-          aria-label={`Perceptron point field. Current class ${cls ? "B" : "A"}. Use arrow keys to move the cursor; press Enter or Space to place a point.`}
+          aria-label={`Perceptron point field. Current class ${cls ? "B" : "A"}. Press A or B to select a point class. Use arrow keys to move the cursor, hold two arrow keys to move diagonally, and hold Shift for larger steps. Press Enter or Space to place a point.`}
           aria-disabled={training}
-          onBlur={() => setIsKeyboardCursorActive(false)}
+          onBlur={deactivateKeyboardCursor}
           onKeyDown={moveCursor}
+          onKeyUp={releaseCursorKey}
           onPointerDown={add}
         >
           {reg && (
@@ -408,7 +426,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           )}
           {!pts.length && (
             <span className="lx-kfield-hint">
-              click to place points · focus + arrows to move · enter to place · activate a point to flip
+              click to place points · tab into the field for keyboard controls · activate a point to flip
             </span>
           )}
         </div>

@@ -49,6 +49,7 @@ function step(f: Field): Field {
 
 export default function KMeansLab({ accent }: { accent: LabAccent }) {
   const fieldRef = useRef<HTMLDivElement>(null);
+  const pressedArrowKeysRef = useRef(new Set<string>());
   const [k, setK] = useState(3);
   const [running, setRunning] = useState(false);
   const [field, setField] = useState<Field>({ pts: [], cents: [], iter: 0, done: false });
@@ -70,26 +71,34 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
 
   const moveCursor = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (running) return;
-    const amount = event.shiftKey ? 0.1 : 0.05;
-    const movement: Partial<Cent> = {};
-    if (event.key === "ArrowLeft") movement.x = -amount;
-    else if (event.key === "ArrowRight") movement.x = amount;
-    else if (event.key === "ArrowUp") movement.y = -amount;
-    else if (event.key === "ArrowDown") movement.y = amount;
-    else if (event.key === "Enter" || event.key === " ") {
+    if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
+      if (event.repeat) return;
       setIsKeyboardCursorActive(true);
       addPoint(cursor.x, cursor.y);
       return;
-    } else {
-      return;
     }
+    if (!event.key.startsWith("Arrow")) return;
+
     event.preventDefault();
+    pressedArrowKeysRef.current.add(event.key);
+    const amount = event.shiftKey ? 0.1 : 0.05;
+    const horizontal = Number(pressedArrowKeysRef.current.has("ArrowRight")) - Number(pressedArrowKeysRef.current.has("ArrowLeft"));
+    const vertical = Number(pressedArrowKeysRef.current.has("ArrowDown")) - Number(pressedArrowKeysRef.current.has("ArrowUp"));
     setIsKeyboardCursorActive(true);
     setCursor((current) => ({
-      x: Math.min(0.97, Math.max(0.03, current.x + (movement.x ?? 0))),
-      y: Math.min(0.97, Math.max(0.03, current.y + (movement.y ?? 0))),
+      x: Math.min(0.97, Math.max(0.03, current.x + horizontal * amount)),
+      y: Math.min(0.97, Math.max(0.03, current.y + vertical * amount)),
     }));
+  };
+
+  const releaseCursorKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    pressedArrowKeysRef.current.delete(event.key);
+  };
+
+  const deactivateKeyboardCursor = () => {
+    pressedArrowKeysRef.current.clear();
+    setIsKeyboardCursorActive(false);
   };
 
   const scatter = () => {
@@ -145,10 +154,11 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
           className="lx-kfield"
           role="application"
           tabIndex={0}
-          aria-label="K-means point field. Use arrow keys to move the cursor; press Enter or Space to place a point."
+          aria-label="K-means point field. Use arrow keys to move the cursor, hold two arrow keys to move diagonally, and hold Shift for larger steps. Press Enter or Space to place a point."
           aria-disabled={running}
-          onBlur={() => setIsKeyboardCursorActive(false)}
+          onBlur={deactivateKeyboardCursor}
           onKeyDown={moveCursor}
+          onKeyUp={releaseCursorKey}
           onPointerDown={add}
         >
           {pts.map((p, i) => (
@@ -181,7 +191,7 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
             </span>
           )}
           {!pts.length && (
-            <span className="lx-kfield-hint">click to place points · focus + arrows to move · enter to place</span>
+            <span className="lx-kfield-hint">click to place points · tab into the field for keyboard controls</span>
           )}
         </div>
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">

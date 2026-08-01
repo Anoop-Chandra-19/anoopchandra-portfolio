@@ -14,7 +14,7 @@ const MODES = [
 export default function ClusterClassifyLab({ accent }: { accent: LabAccent }) {
   const [mode, setMode] = useState<(typeof MODES)[number][0]>("cluster");
   return (
-    <div>
+    <div data-lab-mode={mode}>
       <div className="lx-modes">
         {MODES.map(([m, label]) => (
           <button

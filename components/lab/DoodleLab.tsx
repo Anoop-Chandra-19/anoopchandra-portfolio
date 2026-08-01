@@ -220,20 +220,13 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
     ctx.lineJoin = "round";
     ctx.strokeStyle = "#2a2a2a";
     ctx.beginPath();
-    ctx.arc(92, 246, 52, 0, Math.PI * 2);
-    ctx.moveTo(320, 246);
-    ctx.arc(268, 246, 52, 0, Math.PI * 2);
-    ctx.moveTo(92, 246);
-    ctx.lineTo(160, 151);
-    ctx.lineTo(222, 246);
-    ctx.lineTo(92, 246);
-    ctx.moveTo(160, 151);
-    ctx.lineTo(268, 246);
-    ctx.moveTo(142, 151);
-    ctx.lineTo(184, 151);
-    ctx.moveTo(222, 246);
-    ctx.lineTo(238, 135);
-    ctx.lineTo(270, 135);
+    ctx.rect(65, 45, 230, 270);
+    ctx.moveTo(225, 135);
+    ctx.arc(180, 135, 45, 0, Math.PI * 2);
+    ctx.moveTo(110, 275);
+    ctx.bezierCurveTo(120, 215, 240, 215, 250, 275);
+    ctx.moveTo(145, 127);
+    ctx.bezierCurveTo(150, 85, 210, 85, 215, 127);
     ctx.stroke();
     setHas(true);
     setGuesses(null);
@@ -255,7 +248,7 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
     <div className="lx-body">
       <div className="lx-panel">
         <div id="doodle-instructions" className="mono faint lx-cap">
-          draw here ✎ · keyboard: use sample bicycle
+          draw here ✎ · keyboard: use sample portrait
         </div>
         <div className="lx-canvaswrap">
           <canvas
@@ -266,7 +259,7 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
             aria-label="Drawing pad"
             aria-describedby="doodle-instructions"
           />
-          {!has && <span className="lx-canvas-hint">try a bird, bee, bicycle…</span>}
+          {!has && <span className="lx-canvas-hint">try a portrait, bird, bee…</span>}
         </div>
         <div className="lx-prevrow">
           <div>
@@ -278,7 +271,7 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
               ▸ classify
             </LabButton>
             <button type="button" className="lx-btn sm" disabled={busy} onClick={drawSample}>
-              sample bicycle
+              sample portrait
             </button>
             <LabButton sm disabled={!has} onClick={clear}>
               clear
