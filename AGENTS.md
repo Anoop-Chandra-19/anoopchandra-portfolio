@@ -51,7 +51,10 @@ lib/
   journal-meta.ts          Client-safe journal types and display metadata
   lab-meta.ts              Lab metadata and accent types
   lab-models.ts            Lazy TensorFlow.js loading and model cache
-public/models/              TensorFlow.js model manifests, weights, and vocabulary
+public/
+  journal/<slug>/          Images for one journal entry, folder named for its slug
+  models/                  TensorFlow.js model manifests, weights, and vocabulary
+  projects/                Work-card plates, one file per entry in lib/work-data.ts
 scripts/                    One-off maintenance utilities
 docs/                       Design and implementation notes
 ```
@@ -154,6 +157,8 @@ dek: "Short summary"
 Optional fields include `status` (`published` or `draft`), `sub`, `hero`, `heroAlt`, `heroCaption`, and `related`. A `hero` requires `heroAlt`; every `related` value must name an existing journal slug. Add a tag only by deliberately extending the allowlist in `lib/journal.ts`.
 
 Journal table-of-contents entries are generated from level-two (`##`) headings. Avoid manually assigning metadata that `lib/journal.ts` derives, including reading time, entry number, and page number.
+
+Entry images live in `public/journal/<slug>/`, named for what they show (`hero.png`, `heat-ramp.png`) rather than numbered — plate numbers come from document order, so a numbered filename goes stale the moment a plate is inserted above it. Reference them by public-root path in `hero` frontmatter or an MDX `<Figure src alt>`; both read intrinsic size through `lib/image-dims.ts` at build time, so a missing or moved file fails the build. Keep screenshot sources as PNG and let `next/image` handle delivery encoding.
 
 ## TensorFlow.js and Lab Code
 
