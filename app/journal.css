@@ -45,6 +45,52 @@ body:has([data-journal-root]) {
   color: var(--color-paper);
 }
 
+.journal-year-filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.journal-year-filter::after {
+  content: "⌄";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  translate: 0 -56%;
+  color: var(--color-ink-soft);
+  pointer-events: none;
+}
+
+.journal-year-select {
+  appearance: none;
+  min-width: 104px;
+  padding: 4px 25px 4px 10px;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 6px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.journal-year-select:hover {
+  background: var(--color-paper-2);
+}
+
+.journal-year-select:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
 .journal-subject-chip {
   display: inline-flex;
   align-items: center;

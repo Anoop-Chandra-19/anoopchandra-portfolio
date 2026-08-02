@@ -72,9 +72,10 @@ export default function JournalIndex({
   /** Rendered as a non-interactive transition copy. */
   inert?: boolean;
 }) {
-  /* Kind, subject, and sort are intentionally local rather than URL state. */
+  /* Kind, subject, year, and sort are intentionally local rather than URL state. */
   const [filter, setFilter] = useState<Filter>("all");
   const [tag, setTag] = useState<string | null>(null);
+  const [year, setYear] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
   const { navigate } = useInkTransition();
 
@@ -87,13 +88,26 @@ export default function JournalIndex({
     [entries]
   );
 
+  const years = useMemo(
+    () => [...new Set(entries.map((entry) => entry.date.slice(0, 4)))].sort().reverse(),
+    [entries]
+  );
+
+  // TODO(journal-scale): Add paginated index routes when the archive outgrows
+  // one page. Apply kind, subject, year, and future search filters before
+  // slicing entries so every filter continues to cover the full archive.
   const visible = useMemo(() => {
     const rows = entries.filter(
-      (e) => (filter === "all" || e.kind === filter) && (!tag || e.tag === tag)
+      (entry) =>
+        (filter === "all" || entry.kind === filter) &&
+        (!tag || entry.tag === tag) &&
+        (!year || entry.date.startsWith(`${year}-`))
     );
-    const cmp = SORTERS[sort.key];
-    return rows.sort((x, y) => (sort.dir === "asc" ? cmp(x, y) : -cmp(x, y)));
-  }, [entries, filter, tag, sort]);
+    const compare = SORTERS[sort.key];
+    return rows.sort((left, right) =>
+      sort.dir === "asc" ? compare(left, right) : -compare(left, right)
+    );
+  }, [entries, filter, tag, year, sort]);
 
   // New columns default to title ascending and all others descending.
   const toggleSort = (key: SortKey) =>
@@ -129,7 +143,7 @@ export default function JournalIndex({
           ← back to portfolio
         </Link>
         <div className="mono faint text-[11px] tracking-[2px] uppercase">
-          anoopchandra parampalli · journal · vol. 02
+          anoop parampalli · journal · vol. 02
         </div>
       </div>
 
@@ -172,6 +186,23 @@ export default function JournalIndex({
             <span className="mono text-[11px] opacity-70 ml-1">({counts[k]})</span>
           </button>
         ))}
+        {years.length > 1 && (
+          <label className="journal-year-filter">
+            <span>year ↦</span>
+            <select
+              className="journal-year-select"
+              value={year ?? ""}
+              onChange={(event) => setYear(event.target.value || null)}
+            >
+              <option value="">all years</option>
+              {years.map((entryYear) => (
+                <option key={entryYear} value={entryYear}>
+                  {entryYear}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         {tag && (
           <button
             type="button"
@@ -224,6 +255,12 @@ export default function JournalIndex({
                   {" "}
                   in <b className="font-semibold">{KIND_LABEL[filter]}</b>
                 </>
+              )}
+              {year && (
+                <>
+                  {" "}
+                  during <b className="font-semibold">{year}</b>
+                </>
               )}{" "}
               yet.
             </p>
@@ -233,6 +270,7 @@ export default function JournalIndex({
               onClick={() => {
                 setFilter("all");
                 setTag(null);
+                setYear(null);
               }}
             >
               show the whole book
@@ -316,6 +354,12 @@ export default function JournalIndex({
                 · subject <b className="font-medium text-ink">{tag}</b>
               </>
             )}
+            {year && (
+              <>
+                {" "}
+                · year <b className="font-medium text-ink">{year}</b>
+              </>
+            )}
             {" · "}
             {counts.case} case studies + {counts.note} notes · pp. {pad(first)}–{pad(last)}
           </span>
@@ -330,7 +374,7 @@ export default function JournalIndex({
       </div>
 
       <div style={{ marginTop: 40, textAlign: "center" }} className="mono faint">
-        — © 2026 Anoopchandra Parampalli · journal · made by hand —
+        — © 2026 Anoop Parampalli · journal · made by hand —
       </div>
     </main>
   );

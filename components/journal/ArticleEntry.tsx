@@ -12,7 +12,7 @@ import SectionRail from "@/components/journal/SectionRail";
 import ZoomableImage from "@/components/ui/ZoomableImage";
 import { imageDims } from "@/lib/image-dims";
 
-const AUTHOR = "Anoopchandra Parampalli";
+const AUTHOR = "Anoop Parampalli";
 
 export default function ArticleEntry({
   entry,
