@@ -142,6 +142,17 @@ Use these naming conventions:
 
 ## Journal Content
 
+### Journal Voice and Audience
+
+- Write journal entries for a mixed audience that includes experienced engineers, beginners, recruiters, and technically curious readers without programming or Linux experience.
+- Preserve technical accuracy, real terminology, exact values, and meaningful implementation details. Accessibility does not mean removing complexity or replacing precise explanations with vague analogies.
+- Introduce an unfamiliar term in plain language the first time it appears, then use the correct term normally afterward.
+- Use footnotes for optional definitions, background, and deeper implementation context. The main narrative must remain understandable when every footnote is skipped.
+- Explain why a technical detail mattered to the experience before expanding on how it worked.
+- Prefer chronological, first-person experience over a tutorial or formal case-study voice.
+- Do not pad an entry to increase its read time. Use MDX components only when they improve understanding.
+- Avoid em dashes, formulaic contrast constructions such as "not X but Y," and polished summary lines that force a lesson onto every section.
+
 Journal files live at `content/journal/<slug>.mdx`; the filename is the route slug. Frontmatter is validated during loading and can fail the build.
 
 Required fields:

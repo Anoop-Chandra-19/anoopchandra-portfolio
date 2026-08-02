@@ -1,0 +1,147 @@
+---
+title: "Building fand"
+kind: case
+date: 2026-08-02
+tag: linux
+dek: "I wanted to view and edit my computer's fan settings from Linux, so I started building fand in Rust."
+sub: "self · 2026"
+hero: /journal/building-fand/heat-ramp.png
+heroAlt: "The fand interface showing a simulated rise in CPU and GPU temperatures, two fan groups near full speed, and the curves controlling them."
+heroCaption: "The redesigned fand interface running through a simulated heat ramp."
+---
+
+The BIOS[^1] already controlled my fans, and the fan curves worked fine. A fan curve is a set of temperatures paired with fan speeds. As the computer gets hotter, the curve tells each fan how much faster to run.
+
+Changing a curve meant rebooting, opening the firmware settings, making an adjustment, and booting into Linux again. Once I was back at the desktop, the BIOS gave me no convenient way to watch the curve respond during normal use.
+
+On Windows I used FanControl. It put the temperatures, fan speeds, and curves in one place. I could watch a temperature rise, see the point it had reached on a curve, and check the speed being requested from the fan. That made small adjustments easy to understand.
+
+I like keeping that kind of information visible. I wanted to see how the CPU and GPU temperatures changed throughout the day and how the fans followed them. Going back into the BIOS every time I wanted to inspect or change a curve felt slow after using a desktop application for it.
+
+I tried CoolerControl when I moved to Linux. It could not detect the fan controller.
+
+## Finding the controller
+
+I first ran into the detection problem on Fedora, a version of Linux called a distribution. I was still a student and new enough to Linux that loading an unfamiliar hardware driver[^2] made me nervous. This was the hardware controlling my pump and fans, and I did not want to break it while following instructions I did not understand.
+
+I tried the detection available through CoolerControl and then ran `sensors-detect`. Both left me with the same result. There was no controller available to configure. That result could mean the hardware was unsupported, the driver was missing, or the board had nothing that Linux could control. I did not know enough yet to tell those cases apart.
+
+One line in the output showed that something was there:
+
+```text title="sensors-detect"
+Trying family `VIA/Winbond/Nuvoton/Fintek'...            Yes
+Found unknown chip with ID 0xd802
+```
+
+I did not know what to do with that result at the time, so I left it alone. I later moved to another Linux distribution called CachyOS and ran into the same problem. Seeing the same unknown ID on a second distribution made it clear that changing Linux distributions had not changed the underlying hardware problem. This time I searched for the chip ID.
+
+`0xd802` belongs to the Nuvoton NCT6799D, a small controller on my ASRock B650E Taichi motherboard. It is responsible for several low-level jobs, including reporting sensor readings and controlling fan headers. `sensors-detect` has its own chip database, and the version I was using did not recognize it. The kernel's `nct6775` driver already supported the controller. The detection tool did not know its name, while Linux already had the code needed to communicate with it.
+
+I loaded the driver with `sudo modprobe nct6775`, and an `nct6799` entry appeared under Linux's hardware-monitoring interface, called hwmon.[^3] Inside it were `pwm1` through `pwm7`, fan-speed inputs, and the temperature channels exposed by the chip. The controller had been available to the kernel the whole time. It needed the correct driver loaded before applications could see it.
+
+The hwmon interface presents the readings and controls as a directory of small files. Each fan header has a control value from `0` to `255`. Fan speed is read from files such as `fan1_input`, and control modes are written through files such as `pwm1_enable`. The numbered hwmon directory can change between boots, so a program has to find the controller by its identity instead of keeping one path from the previous boot.
+
+The seven PWM channels reported by the chip are not a list of seven connected fans. The motherboard only wires some of them, and two are in use on my machine. Other temperature channels return plausible values even though there is no useful sensor behind them. A program cannot treat every file exposed by the chip as verified hardware.
+
+CoolerControl probably would have worked once the driver was loaded. I could have configured it and finished the original task. I had also been picking at Rust without a project that required more than a tutorial. By this point I understood where the temperatures and PWM controls lived, and I wanted to learn how to build the program that would manage them.
+
+## Adding the GUI
+
+My first plan had two parts. A daemon, which is a background service that keeps running without a window, would read temperatures, evaluate curves, and write new fan values. A command-line client would let me check its status and change the configuration from a terminal. The two programs would communicate through a private local connection called a Unix socket.[^4] That was enough to replace trips into the BIOS.
+
+This split kept hardware access in one privileged process. The command-line client would never open a fan-control file itself. It would ask the daemon to make a change, and the daemon would validate the complete configuration before touching a physical header. Other clients could follow the same rule later.
+
+I put curve evaluation and configuration logic in `fand-core`, a Rust package that has no hardware or socket access. Its behavior can be tested by giving it ordinary temperatures and checking the fan values it produces. The daemon handles the parts tied to the machine: finding hwmon devices, reading NVIDIA temperatures, writing fan values, responding when Linux asks it to stop, and reporting failures. The NVIDIA GPU is only a temperature source. Its own driver continues to control its fans.
+
+This gave me a useful Rust project. The core had arithmetic and code for tracking how a curve changes over time. The edges had operating-system interfaces and communication between separate programs. I had to read much more Rust than I wrote at the start. Several language concepts arrived together, and understanding the existing patterns took more time than fixing individual compiler errors.
+
+Later I remembered that Tauri uses Rust for the native part of a desktop application.[^5] I had wanted to try building an interface with web technologies without packaging a complete browser with it. It also gave me a way to build the visual part I had liked in FanControl, including live temperature history, current curve positions, and an editor I could use without restarting the machine.
+
+<Figure
+  src="/journal/building-fand/curve-editor.png"
+  alt="The fand graph-curve editor showing a three-point fan curve and controls for temperature source, fan duty, hysteresis, and response time."
+>
+  The graph-curve editor. Changes are staged and applied as one batch rather than sending a half-edited curve to the daemon.
+</Figure>
+
+The editor keeps its changes local until I press Apply. Moving one point can affect the shape of the whole curve, and changing its temperature source changes what the curve means. Sending every intermediate edit to the daemon would allow an incomplete curve to reach the hardware. The GUI sends the completed edit as one update for the daemon to validate.
+
+Adding the GUI gave the daemon two clients. I did not want the command-line client and the Tauri backend to create separate versions of the messages they exchanged with the daemon, so I moved those shared message types into `fand-proto`. All three programs now use the same definitions. Changing a request or response in one place causes Rust to point out every part of the project that must be updated.
+
+The Rust side settled into four packages, which Rust calls crates. `fand-core` contains the logic, `fand-proto` contains the messages, `fand` owns the hardware, and `fanctl` provides the command line. The Tauri backend uses the same protocol package as the other clients. The GUI added much more work than I had planned, and supporting it determined where several of these boundaries ended up.
+
+## Handling the hardware
+
+`fand` runs with permission to write directly to the fan-control files exposed by Linux. A write changes physical hardware immediately. Linux applies these file writes one at a time, and the interface provides no undo operation. The daemon has to decide what values are safe before it starts writing them.
+
+`pwm1` controls an Arctic Liquid Freezer II 360. The pump, its VRM fan, and the three radiator fans are connected to the same header. The pump does not provide its own tachometer reading, so I cannot check its speed separately. Setting that header too low could stop the pump without giving the daemon a pump-speed signal to detect it.
+
+The configuration sets a minimum of `80` out of `255` for `pwm1`. The daemon enforces that minimum while validating the configuration. A hand-edited text configuration, the command-line client, and the GUI all go through the same validation before a value can reach the hardware. The restriction stays in the daemon instead of relying on the curve editor to hide lower values.
+
+Channel names also have to identify one physical header in one consistent way. A name such as `pwm01` still refers to header `1`, which is the same header as `pwm1`. Earlier validation accepted both spellings, while a safety check looking specifically for the text `pwm1` could miss the padded version. The same physical header could also appear twice in one configuration under two names. The daemon now rejects a channel name unless it matches the standard spelling produced from its number.
+
+Taking control from the motherboard firmware requires changing the control mode as well as the fan value. On this Nuvoton chip, writing `5` to a header's `pwmN_enable` file hands control back to the firmware. That is the state `fand` restores when it stops controlling a channel.
+
+A normal shutdown, a request from Linux to stop, and an internal panic all run the restore path before the process exits. Linux also has a forced stop called `SIGKILL` that a program cannot intercept.[^6] The systemd service handles that case from outside the daemon by running `fand --restore-auto` after the process has been killed. The restore command finds the controller again and returns the configured headers to firmware control.
+
+Temperature failures use a separate path. A failed read, a value at or below `0 °C`, or one at or above `115 °C` is treated as a sensor failure. The daemon writes `255` to every controlled channel, restores firmware control, exits with an error, and lets systemd restart it. Continuing to evaluate curves from an old reading would keep producing normal-looking output from data the daemon no longer trusts.
+
+A review found a bug in the channel's PWM deadband. The deadband ignores target changes smaller than `3` PWM points so the daemon does not keep writing tiny adjustments. This is separate from the temperature hysteresis shown in the curve editor. Hysteresis decides when a temperature change reaches the curve, while the PWM deadband decides whether a new curve result is far enough from the current fan value to write.
+
+Firmware could hand `pwm1` over at `78`, while the configured floor was `80`. The old update order first calculated a desired value of `80`, then saw that it was only `2` points away from the current value. Since `2` was inside the `3` point deadband, it kept returning `78`. The same comparison happened on every update, so the channel could remain below its floor indefinitely.
+
+The fix was to allow the deadband only when the current value is already at or above the configured floor. A channel starting below its floor now moves to a safe value before the daemon considers whether a change is small enough to ignore.
+
+The live service owns the real fan headers, so I do not run development builds against them. A development daemon uses dry-run mode and a temporary socket. The GUI can also connect to `mockd`, a fake daemon that speaks the full protocol and feeds synthetic temperatures through the real curve evaluation code.
+
+`mockd` has scenarios for a heat ramp, a connection that drops clients every twenty seconds, and a daemon restart that creates a new process instance. These cases let me work on curve movement, reconnect behavior, and stale requests without stopping the service that is cooling the machine. The heat-ramp screenshot at the top of this article came from that setup.
+
+## Moving state out of React
+
+The GUI originally kept its own copy of the daemon's configuration in React, the library used to build the interface.[^7] React code fetched the current settings through the Tauri backend, stored them for the screen to display, and sent changes back to the daemon. Other code watched the connection and tried to repair the local copy after a disconnect.
+
+The interface was tracking its own edits while the daemon could disconnect, restart, or change its configuration between requests. A request could begin on one connection and finish after a new connection had taken its place. The response still looked valid to the code that had started it.
+
+I was trying CodeRabbit, an automated code-review tool, on the repository. Its review rounds kept finding synchronization problems. One update could start while the daemon was disconnected. A request that never completed could block recovery. A dialog could reopen after a reconnect because an old request finished after the connection had changed.
+
+I fixed these cases inside React for several rounds. The interface gained more timers, connection checks, and bookkeeping for deciding whether a response still belonged to the current connection. Each fix handled the reported case, but the configuration code became harder to follow. Reconnection behavior was spread between the Tauri transport, React's configuration code, and the screens using it.
+
+I eventually moved the shared configuration into the Tauri backend. React now displays the current state and sends actions to the backend. The backend owns communication with the daemon, request timeouts, reconnection, and cache updates. It handles that work in one place beside the socket connection.
+
+That change let me delete the two React hooks that had owned the shared state, along with the recovery code and request bookkeeping around them. Individual screens still keep temporary edits while a dialog is open, but the current daemon configuration has one owner.
+
+Moving the configuration exposed another restart case. The daemon numbers each version of its settings so clients can tell which update is newer. A response from an older daemon process could arrive after a restart with a number much larger than the new process had reached. Comparing those numbers directly could make the backend reject every later update from the new daemon.
+
+Each daemon process now creates a random instance ID and sends it with the version number. Version numbers are compared only when their process IDs match. An update from another process starts a new sequence. The restart scenarios in `mockd` exercise this behavior without restarting the service on the real machine.
+
+The frontend became smaller after the backend took responsibility for service state. I reached that design after spending several review rounds trying to keep the responsibility in React.
+
+## The 1.0 cutover
+
+I made the first commit on July 1 and installed a working version as a systemd service on July 2. That early version had the basic loop I needed: read the temperatures, evaluate the curves, write the fan duties, and restore firmware control on exit.
+
+I froze deployments on July 4 when the redesign started. The version currently controlling my fans is still based on the snapshot from before that work. New code stays on the development side of the temporary socket and mock daemon until I am ready to replace the service in one cutover.
+
+The freeze is deliberate. The live version keeps running because it works, and I know exactly which behavior is controlling the machine. Deploying each redesign change as soon as it landed would mix code under active review with the service I rely on every day. I decided to finish the redesign, review it as a complete system, and deploy it once.
+
+I plan to treat that cutover as version 1.0. After 1.0, changes will go through separate development branches and be reviewed before they are merged into the main line of code. I have kept the looser workflow while building the first version, which has also made it easy to add more work before closing it.
+
+Some of that extra work came from the shape of the project. The CLI led to a GUI, the GUI led to a shared protocol, and repeated review led to changes in where state is owned. Other items were things I decided I wanted in the first complete version once I could see how the parts fit together.
+
+The redesigned GUI is working, and the remaining cutover work does not include every idea I have had. An automatic fan-calibration command for `fanctl` is already deferred. I need to finish the current cutover list without adding every possible feature to it.
+
+Nothing has failed on the live machine. There have been no stuck fans, failed restores, or emergency shutdowns. I have kept the older service running while I finish the version that will replace it. That is the current state of `fand`.
+
+[^1]: BIOS is the familiar name for the firmware settings available before the operating system starts. Modern computers usually use UEFI firmware, but the setup screen is still commonly called the BIOS. It controls motherboard settings such as boot order, memory profiles, and built-in fan curves.
+
+[^2]: The kernel is the core part of Linux that communicates with hardware. A driver contains the hardware-specific instructions the kernel needs for one device or family of devices. `modprobe` loads a driver packaged as a kernel module without requiring a reboot.
+
+[^3]: hwmon is Linux's standard interface for hardware-monitoring devices. It appears through sysfs, a virtual filesystem generated by the kernel, usually under `/sys/class/hwmon`. PWM means pulse-width modulation. It controls a fan by changing how much of each electrical pulse is active. This chip represents that duty as a value from `0` to `255`.
+
+[^4]: A daemon is a long-running background process. A command-line interface, or CLI, is a text-based program used from a terminal. A Unix socket lets two programs on the same computer exchange messages without exposing the service to the network.
+
+[^5]: Tauri combines a web-based interface with a native backend, which can be written in Rust. It uses the operating system's existing webview. Electron applications usually bundle a copy of Chromium with the application instead.
+
+[^6]: Linux uses signals to tell a process that something has happened. `SIGTERM` asks a process to stop and gives it time to clean up. `SIGKILL` stops it immediately and cannot be handled by the process. systemd is the service manager that starts and monitors `fand`; its `ExecStopPost` step can run cleanup after the daemon is gone.
+
+[^7]: React builds an interface from components. Hooks let those components keep state and react to changes such as a connection dropping. They work well for screen state, but coordinating long-running service requests across reconnects added several paths that the interface had to keep synchronized.
