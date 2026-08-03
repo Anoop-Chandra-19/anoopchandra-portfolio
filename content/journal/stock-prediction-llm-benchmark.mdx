@@ -1,108 +1,121 @@
 ---
 title: "Stock Prediction LLM Benchmark"
 kind: case
-date: 2025-11-02
+date: 2025-02-13
 tag: ai/ml
-dek: "Benchmarking 11 LLMs on stock-movement prediction with CoT prompting, MongoDB time-series storage, and a structured-trade eval harness."
-sub: "research · 2024"
-hero: /projects/stock-pred.png
-heroAlt: "Stock prediction benchmark dashboard — model leaderboard and cumulative returns chart"
-related: [notes-on-rag-eval-harnesses, shipping-llms-at-a-startup]
+dek: "We gave eleven language models the same pre-market evidence, turned their answers into simulated trades, and watched every model lose money on average."
+sub: "course project · 2025"
+hero: /journal/stock-prediction-llm-benchmark/trade-timelines.png
+heroAlt: "Trade timelines for Gemini 1.5 Flash and Gemini 2.0 Flash, with green and red circles showing profitable and losing decisions across the earnings benchmark."
+heroCaption: "Two of the eleven trade timelines. Gemini 1.5 Flash came closest to breaking even; Gemini 2.0 Flash had the largest average loss."
+related: [audio-genre-classification, notes-on-rag-eval-harnesses]
 ---
 
-Can a language model trade stocks? Probably not. Can it do better than a coin flip with the right prompt scaffolding? Surprisingly yes — sometimes.
+Before the stock predictions, this project mattered to me for a more personal reason. One of my teammates was the person who helped me learn JavaScript. That led me to React, TypeScript, and Next.js, and eventually to working as a full-stack developer. I can draw a fairly direct line from her help to the work I do now.
 
-## Setup
+We built this as a team course project in February 2025. The question sounded simple: after a company reports earnings, can a large language model decide whether its stock will keep moving in the same direction when the market opens, reverse, or stay flat? More specifically, would a model that produced a longer chain of thought, the reasoning text before its final answer, make a more profitable decision?
 
-- 11 models: gpt-4o, gemini-2.0, deepseek-r1, llama-3.3, mistral-large, phi-4, + others
-- S&P 500 universe, 6-month rolling window, daily decisions
-- Chain-of-thought prompting with structured trade output (BUY / HOLD / SELL + confidence)
-- MongoDB time-series for prices + decisions; eval framework scores against next-day return
+The answer from our benchmark was no. Every one of the eleven models lost money on average.
 
-<Callout>TL;DR — reasoning models (r1, o1-style) outperformed pure scale. gpt-4o was top-3; deepseek-r1 was #1 on risk-adjusted returns.</Callout>
+## The fifteen minutes before the market opens
 
-## Big caveat
+An earnings announcement can move a stock while the regular market is closed. A company may report just after 4:00 PM, trade through the evening, then move sharply again when regular trading begins at 9:30 AM. Our model had to make its decision at 9:15 AM, after seeing after-hours data through 7:00 PM and pre-market data from 4:00 AM onward, but before seeing what happened at the open.
 
-Past performance, etc. The point of this wasn't to make a trading bot — it was to build the harness. The harness is the artifact.
+Netflix's fourth-quarter 2024 report was the example we used in the presentation. Netflix released earnings after the closing bell on January 21, 2025. Its price jumped in after-hours trading and was still up about 14.67% by 9:15 the following morning. The model then had to decide whether that move would continue or reverse.
 
-{/* ── SCAFFOLD-PROSE ─────────────────────────────────────────────
-    Placeholder text, added 2026-07-28 only so the journal index has a
-    spread of read times to sort against during the v4 design port.
-    Delete this whole block when the real entry is written.
-    See docs/hifi-v4-plan.md §1b. Find all: grep -rn SCAFFOLD-PROSE content/
-    ───────────────────────────────────────────────────────────── */}
+<Figure
+  src="/journal/stock-prediction-llm-benchmark/netflix-earnings-window.png"
+  alt="An annotated trading screen for Netflix after its fourth-quarter 2024 earnings, showing the report after market close, an after-hours price jump, pre-market activity, and the unanswered direction at the 9:30 AM open."
+>
+  The Netflix example we used to explain the prediction window.
+</Figure>
+
+This was not a prompt containing only an earnings headline. We assembled a report for each event from several kinds of market data:
+
+- Finnhub supplied actual and estimated earnings per share and revenue.
+- Databento supplied daily and minute-level OHLCV data, meaning open, high, low, close, and volume, plus bid-and-ask records for trade simulation.
+- SPY, IWM, DIA, and QQQ supplied exchange-traded-fund proxies for the recent direction of the S&P 500, Russell 2000, Dow Jones, and Nasdaq 100.
+- MongoDB stored the raw records, transformed time series, generated reports, and model outputs.
+
+The scripts narrowed this data into a chronological description: recent market and stock trends, trading during the earnings day, the after-hours reaction, and pre-market prices through 9:15 AM. The target company's post-open prices were held back for evaluation.
+
+## Turning market data into a trade prompt
+
+The full workflow had five stages. We downloaded earnings and price records, standardized symbols and time series, generated a textual briefing, sent that briefing to each model, then replayed the resulting order against historical one-minute bid-and-ask data. A final analysis stage compared profits, returns, position sizes, exit types, and predicted directions.
+
+<Figure
+  src="/journal/stock-prediction-llm-benchmark/pipeline.png"
+  alt="A five-stage project pipeline from earnings and price extraction through textual data transformation, LLM trade-order generation, simulated trading, and cross-model visualization."
+>
+  The pipeline from structured market records to a scored trade.
+</Figure>
+
+Each model received the same role and constraints. It was a short-term trader with `$50,000` in capital and four-times leverage. At 9:30 AM it could buy, sell short, or decline to trade. If it traded, it had to specify the dollar size of the position, a limit price for taking profit, and a stop price for limiting a loss. The prompt asked it to risk at most one percent of its capital and close any remaining position by 4:00 PM.
+
+We also included three completed examples, one long trade, one short trade, and one decision not to trade. The final line had to follow a parseable form such as:
+
+```text
+BUY +$27,400 NFLX; SELL LMT @90.00 STP -1%
+```
+
+That output format turned prose into something the evaluation script could execute. The parser checked the symbol, position sign, limit, and stop. It entered long positions at the available ask or short positions at the bid. It then stepped through one-minute best-bid-and-offer records until the target or stop condition appeared. A position still open at the end of the session was closed at the market close.
+
+This part changed the question from “does the answer sound financially informed?” to “what would this exact order have returned?” A convincing explanation could still produce an invalid stop, an impossible limit, or a large loss.
+
+The shared implementation is available in [our GitHub repository](https://github.com/b1f6c1c4/earnings-llm). It is a sequence of fourteen Node.js scripts followed by a Jupyter notebook for the analysis. The downloaded market dataset and generated analysis files are not included, so the repository documents the implementation rather than providing a self-contained reproduction.
+
+## Comparing eleven models
+
+We tested eleven model configurations across up to 120 earnings events:
+
+- DeepSeek R1 at 671B, 70B, and 7B
+- Gemini 2.0 Thinking, Gemini 2.0 Flash, and Gemini 1.5 Flash
+- Gemma 2 27B
+- GPT-4o
+- Llama 3.3 70B
+- Mistral 7B
+- Phi-4 14B
+
+The pipeline supported Gemini, Groq, local Ollama inference, and manual imports where an API was unavailable or too expensive. This let us compare a wide range of model sizes and reasoning behavior through the same order parser and simulator.
+
+The event pool contained 120 test prompts, but the profitability averages only included outputs the parser could score. The valid count therefore differed by model. For example, the presentation reported 73 scored decisions for Gemini 1.5 Flash and 98 for Gemini 2.0 Flash. A malformed order was excluded rather than counted as a losing trade.
+
+<Figure
+  src="/journal/stock-prediction-llm-benchmark/model-results.png"
+  alt="A results table for eleven language models showing a negative average profit and return for every model. Gemini 1.5 Flash is closest to break-even at an 85 dollar loss and 0.17 percent negative return per decision."
+>
+  Average simulated profit and return per decision for all eleven models.
+</Figure>
+
+Gemini 1.5 Flash came closest to break-even at an average loss of `$85`, or `-0.17%`, per decision. Llama 3.3 70B followed at `-$144` and `-0.29%`. Gemini 2.0 Flash performed worst at `-$3,407` and `-6.81%`.
+
+The models designed to reason longer did not reverse the result. Gemini 2.0 Thinking averaged `-$1,422` (`-2.84%`). The three DeepSeek R1 variants ranged from `-2.30%` to `-3.66%`. GPT-4o averaged `-3.74%`. None produced a positive average.
+
+<Figure
+  src="/journal/stock-prediction-llm-benchmark/return-distribution.png"
+  alt="Eleven box plots showing the distribution of simulated returns by language model, with the center of every distribution below zero and several large negative outliers."
+>
+  The return distributions made the shared negative tendency easier to see than a leaderboard alone.
+</Figure>
+
+Netflix showed why a correct-looking narrative was not enough. The stock had already climbed sharply after hours and remained elevated before the open. GPT-4o still chose a `$200,000` long position with a five-percent target and a one-percent stop, then lost `$2,711` in our presentation's simulation. Other models also bought and lost money on the same event. They could summarize what had happened before 9:15 AM, but that did not mean they could predict what happened after 9:30 AM.
+
+## What the benchmark did and did not show
+
+We compared complete model configurations with different sizes, providers, and reasoning behavior. That made this a broad model benchmark. It did not isolate chain-of-thought length as a variable on its own.
+
+The benchmark was also one short collection of earnings events. It showed how these configurations behaved in our evaluation window, not how they would behave in every market. Real deployment would add more problems: fees, slippage, changing liquidity, API latency, and the need to stop collecting market data early enough for slower models to finish before the opening bell.
 
 <Callout variant="warning">
-Placeholder text follows — this entry has not been written yet.
+  This was a course benchmark and simulated evaluation, not a trading system or evidence that any model should manage real money.
 </Callout>
 
-## Placeholder — what the harness actually did
+What it did show clearly was that more reasoning text did not guarantee a useful action. The strongest-sounding explanation could end with a malformed order. A valid order could still choose a weaker direction according to our hindsight metric. Even the direction selected by that metric could be paired with a poor target, stop, or position size. Profitability depended on the whole chain.
 
-Placeholder paragraph. The harness is the part worth describing, because the
-models were interchangeable and the scaffolding was not. Each run pinned a
-model, a prompt version, a date window and a random seed, then wrote every
-decision to a time-series collection alongside the reasoning trace that produced
-it. Nothing was scored live. Scoring happened afterwards, against next-day
-returns, so that a change to the scoring rule could be replayed over every run
-that had ever been recorded.
+## The part I carried forward
 
-Placeholder paragraph. That replay property mattered more than any single
-result. The first scoring rule was naive — direction only, equally weighted —
-and it flattered models that guessed confidently and often. Adding a confidence
-weighting and a transaction-cost penalty changed the leaderboard, and being able
-to recompute the whole history in a few minutes meant that discovery cost an
-afternoon rather than a rerun.
+My checked-in contribution focused on the Jupyter analysis and visualizations. I built the return-versus-position scatter plot, model return distributions, exit-strategy comparison, and confusion matrices that compared each model's action with the pipeline's hindsight-selected action. Those charts helped us move past individual anecdotes and see that the losses were spread across the benchmark.
 
-## Placeholder — prompting notes
+The project also gave me a concrete view of a data pipeline larger than one model call. There were API clients, time zones, symbol normalization, MongoDB aggregations, prompt generation, multiple inference providers, output parsing, simulation, and visualization. Each stage could change the final result.
 
-Placeholder paragraph. Chain-of-thought helped, but not uniformly, and not for
-the reason the literature suggests. The reasoning models were already doing the
-work internally, so an explicit scaffold mostly made their output longer. For
-the smaller models the scaffold was load-bearing: without it they would name a
-direction and invent a justification afterwards, which reads convincingly and
-scores terribly.
-
-Placeholder paragraph. Forcing structured output was the single highest-leverage
-change. A free-text answer has to be parsed, and parsing free text from eleven
-different models is a study in how many ways a sentence can nearly mean BUY.
-Once the schema was mandatory the parsing layer disappeared and the failure mode
-became honest — a refusal instead of a guess.
-
-Placeholder paragraph. Temperature was set low and left alone. There is a
-version of this project that sweeps temperature properly across all eleven
-models and reports the variance, and that version is more rigorous than this
-one. It also takes four times the compute budget.
-
-## Placeholder — the results, with caveats attached
-
-Placeholder paragraph. The headline finding held up across re-scorings:
-reasoning-tuned models beat larger general models on risk-adjusted return, and
-the gap widened when transaction costs were included. The mechanism appeared to
-be selectivity rather than accuracy. The reasoning models declined to take a
-position more often, and the positions they did take were not obviously better
-picks — there were simply fewer bad ones.
-
-Placeholder paragraph. Every result carries the same asterisk. A six-month
-window on a single universe is one sample of one market regime. The window
-overlapped a period that rewarded caution, and a benchmark that rewards caution
-will rank the cautious models first. Running the same harness across a regime
-that punished it is the obvious next experiment and the one I have not done.
-
-Placeholder paragraph. There is also a leakage question that never fully went
-away. Training cutoffs are approximate and the models had plainly read a great
-deal about the companies in the universe. Restricting the prompt to price and
-volume series with tickers stripped out reduced performance across the board,
-which is either evidence of leakage or evidence that context helps, and the
-experiment as designed cannot distinguish between the two.
-
-## Placeholder — closing
-
-Placeholder paragraph. Nobody should trade on this. The artifact is the harness:
-a thing that turns an argument about which model is better into a number that
-can be recomputed when the argument changes.
-
-Placeholder paragraph. If I picked this up again the first change would be
-structural rather than analytical: split the harness into a runner and a scorer
-with a stable record format between them, so that the expensive half runs once
-and the cheap half can be rewritten as often as the question changes. Most of
-the friction in the project came from those two concerns sharing a process.
+I remember the project for that engineering work, and I also remember how I got there. A teammate took the time to help me learn JavaScript. I still use what she helped me start learning every day.
