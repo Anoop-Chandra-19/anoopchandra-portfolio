@@ -229,7 +229,7 @@ export const MINOR: Minor[] = [
   },
   {
     t: "Stock Prediction LLM",
-    y: "2024",
-    d: "Benchmarked 11 LLMs on stock-movement prediction with chain-of-thought prompting and a custom trade-decision eval harness.",
+    y: "2025",
+    d: "Benchmarked 11 LLMs on post-earnings trades with a custom simulator; every model lost money on average.",
   },
 ];
