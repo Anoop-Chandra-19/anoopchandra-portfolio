@@ -1,35 +1,46 @@
 ---
 title: "The AM5 Memory Fix"
 kind: note
-date: 2026-04-24
+date: 2025-06-30
 tag: hardware
-dek: "Two sticks of DDR5-6000 should just work. Four sticks? Welcome to the BIOS rabbit hole."
+dek: "My new AM5 build kept showing a memory error. Loosening the CPU cooler fixed it."
 related: [why-i-switched-to-hyprland, a-year-of-arch-arch-is-great-and-awful]
 ---
 
-I built a new AM5 box around a 7950X3D last month. Two sticks of G.Skill DDR5-6000 CL30 — booted to Windows on the first try, ran Prime95 for an hour, no complaints. Then I added the second kit.
+I thought the first boot would be the easy part.
 
-And then nothing booted.
+I had spent hours putting together a new PC with a Ryzen 7 7800X3D. Everything was finally connected, so I pressed the power button and waited. The system powered on, but it would not get through POST.[^1] It kept stopping at a memory error.
 
-## What actually happened
+## Trying the RAM again and again
 
-AM5's memory controller is fine with 2x DIMMs at the rated EXPO speed. With 4x DIMMs, it falls off a cliff — officially supported up to DDR5-3600 in some configurations,[^1] and even that is generous. The system was POSTing fine at JEDEC speeds; EXPO at 6000 was hard-failing into a memtest loop.
+Since the board was pointing at memory, I started with the RAM. I swapped the sticks between slots, tried one stick at a time, reseated them, and rebooted more times than I can remember.
 
-<Callout>TL;DR — 4 sticks of DDR5 on AM5 is not a supported config at advertised speeds. Pick 2 sticks of higher density, or accept JEDEC.</Callout>
+Nothing changed. Every attempt ended at the same memory error.
 
-## The fix
+By then I was tired and annoyed, so I stopped for the night. I went to sleep thinking I would probably have to take the whole build apart the next day.
 
-I returned the second kit and got a single 2x32GB kit instead. 64GB total,[^2] EXPO enabled, boots clean every time. The 'just buy more sticks' instinct from DDR4 doesn't carry over.
+## One random forum post
 
-```
-# what I should have bought first time:
-G.Skill Trident Z5 — 2x32GB DDR5-6000 CL30
-# what I tried:
-2x  G.Skill 2x16GB kits = 4 sticks total
-```
+The next morning, I was doom-scrolling through forum threads when I found a comment that said:
 
-Lesson: density > stick count on AM5. Always.
+<Quote cite="A forum post I found the next morning">
+“Overtightening the CPU cooler can cause memory controller issues with AM5. Try loosening the screws.”
+</Quote>
 
-[^1]: AMD's QVL lists 4x DIMM support at DDR5-3600 on most AM5 boards — under half what the kit is rated for.
+It sounded random. The motherboard was complaining about memory, and this person was telling me to touch the CPU cooler. I had already tried everything else I could think of, though, so I loosened the cooler screws a little and powered the PC on again.
 
-[^2]: Two 32GB sticks also leaves two slots empty, which is the only upgrade path that doesn't mean `rebuying` the lot.
+This time it started memory training.[^2]
+
+That was it. After all the RAM swapping and rebooting, the thing that made a difference was slightly loosening four screws.
+
+## What the cooler had to do with memory
+
+The suggestion made more sense once I looked into it. The memory controller is inside the processor, and AM5 uses contact pins in the motherboard socket underneath it. The CPU cooler clamps the processor against that socket. Too much or uneven mounting pressure can affect that contact and cause problems that show up as memory errors.
+
+I still do not know exactly what was happening in my build. It could have been poor socket contact or a small amount of motherboard flex. I did not feel like tightening it again just to reproduce the problem. The pressure change worked, and the system moved past the error.
+
+Once memory training finished, I installed Windows. About twenty minutes later, I was finally using the PC I had spent the previous day building.
+
+[^1]: POST, short for power-on self-test, is the hardware check a computer runs before starting the operating system.
+
+[^2]: During memory training, the motherboard works out stable settings for communicating with the RAM. On a new AM5 build, the screen can stay blank for several minutes while this happens.
