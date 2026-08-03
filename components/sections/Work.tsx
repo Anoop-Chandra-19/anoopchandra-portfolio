@@ -157,15 +157,7 @@ function MinorRow({ m }: { m: Minor }) {
         <div className="text-[16px] font-semibold leading-[1.3]">{m.t}</div>
         <div className="mono faint minor-year text-[11px] mt-[3px]">{m.y}</div>
       </div>
-      <div>
-        <p className="m-0 text-[14.5px] leading-[1.6]">{m.d}</p>
-        <span
-          className="mono text-[11px] text-ink-soft"
-          style={{ borderBottom: "1px dotted var(--color-ink-faint)" }}
-        >
-          {m.cta}
-        </span>
-      </div>
+      <p className="m-0 text-[14.5px] leading-[1.6]">{m.d}</p>
     </div>
   );
 }

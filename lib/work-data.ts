@@ -60,7 +60,7 @@ export type Project = {
 
 export type Also = { d: string; shortD?: string };
 
-export type Minor = { t: string; y: string; d: string; cta: string };
+export type Minor = { t: string; y: string; d: string };
 
 export const ROLE: Role = {
   org: "Panacea Financial",
@@ -224,14 +224,12 @@ export const PROJECTS: Project[] = [
 export const MINOR: Minor[] = [
   {
     t: "Audio Genre Classification",
-    y: "2024",
-    d: "PyTorch transformer over mel-spectrograms, 8-class, 85% top-1, served as a FastAPI microservice.",
-    cta: "github →",
+    y: "2025",
+    d: "Fine-tuned an Audio Spectrogram Transformer on FMA-Small, reaching 76.72% test accuracy and serving predictions through FastAPI.",
   },
   {
     t: "Stock Prediction LLM",
     y: "2024",
     d: "Benchmarked 11 LLMs on stock-movement prediction with chain-of-thought prompting and a custom trade-decision eval harness.",
-    cta: "read the paper →",
   },
 ];
