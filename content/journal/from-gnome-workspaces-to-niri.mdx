@@ -1,0 +1,140 @@
+---
+title: "From GNOME workspaces to niri"
+kind: note
+date: 2026-08-03
+tag: linux
+dek: "I liked GNOME's workspaces, but got tired of its limits and waiting for extensions to catch up. Niri took that workflow much further."
+hero: /journal/from-gnome-workspaces-to-niri/overview.png
+heroAlt: "Niri's overview on a 3440 by 1440 ultrawide monitor, showing three large application columns across the first workspace and a browser window in the workspace below."
+heroCaption: "My niri overview. Columns move left and right inside workspaces that move up and down."
+---
+
+A couple of months after building my current PC, I installed Linux Mint. This was near the beginning of 2024, and it was my first serious attempt to use Linux as my normal operating system.
+
+The computer was already fast. It has a Ryzen 7 7800X3D and an RTX 4090, so even Windows did not have much room to make it feel slow. Mint still made the whole machine feel lighter. It booted quickly, stayed out of the way, and gave me the slightly ridiculous feeling that I had removed a layer of Windows gunk from a beast of a PC.
+
+Mint is the reason I started liking Linux. It is also where this story begins, even though the desktop I use now looks nothing like it.
+
+## Mint, then Fedora
+
+I used Mint for roughly three months. Its day-to-day performance was good; the slow part was its update cadence. I wanted newer NVIDIA drivers and newer CUDA support for the machine-learning work I was doing.[^1] The versions available through the distribution moved more conservatively than I wanted.
+
+Moving deeper into the Ubuntu side of Linux did not appeal to me either. Ubuntu had moved toward Snap as its default application format, while I preferred Flatpak and the way it was integrated into the desktops I had tried.[^2] I started looking for a distribution that updated faster without asking me to maintain everything myself.
+
+Fedora Workstation ended up being that distribution. I moved to it after those first few months on Mint and stayed until around November 2025. The software was current, NVIDIA worked once I installed the drivers through RPM Fusion, and the system rarely gave me a reason to think about changing it.
+
+That long stretch on Fedora was also when GNOME changed how I used a desktop.
+
+I had spent years on Windows minimizing applications into the taskbar. Leaving a window open somewhere I could not see it felt wrong at first. GNOME's overview made the alternative easy to understand. I could zoom out, see each workspace, drag an application to another one, and give different parts of my day their own space.
+
+My first workspace usually held the code editor and a terminal. The second held a browser so I could look at the UI I was changing. Spotify stayed in a third workspace, often with Discord if I was in a voice call with friends. I stopped minimizing those applications because I knew where they were.
+
+I still boot Windows for games with kernel-level anti-cheat, which runs deeply enough inside Windows that many developers do not support it through Linux, or for games that otherwise do not work when I want to play with friends. Every time I return, I miss being able to move through workspaces the way I do on Linux.
+
+## Moving to CachyOS without leaving GNOME
+
+Fedora was still working when I left it. By late 2025, I wanted to play with the operating system in the same way I liked playing with the hardware.
+
+CachyOS sounded fun for that reason. It is based on Arch Linux, updates quickly, and packages an optimized Linux kernel along with different CPU schedulers.[^3] I liked the idea of trying those options on the PC I had built. It made the software feel connected to the hardware again.
+
+I cannot claim it made the machine noticeably faster. Windows, Mint, and Fedora had all felt fast on this hardware. I moved because changing a kernel or scheduler sounded interesting, and because CachyOS made it easy to install several desktop or compositor sessions and choose between them at login.
+
+I installed CachyOS with GNOME. Yes, I moved to an Arch-based distribution and kept using GNOME instead of KDE. I already had a desktop workflow I liked, and changing the distribution did not give me a reason to throw it away.
+
+For the first couple of months, CachyOS looked and behaved much like the Fedora desktop I had left. The difference appeared whenever I tried to make GNOME more mine.
+
+## The extension cycle
+
+The first example sounds too basic to need an extension: I wanted a wallpaper slideshow. I had a folder of images and wanted GNOME to rotate through them. I could not point the normal wallpaper settings at that folder and ask for a slideshow, so I installed an extension for it.
+
+That was one of several. Blur My Shell changed the overview and shell appearance. GSConnect put KDE Connect integration in the top panel so my phone could communicate with the PC. Another extension restored status icons for applications running in the background.
+
+The setup worked until a GNOME release changed something an extension depended on. Then I would check whether the extension supported the new release, hope its developer had been able to test against the beta, and wait if it had not caught up yet. Sometimes the update arrived quickly. Sometimes a feature I used remained unavailable for months.
+
+I do not blame the people maintaining those extensions. GNOME Shell moves, they have to follow it, and many of them are doing that work in their own time. I was still building my desktop around pieces that could stop working every time the desktop moved to a new major version.
+
+At the same time, GNOME intentionally limited how much of its workflow I could change through normal settings. I liked its workspaces enough to keep trying to work around those limits. Eventually I found a YouTube video showing niri.
+
+My immediate reaction was that this looked like GNOME workspaces taken to an extreme. I wanted to try it.
+
+## Workspaces that keep going
+
+Niri calls itself a scrollable-tiling Wayland compositor.[^4] The phrase made more sense to me after seeing it move than it did as a definition.
+
+A normal tiling layout divides the visible screen each time another window appears. I had never been drawn to the grids of terminals and tiny application windows I saw in many tiling setups. They looked awkward on my 3440 by 1440 ultrawide, and I do not have good enough eyesight to enjoy shrinking four interfaces just because all four can technically fit.
+
+Most of the time I want one or two large windows. Niri lets me have that while keeping more windows beside them. Applications sit in columns on a horizontal strip, including columns beyond the left and right edges of the monitor. Opening another application does not force everything already visible to become smaller.
+
+That was the part that clicked. I normally keep two equal-width columns in view. When I am concentrating on code, Zed takes the full screen. Ghostty, a browser, or another application can remain one `Mod` and arrow-key press away without occupying any of the space I am reading.[^5]
+
+GNOME's influence is still visible in the other direction. Niri's dynamic workspaces are stacked from top to bottom, and its overview shows the columns inside each one. The project was heavily inspired by [PaperWM](https://github.com/paperwm/PaperWM), which first built a scrolling window layout as a GNOME Shell extension.
+
+My coding setup now has two directions I can move through. Left and right take me between columns in one workspace. Up and down take me between workspaces.
+
+If I am changing this portfolio, Zed may fill the first workspace with a terminal in another column. The browser sits in the workspace below it. I make a change, use `Mod` with the scroll wheel to move down, look at the result, and scroll back up to the code. I can move the windows themselves with the keyboard just as quickly.
+
+It is smooth, but the more important part is that it works with my brain. I am not searching a taskbar or repeatedly arranging windows. The code is above the browser. The terminal is beside the editor. Music and Discord can stay somewhere else until I move there.
+
+## Trying niri without dismantling GNOME
+
+I installed niri beside GNOME, so both remained available on the login screen. CachyOS maintains a [niri and Noctalia setup](https://github.com/CachyOS/cachyos-niri-noctalia), which made the first login less bare than I expected from a standalone compositor.
+
+Niri arranges the windows, but it does not try to provide every part of a desktop environment. Noctalia fills in much of the visible shell around it: the bar, notifications, control center, session menu, and lock screen. The CachyOS package gave me those pieces together instead of making me choose and configure each one before I could properly try the layout.
+
+I did replace the included launcher. I use [Vicinae](https://github.com/vicinaehq/vicinae), which is trying to bring a Raycast-like command palette to Linux. It is still coming together. It is already useful, and I like it. I press `Mod` and `Space` when I want to open an application instead of looking through a conventional menu.
+
+I kept the GNOME applications I liked. Nautilus is still my file manager. I continue to use GTK applications, and I like the regular and monospaced Adwaita fonts enough to keep them across the desktop.
+
+## The configuration is part of the desktop
+
+GNOME placed most settings in graphical panels or extensions. Niri expects me to edit configuration files written in KDL, a plain-text format for nested settings.[^6]
+
+The CachyOS setup splits that configuration into separate files for input, displays, keybindings, layouts, window rules, animations, and startup applications. I open those files in Zed when I want to change a shortcut or adjust how a window behaves.
+
+<Figure
+  src="/journal/from-gnome-workspaces-to-niri/config.png"
+  alt="Niri's split KDL configuration open in Zed, with files for animation, startup, displays, input, keybindings, layout, miscellaneous settings, and window rules."
+>
+  The niri configuration in Zed. The files on the left separate keybindings, displays, input, layout, animations, and window rules.
+</Figure>
+
+Editing a text file for a keyboard shortcut would have sounded like a regression when I first left Windows. I have become comfortable with it. Niri reloads the configuration while it is running, so I can save a change and try the shortcut immediately.
+
+Remembering all of those shortcuts is a different problem. My configuration currently contains 97 active bindings. I do not keep 97 combinations in my head.
+
+I installed [NiriMod](https://github.com/srinivasr/nirimod), a graphical frontend for niri's configuration, mostly because its keyboard view gives me a fast way to check what I assigned. I can see every key that already has a `Mod` binding without searching through the KDL files. It can change much more of the configuration, but that quick glance is the part I use most.
+
+<Figure
+  src="/journal/from-gnome-workspaces-to-niri/nirimod.png"
+  alt="NiriMod's keybinding screen showing a full keyboard layout, with configured Mod shortcuts highlighted in purple and configuration categories listed in a sidebar."
+>
+  NiriMod found 97 active bindings and placed them on a keyboard map. I use it when I know a shortcut exists but cannot remember where I put it.
+</Figure>
+
+## NVIDIA, screen sharing, and XWayland
+
+I expected NVIDIA to be one of the difficult parts. On Fedora, I had installed the proprietary driver through RPM Fusion, a third-party package repository. CachyOS offered packaged NVIDIA drivers as part of its installation, and that process was easier for me. Niri has been fine on the RTX 4090 since then.
+
+Screen sharing was another thing I expected to fight after leaving a complete desktop environment. In practice, it has behaved the same way it did under GNOME. I can share the screen when I need to without changing how I approach a call.
+
+The rough edges are smaller and stranger. Spotify runs through XWayland on my setup, which lets an application built for the older X11 display system appear inside a Wayland desktop.[^7] When the pointer crosses into it, the cursor can suddenly render at a different size. It still works. It just makes the boundary between the older and newer display systems visible in a place I look at constantly.
+
+I also miss one GNOME accessibility feature. Pressing `Ctrl` twice would put a visible pulse around the pointer so I could find it. Losing a small cursor on a 34-inch ultrawide is easy for me, and the different cursor sizes in XWayland applications do not help. Niri does not currently give me the same quick gesture.
+
+Some changes also require returning to the configuration file instead of opening a settings panel. I no longer mind doing that, and NiriMod helps when I want a visual reference, but GNOME still wins at making many ordinary desktop settings feel like one integrated system.
+
+GNOME remains installed. I can select it from the same login screen whenever I want a fallback. After several months, niri is the session I keep opening.
+
+[^1]: CUDA is NVIDIA's software platform for running general computation on its graphics cards. The CUDA version, graphics driver, and machine-learning software often need compatible versions.
+
+[^2]: Snap and Flatpak both package desktop applications with much of what they need to run. Linux distributions differ in which format they install and promote by default.
+
+[^3]: The Linux kernel is the core layer between applications and hardware. A CPU scheduler is the part that decides which task receives processor time next. CachyOS packages several schedulers for people who want to experiment with those decisions.
+
+[^4]: A Wayland compositor draws application windows, receives keyboard and pointer input, and decides how the windows are arranged. Niri combines that role with its scrolling column layout.
+
+[^5]: `Mod` is niri's name for its main shortcut modifier. In a normal session, it is the Super key, usually marked with the Windows logo.
+
+[^6]: KDL is a human-readable document language. Niri uses its nested nodes and properties for configuration in much the same way another application might use a structured settings file.
+
+[^7]: XWayland is a compatibility layer that runs applications written for the older X11 display system inside a Wayland session.
