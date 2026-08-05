@@ -31,6 +31,14 @@ export type JournalEntryMeta = {
   related: string[];
 };
 
+const HOME_JOURNAL_ENTRY_LIMIT = 4;
+
+/** The newest entries shown in the compact home-page index. The loader already
+ * sorts metadata newest-first, so preserve the supplied order. */
+export function selectHomeJournalEntries(entries: JournalEntryMeta[]): JournalEntryMeta[] {
+  return entries.slice(0, HOME_JOURNAL_ENTRY_LIMIT);
+}
+
 /** Edge tabs encode kind, never tag: coral for cases and teal for notes.
  *  Text colours mix toward ink because the pure accents lack sufficient
  *  contrast at 10px. */

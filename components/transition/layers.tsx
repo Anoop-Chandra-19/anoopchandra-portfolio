@@ -1,5 +1,5 @@
 // Both transitions use a full home copy; neither constructs a partial destination.
-import type { JournalEntryMeta } from "@/lib/journal-meta";
+import { selectHomeJournalEntries, type JournalEntryMeta } from "@/lib/journal-meta";
 import HomeContent from "@/components/HomeContent";
 import SideNav from "@/components/nav/SideNav";
 import MobileIndexNav from "@/components/nav/MobileIndexNav";
@@ -16,7 +16,7 @@ export default function HomeLayer({
   entries: JournalEntryMeta[];
   scrollY?: number;
 }) {
-  const notes = entries.filter((e) => e.kind === "note");
+  const journalEntries = selectHomeJournalEntries(entries);
   return (
     <div className="ink-layer-paper" aria-hidden="true" inert>
       <div
@@ -24,7 +24,7 @@ export default function HomeLayer({
         style={{ transform: `translateY(${-scrollY}px)` }}
       >
         <div className="page">
-          <HomeContent journalEntries={notes} />
+          <HomeContent journalEntries={journalEntries} />
         </div>
       </div>
       {/* outside the transformed doc — stays viewport-fixed like the real chrome */}
