@@ -65,7 +65,7 @@ export type Minor = { t: string; y: string; d: string };
 export const ROLE: Role = {
   org: "Panacea Financial",
   role: "Full-stack engineer",
-  period: "Aug 2024 — now",
+  period: "Sept 2025 — now",
   blurb:
     "Fintech platform for healthcare professionals. Full-stack delivery across React and React Native clients, a NestJS / PostgreSQL API, a Python Azure Functions service fronting Azure AI Foundry, and Helm / Kubernetes release pipelines.",
 };

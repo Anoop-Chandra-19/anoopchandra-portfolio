@@ -165,7 +165,7 @@ export default function JournalIndex({
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
           }}
         >
-          est. 2024 · updated weekly
+          est. 2025 · updated weekly
         </div>
       </div>
 

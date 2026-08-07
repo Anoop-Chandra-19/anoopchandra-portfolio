@@ -230,7 +230,7 @@ export default function Work() {
       <SectionHeaderArrow
         num="02"
         title="Work"
-        meta={`${WORK.length + PROJECTS.length + MINOR.length} entries · 2024 — now`}
+        meta={`${WORK.length + PROJECTS.length + MINOR.length} entries · 2025 — now`}
       />
       <p className="faint max-w-[740px] mb-7 text-[16px]">
         <span className="marker-highlight">Panacea Financial</span> — the systems I built there,
