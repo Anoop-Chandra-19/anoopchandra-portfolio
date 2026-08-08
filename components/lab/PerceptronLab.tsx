@@ -515,7 +515,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
                 }`
               : pts.length
                 ? ready
-                  ? "ready — hit train"
+                  ? "ready: hit train"
                   : "needs points in both colours"
                 : "place a few points of each colour"}
         </div>
@@ -534,8 +534,8 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
         {w && !training && acc < 1 && (
           <div className="lx-cnote">
             {epochs >= EPOCHS
-              ? "a straight line can't split these — that's the ceiling of a linear model."
-              : `didn't converge in ${epochs} pass${epochs === 1 ? "" : "es"} — give it more epochs to keep going.`}
+              ? "a straight line can't split these. that's the ceiling of a linear model."
+              : `didn't converge in ${epochs} pass${epochs === 1 ? "" : "es"}. give it more epochs to keep going.`}
           </div>
         )}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">

@@ -9,7 +9,7 @@ export default function Hero() {
       <div className="hero-grid grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-10 items-center">
         <div className="hero-text min-w-0">
           <div className="mono faint anim-rise d-hello hero-kicker text-xs tracking-[3px] uppercase">
-            {"// hello.tsx — apr 29, 2026"}
+            {"// hello.tsx"}
           </div>
           {/* The only fluid type on the site. opsz rides font-size, so the top
               of the clamp gets the display cut for free. */}
@@ -25,10 +25,10 @@ export default function Hero() {
             <span className="faint">×</span> linux daily-driver
           </div>
           <div className="anim-rise d-body hero-lede mt-[22px] max-w-[520px] text-[18px]">
-            I build <span className="marker-highlight purple d-marker1">AI</span>,{" "}
+            I build <span className="marker-highlight purple d-marker1">AI tools</span>,{" "}
             <span className="marker-highlight d-marker2">custom PCs</span>, and{" "}
-            <span className="marker-highlight teal d-marker3">scalable backends</span> — always for the
-            person, not just the specs.
+            <span className="marker-highlight teal d-marker3">scalable backends</span> around the people
+            who use them.
           </div>
           <div className="hero-chips mt-[26px] flex gap-2.5 flex-wrap">
             <ScrollLink href="#sec-contact" className="no-underline anim-stamp d-chip1">
@@ -47,7 +47,7 @@ export default function Hero() {
             </a>
           </div>
           <div className="mono faint anim-rise d-meta hero-status mt-7 text-xs">
-            <span className="text-teal">●</span> open to interesting work · Boston, MA
+            open to interesting work · Cleveland, OH
           </div>
         </div>
         {/* The wrapper shrink-wraps the portrait so the annotations anchor to the

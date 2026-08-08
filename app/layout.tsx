@@ -41,11 +41,11 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   title: {
-    default: "Anoopchandra Parampalli — Full-stack dev × AI engineer",
+    default: "Anoopchandra Parampalli | Full-stack dev × AI engineer",
     template: "%s | Anoopchandra Parampalli",
   },
   description:
-    "Portfolio of Anoopchandra Parampalli — full-stack engineer at Panacea Financial, AI/ML projects from Northeastern, and Linux daily-driver. React, NestJS, PyTorch, FastAPI.",
+    "Portfolio of Anoopchandra Parampalli, a full-stack engineer at Panacea Financial with AI/ML projects from Northeastern and a Linux daily driver. React, NestJS, PyTorch, FastAPI.",
   keywords: [
     "AI Engineer",
     "ML Engineer",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://anoopchandra.dev",
-    title: "Anoopchandra Parampalli — Full-stack dev × AI engineer",
+    title: "Anoopchandra Parampalli | Full-stack dev × AI engineer",
     description:
       "Portfolio showcasing AI/ML projects, full-stack work, and a notebook-aesthetic portfolio site.",
     siteName: "Anoopchandra Parampalli Portfolio",

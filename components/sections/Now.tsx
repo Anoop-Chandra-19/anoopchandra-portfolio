@@ -3,29 +3,21 @@ import SectionHeader from "@/components/ui/SectionHeader";
 
 const CARDS = [
   {
-    tag: "// building",
-    h: "this week",
-    items: [
-      "Loan-forms feature at Panacea Financial",
-      "RN internal-build polish pass",
-      "This portfolio rewrite",
-    ],
+    tag: "// making",
+    h: "after work",
+    items: ["Pushing Mosaic toward its first useful release"],
     rot: -1.5,
   },
   {
-    tag: "// reading",
-    h: "on the desk",
-    items: [
-      "Designing Data-Intensive Apps",
-      "Llama-3 architecture posts",
-      "FastHTML docs",
-    ],
+    tag: "// learning",
+    h: "working through",
+    items: ["Rust, with The Rust Programming Language nearby"],
     rot: 1.2,
   },
   {
-    tag: "// listening",
-    h: "headphones",
-    items: ["Lo-fi for debugging", "Dwarkesh podcast", "occasional Tame Impala"],
+    tag: "// reading",
+    h: "on the nightstand",
+    items: ["The Way of Kings by Brandon Sanderson"],
     rot: -0.5,
   },
 ];
@@ -33,7 +25,7 @@ const CARDS = [
 export default function Now() {
   return (
     <section id="sec-now" className="section">
-      <SectionHeader num="01" title="Now" meta="week of apr 29, 2026" />
+      <SectionHeader num="01" title="Now" meta="what has my attention lately" />
       <div
         className="now-well p-10 rounded-lg"
         style={{ background: "color-mix(in oklab, var(--color-coral) 8%, var(--color-paper-2))" }}
@@ -58,7 +50,7 @@ export default function Now() {
           ))}
         </div>
         <div className="mono faint mt-[18px] text-[11px] text-right">
-          ↻ updates every couple of weeks
+          ↻ a snapshot, updated by hand
         </div>
       </div>
     </section>

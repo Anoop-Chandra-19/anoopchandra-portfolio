@@ -20,9 +20,9 @@ export const LAB_EXPS: LabExp[] = [
     accent: "electric",
     tag: "CNN · QuickDraw",
     blurb:
-      "Sketch a shape — the recognizer scores it against what it knows and shows its top guesses.",
+      "Sketch a shape. The recognizer scores it against what it knows and shows its top guesses.",
     foot:
-      "This is the real trained model — a convolutional neural net that learned from millions of Google QuickDraw sketches, downloaded once and run entirely in your browser with TensorFlow.js. It only knows its 50 classes (The Eiffel Tower through bulldozer), so anything else gets mapped to the nearest thing it has seen.",
+      "This is the real trained model: a convolutional neural net that learned from millions of Google QuickDraw sketches, downloaded once and run entirely in your browser with TensorFlow.js. It only knows its 50 classes (The Eiffel Tower through bulldozer), so anything else gets mapped to the nearest thing it has seen.",
   },
   {
     slug: "sentiment",
@@ -31,9 +31,9 @@ export const LAB_EXPS: LabExp[] = [
     accent: "teal",
     tag: "LSTM · IMDB",
     blurb:
-      "Type a sentence — the model reads the mood, word by word, and swings the needle.",
+      "Type a sentence. The model reads the mood, word by word, and swings the needle.",
     foot:
-      "A real LSTM trained on IMDB movie reviews, running locally in TensorFlow.js — the needle and verdict come from the network. The word highlights are a simple lexicon overlay, because an LSTM won't tell you which words moved it. Expect a movie-review accent to its taste.",
+      "A real LSTM trained on IMDB movie reviews runs locally in TensorFlow.js. The needle and verdict come from the network. The word highlights are a simple lexicon overlay, because an LSTM won't tell you which words moved it. Expect a movie-review accent to its taste.",
   },
   {
     slug: "kmeans",
@@ -42,9 +42,9 @@ export const LAB_EXPS: LabExp[] = [
     accent: "coral",
     tag: "clustering · perceptron",
     blurb:
-      "Two toy learners on one grid — group unlabelled points with K-Means, or label them and watch a perceptron find the dividing line.",
+      "Two toy learners share one grid. Group unlabelled points with K-Means, or label them and watch a perceptron find the dividing line.",
     foot:
-      "Both algorithms are the real thing, running live in the page. K-Means: assign each point to the nearest centroid, move each centroid to the mean of its members, repeat until nothing moves. Classifier: a single-layer perceptron nudges its weights point by point (lr 0.13) until the line separates the two colours — or proves it can't.",
+      "Both algorithms are the real thing, running live in the page. K-Means: assign each point to the nearest centroid, move each centroid to the mean of its members, repeat until nothing moves. Classifier: a single-layer perceptron nudges its weights point by point (lr 0.13) until the line separates the two colours or reaches its limit.",
   },
 ];
 

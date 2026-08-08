@@ -29,12 +29,12 @@ export default function Postmark() {
       </defs>
       <text fill="var(--color-electric)" fontFamily="JetBrains Mono, monospace" fontSize="9" letterSpacing="2">
         <textPath href="#pm-top" startOffset="50%" textAnchor="middle">
-          BOSTON · MA
+          CLEVELAND · OH
         </textPath>
       </text>
       <text fill="var(--color-electric)" fontFamily="JetBrains Mono, monospace" fontSize="9" letterSpacing="2">
         <textPath href="#pm-bot" startOffset="50%" textAnchor="middle">
-          02115 · USA
+          VIA THE WEB
         </textPath>
       </text>
       <text x="65" y="62" textAnchor="middle" fill="var(--color-electric)" fontFamily="JetBrains Mono, monospace" fontSize="11" fontWeight="500">

@@ -120,7 +120,7 @@ export default function JournalIndex({
   const pages = entries.map((e) => e.page);
   const first = book?.first ?? Math.min(...pages);
   const last = book?.last ?? Math.max(...pages);
-  const ppRange = `pp. ${pad(first)} — ${pad(last)}`;
+  const ppRange = `pp. ${pad(first)}–${pad(last)}`;
 
   return (
     <main
@@ -155,8 +155,8 @@ export default function JournalIndex({
           The <span className="text-coral">Journal</span>
         </h1>
         <p className="text-[19px] leading-[1.5] italic font-normal mt-2.5 mb-0 max-w-[720px] text-ink-soft">
-          Case studies from shipped work, plus notes-in-progress — bug stories, hot takes, things
-          I figured out the hard way.
+          A working notebook for bug stories, personal projects, opinions, and things I figured
+          out the hard way.
         </p>
         <div
           className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-[10px] tracking-[2px] uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
@@ -165,7 +165,7 @@ export default function JournalIndex({
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
           }}
         >
-          est. 2025 · updated weekly
+          est. 2025 · written by hand
         </div>
       </div>
 
@@ -333,7 +333,7 @@ export default function JournalIndex({
                 type="button"
                 className={`journal-edge-tab ${tag === e.tag ? "is-on" : ""}`}
                 style={tabAccent(e.kind)}
-                title={tag === e.tag ? `showing ${e.tag} — click to clear` : `filter to ${e.tag}`}
+                title={tag === e.tag ? `showing ${e.tag}; click to clear` : `filter to ${e.tag}`}
                 onClick={() => setTag(tag === e.tag ? null : e.tag)}
               >
                 {e.tag}

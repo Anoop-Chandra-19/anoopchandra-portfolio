@@ -1,6 +1,6 @@
 import { SectionHeaderStamp } from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
-import Postmark from "@/components/sections/Postmark";
+import Postmark from "./Postmark";
 
 export default function Contact() {
   return (
@@ -142,7 +142,7 @@ export default function Contact() {
               <div className="mono text-[11px] leading-[1.7] text-ink-soft">
                 Anoopchandra Parampalli
                 <br />
-                Boston, MA
+                Cleveland, OH
                 <br />
                 Source Serif 4 / JetBrains Mono / Caveat · Next.js + Vercel
               </div>

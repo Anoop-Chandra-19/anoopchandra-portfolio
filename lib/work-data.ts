@@ -65,7 +65,7 @@ export type Minor = { t: string; y: string; d: string };
 export const ROLE: Role = {
   org: "Panacea Financial",
   role: "Full-stack engineer",
-  period: "Sept 2025 — now",
+  period: "Sep 2025 to present",
   blurb:
     "Fintech platform for healthcare professionals. Full-stack delivery across React and React Native clients, a NestJS / PostgreSQL API, a Python Azure Functions service fronting Azure AI Foundry, and Helm / Kubernetes release pipelines.",
 };
@@ -77,16 +77,16 @@ export const WORK: System[] = [
     kind: "AI / ML · full-stack",
     status: "internal user testing",
     k: "coral",
-    d: "Streaming LLM assistant embedded in the platform — Python Azure Functions gateway over Azure AI Foundry, NestJS orchestration, topic classification, React chat UI. I initially worked on it as part of a four-engineer team and now maintain it across the stack.",
+    d: "Streaming LLM assistant embedded in the platform, spanning a Python Azure Functions gateway over Azure AI Foundry, NestJS orchestration, topic classification, and a React chat UI. I initially worked on it as part of a four-engineer team and now maintain it across the stack.",
     bullets: [
-      "Replaced Foundry's sequential managed agent with a custom multi-turn orchestrator that fans tool calls out in parallel — RAG, web search, and Snowflake MCP over credit-memo, internal, and partner data. Roughly halved time-to-first-token.",
+      "Built a custom multi-turn orchestrator to replace Foundry's sequential managed agent. It fans tool calls out in parallel across RAG, web search, and Snowflake MCP over credit-memo, internal, and partner data, roughly halving time to first token.",
       "Built an evaluation harness over hand-labeled conversations to pick a classification strategy for a 50-topic taxonomy, then shipped it as an idempotent NestJS service.",
-      "Root-caused streaming failures spanning frontend, API proxy, and gateway, and instrumented the pipeline with OpenTelemetry into Azure Application Insights for per-tool distributed tracing.",
+      "Investigated streaming failures across the frontend, API proxy, and gateway, then added OpenTelemetry instrumentation in Azure Application Insights for per-tool distributed tracing.",
     ],
     shortBullets: [
-      "Replaced Foundry's sequential managed agent with a custom multi-turn orchestrator that fans tool calls out in parallel — RAG, web search, and Snowflake MCP. Roughly halved time-to-first-token.",
+      "Built a custom multi-turn orchestrator to replace Foundry's sequential managed agent. It fans RAG, web search, and Snowflake MCP tool calls out in parallel, roughly halving time to first token.",
       "Built an evaluation harness over hand-labeled conversations to pick a classification strategy for a 50-topic taxonomy, then shipped it as an idempotent NestJS service.",
-      "Root-caused streaming failures across frontend, API proxy, and gateway, and instrumented the pipeline with OpenTelemetry into Application Insights.",
+      "Investigated streaming failures across the frontend, API proxy, and gateway, then added OpenTelemetry instrumentation in Application Insights.",
     ],
     impact:
       "Puts the bank's credit-memo, internal, and partner data behind a question instead of a report request; the taxonomy turns those conversations into demand data.",
@@ -97,27 +97,27 @@ export const WORK: System[] = [
   },
   {
     n: "02",
-    t: "Practice Loans — application digitization",
+    t: "Practice Loans: application digitization",
     kind: "full-stack · web",
     status: "in production",
     k: "electric",
-    d: "Digitized manual PDF loan applications into guided, validated multi-step React web flows — practice acquisition, startup, expansion / relocation, buy-in, and refinance.",
+    d: "Digitized manual PDF loan applications into guided, validated React flows for practice acquisition, startup, expansion or relocation, buy-in, and refinance.",
     shortD:
-      "Digitized manual PDF loan applications into guided, validated multi-step React web flows — acquisition, startup, expansion, buy-in, and refinance.",
+      "Digitized manual PDF loan applications into guided, validated React flows for acquisition, startup, expansion, buy-in, and refinance.",
     bullets: [
-      "Architected the reference implementation — form structure, shared schemas, client / admin split, validation conventions — adopted by ~9 later loan forms.",
+      "Built the initial implementation and established the shared form structure, schemas, client and admin split, and validation patterns later used across about nine forms.",
       "Mentored a ~5-engineer offshore team for three months as the design-system and form-architecture point of contact.",
-      "Engineered dynamic-form handling for conditional rendering and multi-location property flows, with a NestJS / TypeORM layer that lets applicants save a partial application and resume it later.",
+      "Built support for conditional rendering and multi-location property flows, with a NestJS / TypeORM layer that lets applicants save a partial application and resume it later.",
     ],
     shortBullets: [
-      "Architected the reference implementation — form structure, shared schemas, client / admin split, validation conventions — adopted by ~9 later loan forms.",
+      "Built the initial implementation and established the shared form structure, schemas, client and admin split, and validation patterns later used across about nine forms.",
       "Mentored a ~5-engineer offshore team for three months as the design-system and form-architecture point of contact.",
-      "Engineered dynamic-form handling for conditional rendering and multi-location flows, with a NestJS / TypeORM layer for save-and-resume.",
+      "Built support for conditional rendering and multi-location flows, with a NestJS / TypeORM layer for save and resume.",
     ],
     impact:
-      "Replaced paper-and-PDF intake with structured digital onboarding for the bank's highest-value borrowers, on patterns a larger team built the rest of the portfolio on.",
+      "These flows replaced paper and PDF intake with structured digital onboarding, using shared patterns that a larger team extended across the loan portfolio.",
     shortImpact:
-      "Replaced paper-and-PDF intake with structured digital onboarding for the bank's highest-value borrowers.",
+      "These flows replaced paper and PDF intake with structured digital onboarding for healthcare practice borrowers.",
     tags: ["React 19", "React Hook Form", "Redux Toolkit", "TypeScript", "NestJS / TypeORM", "PostgreSQL"],
   },
   {
@@ -126,59 +126,59 @@ export const WORK: System[] = [
     kind: "React Native",
     status: "internal user testing",
     k: "teal",
-    d: "React Native 0.83 iOS + Android client. Learned the stack on the job and shipped major features within weeks of joining.",
+    d: "React Native 0.83 client for iOS and Android. I learned the stack on the job and began contributing substantial features within weeks of joining.",
     bullets: [
       "Rebuilt home and login responsive across aspect ratios, font scales, and tablet; shipped a tools catalog, an in-app WebView browser, and a custom video player.",
-      "Built the mobile auth and account-security layer: onboarding gate, biometric login, email 2FA, phone OTP, password lifecycle, and lockout handling.",
-      "Designed the server-authoritative auth-level enforcement architecture across the NestJS API and both clients — guard, error contract, and an interceptor routing under-leveled users into step-up onboarding.",
+      "Worked across mobile authentication and account security, including the onboarding gate, biometric login, email 2FA, phone OTP, password lifecycle, and lockout handling.",
+      "Designed server-authoritative auth-level enforcement across the NestJS API and both clients, including the guard, error contract, and interceptor that routes under-leveled users into step-up onboarding.",
     ],
     shortBullets: [
       "Rebuilt home and login responsive across aspect ratios, font scales, and tablet; shipped a tools catalog, an in-app WebView browser, and a custom video player.",
-      "Built the mobile auth and account-security layer: onboarding gate, biometric login, email 2FA, phone OTP, password lifecycle, lockout handling.",
-      "Designed the server-authoritative auth-level enforcement architecture across the API and both clients.",
+      "Worked across mobile authentication and account security, including the onboarding gate, biometric login, email 2FA, phone OTP, password lifecycle, and lockout handling.",
+      "Designed server-authoritative auth-level enforcement across the API and both clients.",
     ],
     impact:
-      "Members recover their own logins instead of calling the bank, and the enforcement design is the access boundary banking resumes behind.",
+      "Members can recover their logins without calling the bank, while server-side enforcement keeps access rules consistent across web and mobile.",
     tags: ["React Native", "NativeWind", "Reanimated", "Redux", "biometrics / 2FA"],
   },
 ];
 
 export const ALSO: Also[] = [
   {
-    d: "Release engineering — owned recurring Helm / Kubernetes deployments across QA, staging, and production via Azure DevOps pipelines, including database migrations and hotfix cuts.",
+    d: "Release engineering: handled recurring Helm / Kubernetes deployments across QA, staging, and production through Azure DevOps pipelines, including database migrations and hotfix cuts.",
     shortD:
-      "Release engineering — owned recurring Helm / Kubernetes deployments across QA, staging, and production via Azure DevOps pipelines.",
+      "Release engineering: handled recurring Helm / Kubernetes deployments across QA, staging, and production through Azure DevOps pipelines.",
   },
   {
-    d: "Design system — published reusable components to a shared Tailwind library consumed by web, backoffice, and mobile; owned semantic versioning across downstream apps.",
+    d: "Design system: published reusable components to a shared Tailwind library consumed by web, backoffice, and mobile, and maintained semantic versioning across downstream apps.",
     shortD:
-      "Design system — published reusable components to a shared Tailwind library consumed by web, backoffice, and mobile.",
+      "Design system: published reusable components to a shared Tailwind library consumed by web, backoffice, and mobile.",
   },
   {
-    d: "Deep linking & access management — built a tenant-aware deep-link and invitation system, then authored the campaign-URL reference that let product and marketing launch campaigns without engineering involvement.",
+    d: "Deep linking and access management: built a tenant-aware deep-link and invitation system, then wrote the campaign URL reference that lets product and marketing launch campaigns without engineering involvement.",
     shortD:
-      "Deep linking & access management — built a tenant-aware deep-link and invitation system, plus the campaign-URL reference product and marketing run on.",
+      "Deep linking and access management: built a tenant-aware deep-link and invitation system and the campaign URL reference used by product and marketing.",
   },
   {
-    d: "Contract Review — extended backoffice search across clients, reps, and promo codes, with sortable tables and deep-linkable form fields across a React portal and an embeddable JS plugin.",
+    d: "Contract Review: extended backoffice search across clients, reps, and promo codes, with sortable tables and deep-linkable form fields across a React portal and an embeddable JS plugin.",
     shortD:
-      "Contract Review — extended backoffice search across clients, reps, and promo codes with sortable tables and deep-linkable fields.",
+      "Contract Review: extended backoffice search across clients, reps, and promo codes with sortable tables and deep-linkable fields.",
   },
 ];
 
 export const PROJECTS: Project[] = [
   {
-    t: "fand — Linux fan control daemon",
-    org: "self · 2026 — now",
+    t: "fand: Linux fan control daemon",
+    org: "self · 2026 to present",
     cat: "systems · Rust",
     k: "teal",
     img: "/projects/fand.png",
     imgW: 1696,
     imgH: 1250,
     imgAlt:
-      "fand's desktop GUI — a live temperature graph for a Ryzen 7 7800X3D and an RTX 4090, with two PWM headers and their curve cards below it.",
+      "fand's desktop GUI, showing a live temperature graph for a Ryzen 7 7800X3D and an RTX 4090, with two PWM headers and their curve cards below it.",
     imgFit: "contain",
-    d: "Fan control daemon, CLI, and GUI for Linux, written to learn Rust on something with real consequences — one privileged daemon owning sysfs and NVML, driving an AIO pump on a shared header with no tachometer, with a failsafe that hands control back to firmware on every exit path.",
+    d: "Fan control daemon, CLI, and GUI for Linux, written to learn Rust through a problem with real consequences. One privileged daemon owns sysfs and NVML, drives an AIO pump on a shared header with no tachometer, and hands control back to firmware on every exit path.",
     bullets: [
       "Rust workspace splitting a pure curve-evaluation core (mix mode, hysteresis, ramp, unit-tested) from the privileged daemon.",
       "hwmon + NVML sensor reads, a systemd unit, and a Unix-socket protocol serving status and subscriptions to a fanctl CLI.",
@@ -193,7 +193,7 @@ export const PROJECTS: Project[] = [
     cta: "github →",
   },
   {
-    t: "Mosaic — local-first resume builder",
+    t: "Mosaic: local-first resume builder",
     org: "self · in progress",
     cat: "frontend · local-first",
     k: "electric",

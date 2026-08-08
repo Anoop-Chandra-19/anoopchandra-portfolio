@@ -148,7 +148,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             <circle cx="100" cy="104" r="7" fill="var(--color-paper)" stroke="var(--color-ink)" strokeWidth="2" />
           </svg>
           <div className="lx-verdict" style={{ color: res ? color : "var(--color-ink-faint)" }}>
-            {res ? verdictLabel(s) : "—"}
+            {res ? verdictLabel(s) : "…"}
             <span className="mono lx-verdict-pct">{res ? ` ${Math.round(Math.abs(s) * 100)}%` : ""}</span>
           </div>
         </div>
@@ -159,12 +159,8 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             void run();
           }}
         >
-          <label
-            htmlFor="sentiment-text"
-            className="mono"
-            style={{ color: `var(--color-${accent})`, fontSize: 20 }}
-          >
-            $ review
+          <label htmlFor="sentiment-text" className="sr-only">
+            Text to analyze
           </label>
           <input
             id="sentiment-text"
@@ -215,7 +211,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
         )}
         {res && !res.matched && (
           <div className="mono faint lx-hint2">
-            none of these words are in the highlight lexicon — the needle still read the whole sentence
+            none of these words are in the highlight lexicon. the needle still read the whole sentence
           </div>
         )}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
@@ -227,7 +223,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
       <div className="lx-panel lx-out">
         <div className="mono faint lx-cap">$ history</div>
         {error?.kind === "load" ? (
-          <div className="mono lx-cnote">model unavailable — use retry above</div>
+          <div className="mono lx-cnote">model unavailable. use retry above</div>
         ) : log.length === 0 ? (
           <BenchBoot
             id="sentiment"

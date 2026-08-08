@@ -49,7 +49,7 @@ export default function BenchBoot({
       { key: "cmd", cls: "faint", text: `$ ./wake ${num} --model ${modelFlag}` },
     ];
     if (p.phase === "error") {
-      out.push({ key: "err", cls: "err", text: "✗ model failed to load — reload to retry" });
+      out.push({ key: "err", cls: "err", text: "✗ model failed to load. reload to retry" });
       return out;
     }
     out.push({
@@ -77,7 +77,7 @@ export default function BenchBoot({
       });
     }
     if (p.phase === "ready") {
-      out.push({ key: "ready", cls: "ready", text: `ready — ${readyHint}` });
+      out.push({ key: "ready", cls: "ready", text: `ready: ${readyHint}` });
     }
     return out;
   }, [id, num, modelFlag, sizeMB, readyHint, p, rank]);

@@ -5,14 +5,14 @@ import JournalIndex from "@/components/journal/JournalIndex";
 export const metadata: Metadata = {
   title: "The Journal",
   description:
-    "A working notebook — case studies from shipped work, plus notes-in-progress: bug stories, hot takes, things I figured out the hard way.",
+    "A working notebook for bug stories, personal projects, opinions, and things I figured out the hard way.",
   alternates: { canonical: "/journal" },
   openGraph: {
     type: "website",
     url: "https://anoopchandra.dev/journal",
-    title: "The Journal — Anoopchandra Parampalli",
+    title: "The Journal | Anoopchandra Parampalli",
     description:
-      "Case studies from shipped work, plus notes-in-progress — bug stories, hot takes, hard-won lessons.",
+      "Bug stories, personal projects, opinions, and things I figured out the hard way.",
   },
 };
 

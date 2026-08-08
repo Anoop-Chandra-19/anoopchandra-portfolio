@@ -137,7 +137,7 @@ function AlsoList() {
     <ul className="also-list list-none p-0 m-0 grid gap-3">
       {ALSO.map((a) => (
         <li key={a.d} className="grid gap-3 items-start">
-          <span className="mono text-[13px] leading-[1.6] text-ink-faint">—</span>
+          <span className="mono text-[13px] leading-[1.6] text-ink-faint">•</span>
           <span className="text-[15px] leading-[1.6]">
             <Copy long={a.d} short={a.shortD} />
           </span>
@@ -230,17 +230,17 @@ export default function Work() {
       <SectionHeaderArrow
         num="02"
         title="Work"
-        meta={`${WORK.length + PROJECTS.length + MINOR.length} entries · 2025 — now`}
+        meta={`${WORK.length + PROJECTS.length + MINOR.length} entries · 2025 to present`}
       />
       <p className="faint max-w-[740px] mb-7 text-[16px]">
-        <span className="marker-highlight">Panacea Financial</span> — the systems I built there,
-        plus what I build on my own time.
+        <span className="marker-highlight">Panacea Financial</span>: selected work from my current
+        role, alongside projects I build on my own time.
       </p>
 
       <RoleBlock />
 
       <div className="mb-5">
-        <GroupRule label="what I built there" count={`${WORK.length} systems`} />
+        <GroupRule label="selected work" count={`${WORK.length} systems`} />
       </div>
       <div className="col gap-[18px]">
         {WORK.map((p) => (
@@ -249,7 +249,7 @@ export default function Work() {
       </div>
 
       <div className="mt-9 mb-5">
-        <GroupRule label="also shipped" count={`${ALSO.length} things`} />
+        <GroupRule label="across the platform" count={`${ALSO.length} areas`} />
       </div>
       <AlsoList />
 

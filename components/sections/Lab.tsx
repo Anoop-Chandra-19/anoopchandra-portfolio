@@ -27,8 +27,8 @@ export default function Lab() {
     <section id="sec-lab" className="section">
       <SectionHeader num="03" title="The Lab" meta="3 live experiments · all in-browser" />
       <p className="faint max-w-[720px] mb-7">
-        Real ML running entirely in your browser with TensorFlow.js — no server, no cold starts.
-        Everything below is live: open an experiment and try it.
+        Real ML runs entirely in your browser with TensorFlow.js. There is no server and no cold
+        start. Everything below is live, so open an experiment and try it.
       </p>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5">
         {LAB_EXPS.map((e, i) => {

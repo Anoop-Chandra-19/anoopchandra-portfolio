@@ -20,7 +20,7 @@ export async function generateMetadata({
   const exp = getLabExp(slug);
   if (!exp) return {};
   return {
-    title: `${exp.title} — The Lab`,
+    title: `${exp.title} | The Lab`,
     description: exp.blurb,
     alternates: { canonical: `/lab/${exp.slug}` },
   };

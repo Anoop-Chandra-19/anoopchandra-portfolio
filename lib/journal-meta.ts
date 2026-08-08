@@ -31,7 +31,7 @@ export type JournalEntryMeta = {
   related: string[];
 };
 
-const HOME_JOURNAL_ENTRY_LIMIT = 4;
+const HOME_JOURNAL_ENTRY_LIMIT = 5;
 
 /** The newest entries shown in the compact home-page index. The loader already
  * sorts metadata newest-first, so preserve the supplied order. */

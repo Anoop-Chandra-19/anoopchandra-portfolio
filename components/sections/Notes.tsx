@@ -12,7 +12,8 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
     <section id="sec-notes" className="section">
       <SectionHeader num="05" title="Notes & Stories" meta={`${entries.length} entries · index`} />
       <p className="faint max-w-[720px] mb-6">
-        Working journal — bug stories, hot takes, things I figured out the hard way.
+        A working journal for bug stories, personal projects, opinions, and things I figured out
+        the hard way.
       </p>
 
       <div className="relative">
@@ -26,7 +27,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
             className="mono faint notes-index-label absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
             style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
           >
-            ✎ index — pp. {pad(Math.min(...pages))} — {pad(Math.max(...pages))}
+            ✎ index — pp. {pad(Math.min(...pages))}–{pad(Math.max(...pages))}
           </div>
 
           <div
