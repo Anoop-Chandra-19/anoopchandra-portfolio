@@ -6,9 +6,10 @@
   --color-paper-2: #f5f0e1;
   --color-ink: #1a1a1a;
   --color-ink-soft: #4a4a4a;
-  /* #737373 is the lightest grey that still clears 4.5:1 on paper; the 10-11px
-     labels this drives were at 3.31:1. Also tints the dashed/dotted hairlines. */
-  --color-ink-faint: #737373;
+  /* Lightest grey clearing 4.5:1 on every surface it lands on, not just paper:
+     paper-2 and the coral-tinted Now well need #6b6b6b where paper needs
+     #737373. Was #8a8a8a (3.31:1). Also tints the dashed/dotted hairlines. */
+  --color-ink-faint: #6b6b6b;
   --color-rule: #2a2a2a;
 
   --color-electric: #cc00e6;
