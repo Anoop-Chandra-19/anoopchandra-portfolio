@@ -203,7 +203,15 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
         />
         <TagRow tags={p.tags} short={p.shortTags} />
         <div className="mt-[18px]">
-          <Chip kind={p.k}>{p.cta}</Chip>
+          <a
+            href={p.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View ${p.t} on GitHub`}
+            className="inline-flex no-underline"
+          >
+            <Chip kind={p.k}>{p.cta}</Chip>
+          </a>
         </div>
       </div>
       {flip && <ProjectMedia p={p} />}

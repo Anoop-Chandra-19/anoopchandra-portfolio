@@ -56,6 +56,7 @@ export type Project = {
   tags: string[];
   shortTags?: string[];
   cta: string;
+  href: string;
 };
 
 export type Also = { d: string; shortD?: string };
@@ -191,6 +192,7 @@ export const PROJECTS: Project[] = [
     ],
     tags: ["Rust", "systemd", "hwmon / sysfs", "NVML", "Unix sockets", "Tauri"],
     cta: "github →",
+    href: "https://github.com/Anoop-Chandra-19/fand",
   },
   {
     t: "Mosaic: local-first resume builder",
@@ -218,6 +220,7 @@ export const PROJECTS: Project[] = [
     tags: ["React 19", "TypeScript", "Tailwind v4", "Zustand", "Dexie / IndexedDB", "react-pdf"],
     shortTags: ["React 19", "TypeScript", "Tailwind v4", "Zustand", "Dexie", "react-pdf"],
     cta: "github →",
+    href: "https://github.com/Anoop-Chandra-19/mosaic",
   },
 ];
 
