@@ -1,5 +1,6 @@
 import { SectionHeaderStamp } from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
+import Postmark from "@/components/sections/Postmark";
 
 export default function Contact() {
   return (
@@ -99,39 +100,7 @@ export default function Contact() {
 
           <div className="contact-colophon postcard-address pt-[30px] px-9 pb-9 relative z-[2] flex flex-col">
             <div className="contact-stamps flex justify-between items-start mb-7 gap-5">
-              <svg
-                viewBox="0 0 130 130"
-                width="110"
-                height="110"
-                className="contact-postmark shrink-0 opacity-[0.78]"
-                style={{ transform: "rotate(-9deg)" }}
-              >
-                <circle cx="65" cy="65" r="58" fill="none" stroke="var(--color-electric)" strokeWidth="1.6" />
-                <circle cx="65" cy="65" r="48" fill="none" stroke="var(--color-electric)" strokeWidth="1.2" />
-                <defs>
-                  <path id="pm-top" d="M 17 65 A 48 48 0 0 1 113 65" />
-                  <path id="pm-bot" d="M 17 65 A 48 48 0 0 0 113 65" />
-                </defs>
-                <text fill="var(--color-electric)" fontFamily="JetBrains Mono, monospace" fontSize="9" letterSpacing="2">
-                  <textPath href="#pm-top" startOffset="50%" textAnchor="middle">
-                    BOSTON · MA
-                  </textPath>
-                </text>
-                <text fill="var(--color-electric)" fontFamily="JetBrains Mono, monospace" fontSize="9" letterSpacing="2">
-                  <textPath href="#pm-bot" startOffset="50%" textAnchor="middle">
-                    02115 · USA
-                  </textPath>
-                </text>
-                <text x="65" y="62" textAnchor="middle" fill="var(--color-electric)" fontFamily="JetBrains Mono, monospace" fontSize="11" fontWeight="500">
-                  APR 29
-                </text>
-                <text x="65" y="76" textAnchor="middle" fill="var(--color-electric)" fontFamily="JetBrains Mono, monospace" fontSize="11" fontWeight="500">
-                  2026
-                </text>
-                <line x1="113" y1="58" x2="170" y2="58" stroke="var(--color-electric)" strokeWidth="1.2" />
-                <line x1="113" y1="65" x2="170" y2="65" stroke="var(--color-electric)" strokeWidth="1.2" />
-                <line x1="113" y1="72" x2="170" y2="72" stroke="var(--color-electric)" strokeWidth="1.2" />
-              </svg>
+              <Postmark />
 
               <div
                 className="contact-stamp w-[92px] h-[110px] border-[1.5px] border-ink rounded-sm relative shrink-0 p-1.5 flex flex-col items-center justify-center text-center"

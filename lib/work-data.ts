@@ -77,7 +77,7 @@ export const WORK: System[] = [
     kind: "AI / ML · full-stack",
     status: "internal user testing",
     k: "coral",
-    d: "Streaming LLM assistant embedded in the platform — Python Azure Functions gateway over Azure AI Foundry, NestJS orchestration, topic classification, React chat UI. Started on a five-engineer team; the only engineer on it since.",
+    d: "Streaming LLM assistant embedded in the platform — Python Azure Functions gateway over Azure AI Foundry, NestJS orchestration, topic classification, React chat UI. I initially worked on it as part of a four-engineer team and now maintain it across the stack.",
     bullets: [
       "Replaced Foundry's sequential managed agent with a custom multi-turn orchestrator that fans tool calls out in parallel — RAG, web search, and Snowflake MCP over credit-memo, internal, and partner data. Roughly halved time-to-first-token.",
       "Built an evaluation harness over hand-labeled conversations to pick a classification strategy for a 50-topic taxonomy, then shipped it as an idempotent NestJS service.",
