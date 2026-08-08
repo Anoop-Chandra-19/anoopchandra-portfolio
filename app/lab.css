@@ -20,6 +20,8 @@ body:has([data-lab-root]) {
   margin-bottom: 26px;
 }
 .lx-back {
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-mono);
   font-size: 13px;
   letter-spacing: 0.5px;
@@ -29,6 +31,7 @@ body:has([data-lab-root]) {
   padding: 7px 14px;
   cursor: pointer;
   color: var(--color-ink);
+  text-decoration: none;
   transition: transform 0.12s;
 }
 .lx-back:hover {

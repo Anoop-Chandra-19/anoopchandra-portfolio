@@ -46,9 +46,17 @@ export default function LabShell({ exp }: { exp: LabExp }) {
       style={{ "--lxa": `var(--color-${exp.accent})` } as React.CSSProperties}
     >
       <div className="lx-page-head">
-        <button type="button" className="lx-back" onClick={() => navigate("/", { effect: "peel" })}>
-          ← home
-        </button>
+        <Link
+          href="/"
+          className="lx-back"
+          onClick={(event) => {
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            navigate("/", { effect: "peel" });
+          }}
+        >
+          ← back to portfolio
+        </Link>
         <nav className="lx-tabs" aria-label="Experiments">
           {LAB_EXPS.map((x) =>
             x.slug === exp.slug ? (

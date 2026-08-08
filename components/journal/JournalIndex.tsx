@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { pad, tabAccent, type JournalEntryMeta } from "@/lib/journal-meta";
-import { useInkTransition } from "@/components/transition/InkTransitionProvider";
+import JournalBackLink from "@/components/journal/JournalBackLink";
 
 type Filter = "all" | "case" | "note";
 type SortKey = "title" | "read" | "date";
@@ -77,7 +77,6 @@ export default function JournalIndex({
   const [tag, setTag] = useState<string | null>(null);
   const [year, setYear] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
-  const { navigate } = useInkTransition();
 
   const counts = useMemo(
     () => ({
@@ -132,16 +131,9 @@ export default function JournalIndex({
         className="flex items-center justify-between flex-wrap gap-3 mb-7 pb-3.5"
         style={{ borderBottom: "1.5px dashed var(--color-ink-faint)" }}
       >
-        <Link
-          href="/"
-          className="mono inline-flex items-center gap-1.5 text-xs tracking-[1px] py-[5px] px-3 border-[1.5px] border-ink rounded-full bg-paper no-underline text-ink"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate("/", { effect: "peel" });
-          }}
-        >
+        <JournalBackLink href="/" peel>
           ← back to portfolio
-        </Link>
+        </JournalBackLink>
         <div className="mono faint text-[11px] tracking-[2px] uppercase">
           anoop parampalli · journal · vol. 02
         </div>

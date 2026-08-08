@@ -9,6 +9,7 @@ import { mdxComponents } from "@/components/journal/mdx-components";
 import FootnoteSheet from "@/components/journal/FootnoteSheet";
 import ReadingProgress from "@/components/journal/ReadingProgress";
 import SectionRail from "@/components/journal/SectionRail";
+import JournalBackLink from "@/components/journal/JournalBackLink";
 import ZoomableImage from "@/components/ui/ZoomableImage";
 import { imageDims } from "@/lib/image-dims";
 
@@ -36,7 +37,7 @@ export default function ArticleEntry({
       <FootnoteSheet />
       <div className="je-inner">
         <nav className="je-top">
-          <Link className="je-back" href="/journal">← back to index</Link>
+          <JournalBackLink href="/journal">← back to journal</JournalBackLink>
           <span className="je-topmeta">the journal · vol. 02 · p.{pad(entry.page)}</span>
         </nav>
 
