@@ -43,10 +43,10 @@ function SortHead({
 }) {
   const on = sort.key === sortKey;
   return (
-    <span
-      aria-sort={on ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
-      className={align === "right" ? "text-right" : undefined}
-    >
+    /* No aria-sort: this header is a div grid, not a table, and the attribute is
+       only supported on columnheader/rowheader. The state rides on the button,
+       where the arrow glyph is aria-hidden and would otherwise say nothing. */
+    <span className={align === "right" ? "text-right" : undefined}>
       <button
         type="button"
         className={`journal-sort ${on ? "is-on" : ""}`}
@@ -56,6 +56,11 @@ function SortHead({
         <span aria-hidden="true" className="journal-sort-arrow">
           {on && sort.dir === "asc" ? "▲" : "▼"}
         </span>
+        {on && (
+          <span className="sr-only">
+            , sorted {sort.dir === "asc" ? "ascending" : "descending"}
+          </span>
+        )}
       </button>
     </span>
   );
