@@ -37,7 +37,9 @@ export default function Lab() {
               key={e.slug}
               href={`/lab/${e.slug}`}
               className="lab-card-btn"
-              aria-label={`Open experiment: ${e.title}`}
+              /* No aria-label: it replaced the card's whole subtree, hiding the
+                 number, status and description, and left the accessible name
+                 without the visible "open experiment" text. */
               onClick={(ev) => {
                 // keep native behavior for new-tab/window clicks
                 if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
@@ -72,7 +74,7 @@ export default function Lab() {
                   <span className="text-[17px] text-ink-soft">{ACTIONS[e.slug]}</span>
                 </div>
                 <div className="p-[18px]">
-                  <h4>{e.title}</h4>
+                  <h3 className="card-title">{e.title}</h3>
                   <p className="text-[16px] leading-[1.55] mt-1.5">{DESCRIPTIONS[e.slug]}</p>
                   <Chip>▸ open experiment</Chip>
                 </div>

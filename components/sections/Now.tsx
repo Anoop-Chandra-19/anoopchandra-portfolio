@@ -40,7 +40,7 @@ export default function Now() {
               style={{ "--rot": `${c.rot}deg` } as CSSProperties}
             >
               <div className="mono faint text-[11px] mb-1.5">{c.tag}</div>
-              <h4>{c.h}</h4>
+              <h3 className="card-title">{c.h}</h3>
               <ul className="pl-[18px] mt-2 text-[16px] leading-[1.6]">
                 {c.items.map((i) => (
                   <li key={i}>{i}</li>

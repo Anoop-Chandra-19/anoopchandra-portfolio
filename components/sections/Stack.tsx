@@ -151,7 +151,7 @@ export default function Stack() {
             className="sketch-box pr-[22px]"
             style={{ borderTop: "5px solid", borderTopColor: col.c }}
           >
-            <h4 style={{ color: col.c }}>{col.h}</h4>
+            <h3 className="card-title" style={{ color: col.c }}>{col.h}</h3>
             <div className="mono faint text-[11px] mt-0.5">{col.note}</div>
             <ul className="mono stack-list list-none p-0 mt-4 text-[13px] tracking-[-0.01em] leading-[1.4]">
               {col.items.map(([name, years, obsession]) => (

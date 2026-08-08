@@ -6,7 +6,9 @@
   --color-paper-2: #f5f0e1;
   --color-ink: #1a1a1a;
   --color-ink-soft: #4a4a4a;
-  --color-ink-faint: #8a8a8a;
+  /* #737373 is the lightest grey that still clears 4.5:1 on paper; the 10-11px
+     labels this drives were at 3.31:1. Also tints the dashed/dotted hairlines. */
+  --color-ink-faint: #737373;
   --color-rule: #2a2a2a;
 
   --color-electric: #cc00e6;
@@ -104,7 +106,9 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   h1 { font-size: 72px; line-height: 1.02; letter-spacing: -0.022em; }
   h2 { font-size: 42px; line-height: 1.08; letter-spacing: -0.016em; }
   h3 { font-size: 28px; line-height: 1.18; letter-spacing: -0.012em; }
-  h4 { font-size: 21px; line-height: 1.25; letter-spacing: -0.008em; margin-bottom: 8px; }
+  /* .card-title is an h3 by document outline, h4 by type scale: card headings
+     sit directly under a section's h2, so the tag can't skip a level. */
+  h4, .card-title { font-size: 21px; line-height: 1.25; letter-spacing: -0.008em; margin-bottom: 8px; }
 
   p, li, blockquote { font-weight: 400; }
   strong, b { font-weight: 600; }
@@ -511,7 +515,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
     h1 { font-size: 42px; line-height: 1.03; letter-spacing: -0.022em; }
     h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.014em; }
     h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.012em; }
-    h4 { font-size: 17px; line-height: 1.25; letter-spacing: -0.008em; }
+    h4, .card-title { font-size: 17px; line-height: 1.25; letter-spacing: -0.008em; }
     p { font-size: 16px; line-height: 1.62; }
   }
 
