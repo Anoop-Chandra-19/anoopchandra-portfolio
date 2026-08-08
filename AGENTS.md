@@ -144,6 +144,7 @@ Use these naming conventions:
 
 ### Journal Voice and Audience
 
+- When planning, drafting, revising, or reviewing journal prose, load and follow the project-local `journal-story-writing` skill at `.agents/skills/journal-story-writing/SKILL.md` before changing `content/journal/*.mdx`.
 - Write journal entries for a mixed audience that includes experienced engineers, beginners, recruiters, and technically curious readers without programming or Linux experience.
 - Preserve technical accuracy, real terminology, exact values, and meaningful implementation details. Accessibility does not mean removing complexity or replacing precise explanations with vague analogies.
 - Introduce an unfamiliar term in plain language the first time it appears, then use the correct term normally afterward.
