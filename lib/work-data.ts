@@ -199,7 +199,7 @@ export const PROJECTS: Project[] = [
     k: "electric",
     img: "/projects/mosaic.png",
     imgW: 1696,
-    imgH: 1285,
+    imgH: 1321,
     imgAlt: "Mosaic's editor beside its live print preview, mid-edit on a resume.",
     imgFit: "contain",
     d: "A modular resume editor with a live print-style preview, built local-first: resume data and preferences never leave the machine. Include/exclude toggles per entry and bullet, so one dataset can produce a targeted resume per application.",
