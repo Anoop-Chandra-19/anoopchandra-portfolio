@@ -1,18 +1,53 @@
 # anoopchandra.dev
 
-Personal portfolio and engineering notebook for Anoopchandra Parampalli, built with Next.js. The site combines a statically generated portfolio and MDX journal with interactive machine-learning and algorithm demos that run entirely in the browser.
+My portfolio and engineering journal. It is a statically generated Next.js site with an MDX writing section and a Lab of machine-learning experiments that run entirely in the visitor's browser, with no inference server behind them.
 
 **Live site:** [anoopchandra.dev](https://anoopchandra.dev)
 
-## Highlights
+![The anoopchandra.dev cover: the name Anoopchandra set in large serif type beside a portrait, over notebook paper](public/og-image.png)
 
-- **Notebook-inspired interface** with responsive navigation and custom ink-bleed route transitions
-- **Statically generated journal** backed by local MDX, validated frontmatter, generated reading times, related entries, and section navigation
-- **Client-side ML demos** using real TensorFlow.js graph models for doodle classification and sentiment analysis
-- **Interactive algorithms** for K-Means clustering and perceptron training
-- **Production-oriented model loading** with lazy TensorFlow imports, shared in-memory promises, progress reporting, IndexedDB persistence, and non-fatal cache fallback
-- **Accessibility-conscious motion** with reduced-motion handling, keyboard-operable controls, focus-managed overlays, and semantic route structure
-- **SEO and discovery** through App Router metadata, structured data, sitemap, robots, and static route generation
+## What was actually hard
+
+### Shipping two neural networks without charging every visitor for them
+
+The Lab runs a doodle classifier and a sentiment model as real TensorFlow.js graph models. TensorFlow.js is by far the heaviest dependency in the project, and the sentiment weights alone are about 9 MB across three shards. A plain top-level import would have put all of that into every page bundle, including pages that never touch a model.
+
+`lib/lab-models.ts` handles the whole lifecycle:
+
+- TensorFlow.js is loaded through a dynamic import, so it stays out of the bundle for every route that does not need it.
+- Each model resolves through one shared module-level promise, so concurrent callers and repeat visits across client-side navigation reuse a single load instead of racing.
+- Loads try IndexedDB before the network. Persistence is best effort, because private browsing and quota limits should cost a visitor one network fetch, not a broken experiment.
+- A dummy `predict` over a zero tensor compiles the WebGL shaders during loading, so the first real classification a visitor triggers is not the one that pays for compilation.
+- Progress is reported from the actual fetch, and a failed load clears the shared promise so a retry is possible.
+
+The sentiment tokenizer shipped as a 2.1 MB `word_index.json`, but the model only ever looks up indices below 10,000. `scripts/prune-word-index.mjs` reduces it to 142 KB losslessly, with the original kept as a fallback fetch.
+
+I wrote about this in more detail in [Loading my TensorFlow.js models without loading them everywhere](https://anoopchandra.dev/journal/loading-my-tensorflowjs-models).
+
+### A route transition that neither shimmers nor stalls
+
+Navigation runs a custom ink-bleed animation over the outgoing page. Two details did most of the work:
+
+- Edge noise comes from a seeded mulberry32 PRNG rather than `Math.random()`. Random noise regenerated per frame shimmers; a deterministic sequence gives a stable ragged edge.
+- Duration is chosen once at navigate time from the captured viewport and never re-tracked mid-flight. Phone viewports run a shorter version, because desktop timing reads as a stall when there is less screen for the ink to cross.
+
+Geometry lives in `lib/ink-bleed.ts` as pure functions, separate from the React layers that draw it, which makes the timing curves testable in isolation.
+
+### Content that fails the build instead of the page
+
+Journal entries are plain MDX on disk, so nothing stops a typo from reaching production except validation. `lib/journal.ts` is marked `server-only` and validates frontmatter as it loads: malformed metadata, a missing image alternative, or a `related` slug that points at nothing throws with the offending filename and fails the build. Reading times are derived from word count rather than maintained by hand, so they cannot drift from the prose.
+
+## The journal
+
+Nine entries, mostly about things that broke and what the debugging actually looked like. A representative few:
+
+| Entry | About |
+| --- | --- |
+| [The requests were concurrent. The responses were not.](https://anoopchandra.dev/journal/the-requests-were-concurrent) | Five calls hit the network within a millisecond; four came back together. Transport-level production debugging. |
+| [The session expired mid-answer](https://anoopchandra.dev/journal/the-session-expired-mid-answer) | A streamed response that stopped mid-sentence with no error, traced across the stack. |
+| [Building fand](https://anoopchandra.dev/journal/building-fand) | Writing a Rust daemon to read and control fan curves from Linux. |
+| [Stock Prediction LLM Benchmark](https://anoopchandra.dev/journal/stock-prediction-llm-benchmark) | Eleven language models given identical pre-market evidence. Every one lost money on average. |
+| [Audio Genre Classification](https://anoopchandra.dev/journal/audio-genre-classification) | Fine-tuning an Audio Spectrogram Transformer on FMA-Small, served behind FastAPI. |
 
 ## Stack
 
@@ -39,21 +74,31 @@ components/
   sections/                Home-page sections
   transition/              Ink transition provider, layers, and animation overlay
   ui/                      Shared interface primitives
-content/journal/            Local MDX journal entries
-hooks/                      Shared client hooks
+content/journal/           Local MDX journal entries
+hooks/                     Shared client hooks
 lib/
   journal.ts               Server-only content loading and validation
   journal-meta.ts          Serializable journal metadata and display helpers
+  lab-meta.ts              Experiment registry shared by routes and the home page
   lab-models.ts            Lazy model loading, progress, caching, and retries
+  work-data.ts             Project entries rendered by the work section
   ink-bleed.ts             Pure transition geometry
-public/models/              TensorFlow.js manifests, weights, and vocabulary
-scripts/                    Maintenance utilities for generated model assets
-docs/                       Design and implementation notes
+public/models/             TensorFlow.js manifests, weights, and vocabulary
+scripts/                   Maintenance utilities for generated model assets
+docs/                      Design and implementation notes
 ```
 
-Server Components are the default. Interactive behavior is isolated behind explicit client boundaries, while filesystem-backed journal loading stays server-only. Journal and lab slugs are known at build time and generated statically.
+Server Components are the default. Interactive behavior sits behind explicit client boundaries, and filesystem-backed journal loading stays server-only. Every journal and lab slug is known at build time and generated statically.
 
-## Local development
+The three Lab experiments are registered in `lib/lab-meta.ts` and rendered at `/lab/<slug>`:
+
+| Slug | Experiment | What it runs |
+| --- | --- | --- |
+| `doodle` | Doodle Classifier | A TensorFlow.js graph model reading a sketch from a canvas |
+| `sentiment` | Sentiment Analysis | A TensorFlow.js text model with a pruned word index |
+| `kmeans` | Cluster & Classify | K-Means and perceptron training implemented directly in the browser |
+
+## Running it locally
 
 Next.js 16 requires Node.js **20.9.0 or newer**. This repository uses npm and commits its lockfile.
 
@@ -61,51 +106,18 @@ Next.js 16 requires Node.js **20.9.0 or newer**. This repository uses npm and co
 git clone https://github.com/Anoop-Chandra-19/anoopchandra-portfolio.git
 cd anoopchandra-portfolio
 npm ci
-npm run dev
+npm run dev        # http://localhost:3000
 ```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Validation
 
 ```bash
-npm run typecheck   # TypeScript compiler check
-npm run lint        # ESLint with Next.js Core Web Vitals rules
-npm run build       # Optimized production build and static generation
+npm run typecheck  # TypeScript compiler check
+npm run lint       # ESLint with Next.js Core Web Vitals rules
+npm run build      # Production build and static generation
 ```
 
-## Journal authoring
+Deployment is a standard Next.js production build, hosted on Vercel. No secrets or runtime environment variables are required, since inference and model persistence happen in the visitor's browser.
 
-Entries live at `content/journal/<slug>.mdx`; the filename becomes the route slug. Frontmatter is validated during loading, so invalid metadata, missing image alternatives, or unknown related slugs fail the build with a file-specific error.
-
-The MDX component map supports the journal's figures, callouts, side notes, quotes, code blocks, and footnotes. Level-two headings generate the article section rail automatically.
-
-See `AGENTS.md` for the current frontmatter contract and repository-specific development guidance.
-
-## Lab models
-
-The trained model artifacts under `public/models/` are loaded only when their experiment is needed. `lib/lab-models.ts`:
-
-1. Dynamically imports TensorFlow.js and waits for its backend.
-2. Reuses one model-loading promise per experiment.
-3. Attempts an IndexedDB model hit before fetching network weights.
-4. Treats persistence failures as non-fatal.
-5. Warms the model before the first user prediction.
-6. Reports real loading progress and permits retries after failure.
-
-The sentiment vocabulary is generated by `scripts/prune-word-index.mjs`; generated model files should not be edited manually.
-
-## Deployment
-
-The application is designed for static generation on Vercel or another platform capable of running a Next.js production build:
-
-```bash
-npm ci
-npm run build
-npm start
-```
-
-No application secrets or runtime environment variables are required for the current feature set. TensorFlow.js inference and model persistence occur locally in the visitor's browser.
+Journal entries live at `content/journal/<slug>.mdx`, where the filename becomes the route slug. See `AGENTS.md` for the frontmatter contract and repository-specific development guidance.
 
 ## License
 

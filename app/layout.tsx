@@ -70,12 +70,19 @@ export const metadata: Metadata = {
     siteName: "Anoopchandra Parampalli Portfolio",
     images: [
       {
-        url: "/anoopchandra.webp",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Anoopchandra Parampalli",
+        alt: "The anoopchandra.dev cover: the name Anoopchandra set in large serif type beside a portrait, over notebook paper",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Anoopchandra Parampalli | Full-stack dev × AI engineer",
+    description:
+      "Portfolio showcasing AI/ML projects, full-stack work, and a notebook-aesthetic portfolio site.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
