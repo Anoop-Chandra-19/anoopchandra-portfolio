@@ -1,0 +1,101 @@
+---
+title: "The session expired mid-answer"
+kind: case
+date: 2026-08-08
+tag: web
+dek: "An AI response stopped halfway with no error or warning. The same path worked normally when I tried it again."
+sub: "cross-stack debugging · 2026"
+related: [the-requests-were-concurrent]
+---
+
+The response stopped in the middle of a sentence.
+
+Several paragraphs had already appeared when the streaming indicator disappeared. The text stayed in the conversation. There was no error, retry button, or warning to explain why it had ended there.
+
+The report came from internal user testing. The agent had been responding normally, then it stopped. Nobody had a repeatable sequence for making it happen, and when I opened the same chat path, the next response completed.
+
+## The first evidence pointed upstream
+
+The response crossed a React frontend, a NestJS backend, a Python AI gateway, and the model service. I had worked on the Python and gateway parts, so that was where I began. The frontend session monitor and backend authentication lifecycle were outside my original ownership, even though I now had to trace the request through all of them.
+
+The agent streamed its response through Server-Sent Events, or SSE, which kept one HTTP response open and delivered text as it was generated.[^1] I tried to reproduce the cutoff while following that path through the monitoring tools available to me.
+
+In Application Insights, the Azure AI Foundry side of the request had returned `200 OK` and showed that the model completed its response. The model had finished generating the answer.
+
+The gateway logs gave me nothing for errors after streaming had begun. We did not have enough logging around that part of the response lifecycle. Farther back in the path, a backend API audit table recorded the result as partial, and the conversation message carried the same partial state in its metadata. Both that audit record and Sentry described an upstream failure.
+
+The evidence ended at an uncomfortable gap. Foundry showed a completed model response, while the backend had received only part of it. The gateway sat between them without recording what had happened inside the stream. At the same time, another response passed through the same gateway and completed normally.
+
+## Three days chasing the cutoff
+
+I spent the next three full days trying to make the same failure happen. I tested hundreds of scenarios across the model, gateway, backend, browser, accounts, and tab state. Large language models are nondeterministic, meaning the same prompt can produce a different response on another run. I replayed every reported prompt that had previously stopped halfway because I still did not know whether particular wording was part of the trigger.
+
+The internal users could not recreate it on demand, and neither could I. Every standup and agent-specific meeting came with the same update: I was still debugging it. It did not feel good to repeat that without a result, but I did not want to mark the issue unreproducible and move it aside while people were still encountering it.
+
+By the third day I was grasping at straws and reading everything the browser developer tools showed me.
+
+## The console message I had ignored
+
+One of my scenarios compared an existing account with someone newly enabled. The agent had originally been planned for a closed pilot, and I had worked on the dashboard access request and the matching internal approval pages. Leadership later added an internal-testing phase so staff familiar with the underlying information could check the agent's answers before the pilot began.
+
+I used those existing controls to prepare a new local account. Signing out and back in would make the frontend fetch its updated access state, but reloading was faster. The developer tools were already open for the cutoff investigation.
+
+During that reload, I stopped at one console message:
+
+<Quote cite="browser console, paraphrased">
+  Session timer set to null. Session monitoring disabled.
+</Quote>
+
+The message was not new. I had ignored it during earlier reloads because I had no reason to connect session monitoring to an answer that appeared to fail inside the AI path. We were building several systems quickly, and the development branch had moved far beyond the code in staging, so I assumed this was session work someone was already finishing in the newer code.
+
+When I checked, the development branch disabled the timer too. By then I was grasping at straws, and I wanted to know why both versions still did it. I began following the timer code to understand what the tab lost when that line ran.
+
+## The code gave me a theory
+
+I read through the session-management paths in both the frontend and backend. The browser was supposed to use activity to keep an authenticated session alive. Keyboard and mouse events reset an idle timer. A session monitor used that state to decide whether to call a keep-alive endpoint, and the backend extended the expiry associated with the token. 
+
+If the user remained idle and the session approached expiry, the same monitoring path was supposed to show a warning modal. The user could choose Continue to renew the session, log out immediately, or let the modal's countdown log them out after further inactivity.
+
+The refresh path cleared that monitor, and I could not find anything that re-enabled it for the tab. A forced full-page navigation passed through the same restoration flow. If someone continued working in either case, their activity would no longer reach the expected keep-alive behavior. The backend expiry would remain unchanged, and the warning modal would never appear.
+
+That gave me a theory for the inconsistent reports.
+
+If an answer finished before expiry, it would look normal. If someone submitted a message after expiry, the protected NestJS endpoint would reject it before streaming began and send the browser to login.
+
+The reported partial answer required the request to begin with valid authentication and the token to expire while the response was still streaming. From the code, the backend and AI gateway would stop the protected operation at that point. The text already sent would remain on the page, and the login navigation would wait until the user's next authenticated action.
+
+That sequence fit what the internal users had seen, including the missing session warning. It was still a theory assembled from code. I had to make the session expire during a live response and see whether it produced the same partial record, upstream error, and silent gateway.
+
+## Every attempt took the full session
+
+The reload gave me a way to disable monitoring on demand. Reproducing the reported cutoff still required waiting through the complete session window, then starting an answer late enough for the token to expire while text was arriving.
+
+If the response finished a little earlier, I missed it. If I submitted a little later, the backend rejected the request before the first streamed event. The agent's response length varied, so getting close did not guarantee the right overlap. Each miss meant another full wait.
+
+I first tried to prove it in staging with the real session lifetime. Missing the narrow window and waiting through another session quickly became frustrating.
+
+For local debugging, I checked out `main` and reset my database to the state that branch expected. I also switched to `develop` to see whether disabling the timer was limited to the older code. `develop` had moved far ahead while several connected systems were being built, but the same timer path was still there.
+
+I returned to the local `main` setup because it was closer to staging, shortened the expiry, and repeated the timing without the full wait. When I finally held a response open across expiry, it produced the same cutoff and partial message reported in staging. The earlier backend audit, message metadata, and Sentry error now lined up with the local sequence. I had been missing the expired session earlier in the chain.
+
+## The console message was an old reminder
+
+The line that disabled monitoring had been intentional when it was written.
+
+The first timer existed before session restoration was complete. At that point, a refreshed page did not have reliable persisted expiry information from which to rebuild it. Clearing the in-memory value was safer than scheduling from an expiry the page could no longer prove.
+
+The console message pointed at the unfinished part. Once proper session management could restore the expiry after a page load, the refresh path needed to rebuild the timer.
+
+That session work later arrived while several connected systems were changing for the unified login, onboarding flow, and dashboard. The persisted expiry became available. The old disabling branch remained, and nothing connected the restored value back to the monitor.
+
+The ridiculous part was that the browser had announced it on every affected reload. I had looked past the message for days because the evidence kept me inside the AI path. Preparing the new account made me reload once more, and by then I was reading every line the developer tools gave me.
+
+## Rebuilding the timer after refresh
+
+The fix was to finish the restoration path. After authentication was restored, the application read the persisted expiry, calculated how much time remained, and re-armed session monitoring from that value. If the session was already close enough to require renewal, it started the keep-alive work immediately instead of scheduling it too late.
+
+With the monitor running again, keyboard and mouse activity could reset the idle state and reach the keep-alive path. I also made each model-stream event count as activity. Someone reading a long answer might not touch the keyboard or mouse, but the response arriving on screen still meant the session was in use. A genuinely idle session could reach the warning modal before expiry, while a refresh or forced full-page navigation no longer left the tab without monitoring.
+
+After that change, I could not recreate the cutoff. Every keyboard event, mouse event, or piece of the streamed response restarted the idle timer. The keep-alive path extended the backend expiry, so an answer that was still arriving no longer crossed the old session boundary.
+
+[^1]: Server-Sent Events provide a one-way stream over an HTTP response. The browser keeps the response open and handles new events as the server sends them, which works well for text that arrives incrementally.
