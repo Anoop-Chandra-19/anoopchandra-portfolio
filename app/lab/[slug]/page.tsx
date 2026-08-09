@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LAB_EXPS, getLabExp } from "@/lib/lab-meta";
+import { socialCard } from "@/lib/social-card";
 import LabShell from "@/components/lab/LabShell";
 
 // The three experiments are a fixed set — unknown URLs 404 at the routing
@@ -19,10 +20,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const exp = getLabExp(slug);
   if (!exp) return {};
+  const title = `${exp.title} | The Lab`;
   return {
-    title: `${exp.title} | The Lab`,
+    title,
     description: exp.blurb,
     alternates: { canonical: `/lab/${exp.slug}` },
+    ...socialCard({ path: `/lab/${exp.slug}`, title, description: exp.blurb }),
   };
 }
 

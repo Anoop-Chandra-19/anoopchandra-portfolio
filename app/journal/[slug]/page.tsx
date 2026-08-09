@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAdjacent, getEntries, getEntryBySlug, getRelated, getSections } from "@/lib/journal";
 import ArticleEntry from "@/components/journal/ArticleEntry";
+import { imageDims } from "@/lib/image-dims";
+import { socialCard } from "@/lib/social-card";
 
 // Every valid slug is known at build time (slug = filename in content/journal),
 // so unknown URLs 404 at the routing layer without invoking any server code.
@@ -19,17 +21,29 @@ export async function generateMetadata({
   const { slug } = await params;
   const entry = getEntryBySlug(slug);
   if (!entry) return {};
+  // An entry without a hero falls through to the site cover rather than to no
+  // image at all — an card with no art is worse than a generic one.
+  const heroDims = entry.hero ? imageDims(entry.hero) : null;
+  const hero =
+    entry.hero && heroDims
+      ? {
+          url: entry.hero,
+          width: heroDims.w,
+          height: heroDims.h,
+          alt: entry.heroAlt ?? entry.title,
+        }
+      : null;
   return {
     title: entry.title,
     description: entry.dek,
     alternates: { canonical: `/journal/${entry.slug}` },
-    openGraph: {
-      type: "article",
-      url: `https://anoopchandra.dev/journal/${entry.slug}`,
+    ...socialCard({
+      path: `/journal/${entry.slug}`,
       title: entry.title,
       description: entry.dek,
-      ...(entry.hero ? { images: [{ url: entry.hero, alt: entry.heroAlt ?? entry.title }] } : {}),
-    },
+      type: "article",
+      image: hero,
+    }),
   };
 }
 

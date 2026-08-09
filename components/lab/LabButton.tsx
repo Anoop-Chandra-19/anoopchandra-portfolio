@@ -15,6 +15,7 @@ export default function LabButton({
 }) {
   return (
     <button
+      type="button"
       className={`lx-btn${accent ? " on" : ""}${sm ? " sm" : ""}`}
       onClick={onClick}
       disabled={disabled}

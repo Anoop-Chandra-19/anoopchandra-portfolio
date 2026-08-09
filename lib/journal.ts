@@ -47,9 +47,19 @@ function fail(file: string, msg: string): never {
 function displayDate(iso: string, file: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   if (!m) fail(file, `"date" must be an ISO date (YYYY-MM-DD), got "${iso}"`);
-  const month = MONTHS[Number(m[2]) - 1];
-  if (!month) fail(file, `"date" has an invalid month: "${iso}"`);
-  return `${month} ${m[3]}, ${m[1]}`;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  // Shape alone is not validity: 2026-02-31 matches the pattern and would render
+  // as "feb 31, 2026". UTC round-trip, because Date overflows rather than
+  // rejecting — Feb 31 comes back as Mar 3 and no longer matches what was typed.
+  const asDate = new Date(Date.UTC(y, mo - 1, d));
+  if (
+    asDate.getUTCFullYear() !== y ||
+    asDate.getUTCMonth() !== mo - 1 ||
+    asDate.getUTCDate() !== d
+  ) {
+    fail(file, `"date" is not a real calendar date: "${iso}"`);
+  }
+  return `${MONTHS[mo - 1]} ${m[3]}, ${m[1]}`;
 }
 
 function readTime(mdx: string): string {
@@ -68,7 +78,7 @@ function oneOf<T extends string>(v: unknown, allowed: readonly T[]): v is T {
 function parseEntry(file: string): JournalEntry {
   const slug = file.replace(/\.mdx$/, "");
   const raw = fs.readFileSync(path.join(CONTENT_DIR, file), "utf8");
-  const { data, content } = matter(raw);
+  const { data, content, matter: frontmatter } = matter(raw);
 
   for (const field of ["title", "kind", "date", "tag", "dek"]) {
     if (data[field] === undefined || data[field] === null || data[field] === "") {
@@ -83,6 +93,16 @@ function parseEntry(file: string): JournalEntry {
   }
 
   const date = data.date instanceof Date ? data.date.toISOString().slice(0, 10) : String(data.date);
+
+  // An unquoted `date:` is resolved by YAML into a Date before it ever reaches
+  // here, and Date overflows instead of rejecting: 2026-02-31 arrives already
+  // rewritten to 2026-03-03 and renders as a real but wrong day. displayDate
+  // cannot catch that — by then the evidence is gone — so compare against what
+  // was actually typed. A quoted date stays a string and displayDate rejects it.
+  const authored = /^\s*date:\s*["']?(\d{4}-\d{2}-\d{2})["']?\s*$/m.exec(frontmatter)?.[1];
+  if (authored && authored !== date) {
+    fail(file, `"date" is not a real calendar date: "${authored}" (YAML read it as ${date})`);
+  }
 
   return {
     slug,
@@ -195,10 +215,30 @@ export function getSections(entry: JournalEntry): Section[] {
   // onto the DOM, so two headings with the same words have to be counted here
   // too or the second one's rail link points at the first one's heading.
   const seen = new Map<string, number>();
-  const re = /^##\s+(.+)$/gm;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(entry.body))) {
-    const title = m[1].trim();
+  // Scanned line by line with fence tracking rather than by one global regex.
+  // A `##` line inside a fenced block is code: the MDX pipeline stamps no id for
+  // it, so counting it here invents a rail link pointing at an anchor that
+  // exists nowhere in the DOM — and shifts the -1/-2 suffix of every repeated
+  // heading after it.
+  let fence: string | null = null;
+  for (const raw of entry.body.split("\n")) {
+    const line = raw.replace(/\r$/, "");
+    // Up to three leading spaces still opens a fence; a fourth makes it an
+    // indented code block, which cannot contain a heading either way.
+    const f = /^ {0,3}(`{3,}|~{3,})/.exec(line);
+    if (f) {
+      const marker = f[1][0];
+      if (!fence) fence = marker;
+      else if (marker === fence) fence = null;
+      continue;
+    }
+    if (fence) continue;
+    const m = /^##\s+(.+)$/.exec(line);
+    if (!m) continue;
+    // CommonMark treats a trailing run of #s as a closing marker and drops it,
+    // so it must not reach the slug or the rail link misses the real heading.
+    const title = m[1].replace(/\s+#+\s*$/, "").trim();
+    if (!title) continue;
     const base = slugify(title);
     const n = seen.get(base) ?? 0;
     seen.set(base, n + 1);
