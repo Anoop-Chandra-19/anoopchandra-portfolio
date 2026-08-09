@@ -29,6 +29,7 @@ export default function SideNav({
           <a
             key={id}
             href={`#sec-${id}`}
+            aria-current={isActive ? "true" : undefined}
             className={`anim-rail d-rail-${idx} flex h-[30px] items-center gap-[10px] no-underline text-ink px-[6px] rounded`}
             onClick={(e) => {
               e.preventDefault();

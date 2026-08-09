@@ -19,7 +19,9 @@ export default function ClusterClassifyLab({ accent }: { accent: LabAccent }) {
         {MODES.map(([m, label]) => (
           <button
             key={m}
+            type="button"
             className={"lx-btn sm" + (mode === m ? " on" : "")}
+            aria-pressed={mode === m}
             onClick={() => setMode(m)}
             style={mode === m ? ({ "--lxa": `var(--color-${accent})` } as React.CSSProperties) : undefined}
           >

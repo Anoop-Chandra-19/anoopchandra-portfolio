@@ -61,8 +61,7 @@ export default function Lab() {
                   <span>{e.num}</span>
                   <span>
                     <span
-                      className="inline-block w-2 h-2 rounded-full bg-white mr-1.5"
-                      style={{ animation: "pulse 1.4s infinite" }}
+                      className="pulse-dot inline-block w-2 h-2 rounded-full bg-white mr-1.5"
                     />
                     live
                   </span>

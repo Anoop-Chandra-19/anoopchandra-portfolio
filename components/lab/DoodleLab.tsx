@@ -12,7 +12,7 @@ import type { LabAccent } from "@/lib/lab-meta";
 import LabButton from "./LabButton";
 import BenchBoot from "./BenchBoot";
 
-/* Drawing pad + the QuickDraw CNN from the old site (public/models/doodle).
+/* Drawing pad + the QuickDraw CNN from the old site (public/models/doodle/v1).
    The model expects what main's demo fed it: [1,28,28,1] grayscale, 0..255,
    strokes bright on black. The pad here draws ink-on-paper, so preprocessing
    bbox-crops the sketch, centers it into the 28×28 field, and inverts. */

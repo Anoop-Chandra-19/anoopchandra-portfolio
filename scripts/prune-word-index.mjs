@@ -9,8 +9,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 const VOCAB_SIZE = 10000;
-const SRC = "public/models/sentiment/word_index.json";
-const OUT = "public/models/sentiment/word_index.min.json";
+const SRC = "public/models/sentiment/v1/word_index.json";
+const OUT = "public/models/sentiment/v1/word_index.min.json";
 
 const src = JSON.parse(readFileSync(SRC, "utf8"));
 const out = {};

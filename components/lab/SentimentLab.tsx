@@ -13,7 +13,7 @@ import type { LabAccent } from "@/lib/lab-meta";
 import BenchBoot from "./BenchBoot";
 
 /* Gauge + input UI from the design, verdict from the real IMDB LSTM
-   (public/models/sentiment). Tokenization is ported from main's
+   (public/models/sentiment/v1). Tokenization is ported from main's
    useSentimentModel: clean → word_index lookup (OOV=1, vocab 10k) → pad to
    64 → sigmoid score 0..1, remapped here to -1..1 for the needle.
    The word chips are the design's lexicon scorer kept as a purely visual

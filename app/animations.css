@@ -2,6 +2,10 @@
 
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+/* "live" status dot on the lab cards. Must stay a class, not an inline
+   animation, or the reduced-motion block below cannot switch it off. */
+.pulse-dot { animation: pulse 1.4s infinite; }
+
 @keyframes swipeIn {
   from { clip-path: inset(0 100% 0 0); }
   to   { clip-path: inset(0 0 0 0); }
@@ -106,6 +110,9 @@ body.ink-no-anim .marker-highlight {
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
+  /* continuous, so no hydration gate — nothing to restore afterwards */
+  .pulse-dot { animation: none; }
+
   body.hydrated .anim-swipe,
   body.hydrated .anim-rise,
   body.hydrated .anim-stamp,

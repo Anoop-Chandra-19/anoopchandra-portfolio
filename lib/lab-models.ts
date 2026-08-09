@@ -40,17 +40,20 @@ const CONFIG: Record<
   { url: string; idb: string; wordIndexUrl: string | null; warmShape: number[] }
 > = {
   doodle: {
-    url: "/models/doodle/model.json",
+    // the /vN/ segment is what makes these URLs safe to serve `immutable`
+    // (next.config.ts) — shard names are not content-hashed, so a re-export
+    // means a new directory here plus a matching bump of the idb key
+    url: "/models/doodle/v1/model.json",
     idb: "indexeddb://lab-doodle-v1",
     wordIndexUrl: null,
     warmShape: [1, 28, 28, 1],
   },
   sentiment: {
-    url: "/models/sentiment/model.json",
+    url: "/models/sentiment/v1/model.json",
     idb: "indexeddb://lab-sentiment-v1",
     // pruned to vocab indices < 10,000 (all the tokenizer ever uses) by
     // scripts/prune-word-index.mjs — ~2.1MB down to ~200KB, lossless
-    wordIndexUrl: "/models/sentiment/word_index.min.json",
+    wordIndexUrl: "/models/sentiment/v1/word_index.min.json",
     warmShape: [1, 64],
   },
 };
@@ -123,7 +126,7 @@ async function doLoad(id: LabModelId): Promise<LoadedModel> {
     if (cfg.wordIndexUrl) {
       report(id, { phase: "wordindex" });
       let res = await fetch(cfg.wordIndexUrl);
-      if (!res.ok) res = await fetch("/models/sentiment/word_index.json");
+      if (!res.ok) res = await fetch("/models/sentiment/v1/word_index.json");
       if (!res.ok) throw new Error(`word index fetch failed (${res.status})`);
       wordIndex = await res.json();
     }
