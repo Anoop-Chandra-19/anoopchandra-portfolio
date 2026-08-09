@@ -1,0 +1,112 @@
+---
+title: "The requests were concurrent. The responses were not."
+kind: case
+date: 2026-06-24
+tag: backend
+dek: "Five MCP calls reached the network within one millisecond. One streamed back; the other four waited and returned together."
+sub: "production debugging · 2026"
+hero: /journal/the-requests-were-concurrent/transport-timeline.png
+heroAlt: "A recreated transport timeline for five concurrent calls. All five requests are sent together, the first receives a 200 response and streams, then the remaining four receive 200 responses together when that first stream ends."
+heroCaption: "The ordering recorded by the transport audit, recreated without internal logs. Horizontal spacing is explanatory, not to scale."
+---
+
+The first timeline made our parallel code look like it was not parallel at all.
+
+I was working on the tool-calling loop for an AI assistant. A language model could ask for information from several tools, our code would run those tools, and the results would go back to the model so it could continue its answer. The older managed agent executed tool calls one after another. Our custom loop was supposed to fan independent calls out together.
+
+The calls in question went through an MCP server connected to a data warehouse.[^1] MCP, short for Model Context Protocol, gave the assistant one consistent way to discover and invoke tools even though the data lived in another system.
+
+Parallel execution mattered because several tools could start long-running Snowflake queries in the same model turn. The model could not continue until the loop had collected every requested tool output. Running the queries sequentially made their durations accumulate: each query began after the previous one finished. Starting them together should have let those waits overlap, with the tool stage completing when its slowest query finished and `gather` returned the complete result list.
+
+I instrumented the orchestration with OpenTelemetry and created a child span for each tool call. In Application Insights, Azure's endpoint request was the root operation, the orchestration span sat beneath it, and the tool-call spans were children of that orchestration span.[^2] The transaction view displayed those calls as horizontal bars on a shared timeline. That was where the pattern first became difficult to ignore.
+
+With two tool calls, both could finish at the same time. With five, one would return first, then the other four would finish together later. If the model requested more, the shape could become one response followed by another cluster.
+
+The issue came back to the application team as a question about our code. Were we actually running the calls concurrently, or did the agentic loop only look concurrent from the Python above it?
+
+## Five calls was enough
+
+For this experiment, I capped the parallel group at five tool calls. Five was not a special limit in the protocol. It was enough work to expose a queue or batch without producing a timeline too crowded to inspect.
+
+The fan-out happened inside our MCP client. It passed one asynchronous operation per tool call to Python's `asyncio.gather`.[^3] The calls could send, receive, and complete independently, but `gather` formed a barrier for the agentic loop: it returned the collected results only after every call had finished. The loop then sent those tool outputs back to the model together. At the application level, that part looked straightforward.
+
+Application-level timing could still mislead me. Five Python tasks starting together did not prove that five HTTP requests reached the network together. The client might have queued them. Its connection pool might have limited them. Something in the agent loop might have transformed the list before it reached the transport.
+
+I needed to remove those surrounding layers without replacing the code we were being asked to defend.
+
+## Removing the agent, keeping the client
+
+I built a focused harness that supplied five predetermined tool calls directly to the same MCP client used by the agentic loop.
+
+The model was gone. The multi-turn orchestration was gone. The managed-agent integration and the existing telemetry were gone. The client implementation, its `asyncio.gather` fan-out, the HTTP stack, and the destination MCP server stayed the same.
+
+That distinction mattered. A new script with five hand-written `httpx` calls could prove that Python supported concurrency. It would say very little about whether our actual MCP client used it correctly. Running the production client independently kept the suspected code in the experiment.
+
+<Figure
+  src="/journal/the-requests-were-concurrent/isolation-path.png"
+  alt="Two request paths. The normal path runs from an agentic loop through an MCP client, HTTP transport, and data-warehouse MCP server. The isolated path replaces the agent with five fixed calls while keeping the same MCP client, transport, and server."
+>
+  The isolated run removed the model and orchestration while preserving the MCP client and network path under investigation.
+</Figure>
+
+The focused harness also made the test repeatable. I no longer needed the model to happen to choose five useful tools in one turn. Every run began with the same known calls and exercised the same client path.
+
+## Going below the client
+
+I instrumented `httpx` and `httpcore`, the Python libraries carrying the MCP requests, at the transport layer.[^4] Instead of measuring one duration around the complete client call, the audit recorded the request and response lifecycle in stages:
+
+1. The request was created.
+2. It entered the HTTP transport.
+3. The request was sent.
+4. Response headers arrived.
+5. The streamed response body completed.
+
+Those stages let me separate waiting before a request left our client from waiting after it had been dispatched. A timer around the whole tool call collapsed both into one number.
+
+On a five-call run, all five request sends occurred within approximately `0.001` seconds from the first to the last. The fan-out was reaching the network in about one millisecond.
+
+Then the response side behaved very differently.
+
+The first, lightweight call received `200 OK` and began streaming its result.[^5] The other four calls had not received response headers. The moment that first response finished streaming, the remaining four received `200 OK` almost immediately and returned as a cluster.
+
+That was the same shape I had seen from farther away in Application Insights. The transport audit filled in what happened before the bars finished: five sends together, one response stream, then four response headers together.
+
+## What the timestamps ruled out
+
+The experiment gave us a narrower conclusion than “the server is broken,” and that narrower conclusion was enough.
+
+The agentic loop was not feeding the client one tool at a time. The same response pattern survived after I removed the agent and supplied fixed calls directly.
+
+The MCP client was not deliberately awaiting one complete call before starting the next. Its `asyncio.gather` fan-out reached the transport for all five calls, and the recorded sends were separated by about one millisecond.
+
+The response gate appeared after that dispatch. The exact internal reason remained beyond what my client-side audit could see. It could show when requests left and when response headers returned. It could not inspect queues, connection handling, container capacity, or warehouse scheduling inside a server owned by another team.
+
+The broader comparison made the cost visible as well. Concurrent data-warehouse calls became roughly five times slower per call than the same kind of work run alone. Running the batch in parallel saved very little wall-clock time because the calls were waiting behind a shared limit instead of using independent capacity.
+
+More `asyncio` on the application side could not create throughput that the next system did not expose.
+
+## Making the result easy to inspect
+
+I turned the focused harness into a small Streamlit demonstration with solo and concurrent runs. It plotted each request as a Gantt-style bar so the start, wait, and clustered finish could be compared without reading transport logs line by line.
+
+I also added a demo mode using previously captured measurements. The live path still existed, but a standup presentation no longer depended on the VPN, the network, the warehouse, and the MCP server all behaving on cue.
+
+The visual comparison helped because “we use `asyncio.gather`” was never going to settle the question. That only described what the code intended to do. The transport timestamps showed what it had done, and the Gantt view made the one-then-four response pattern visible to people who had not read the client.
+
+## The boundary of our fix
+
+The MCP server and warehouse belonged to the data-platform side of the system. Our application team could change the orchestrator and its concurrency policy, but we could not change how that server scheduled or released the warehouse calls.
+
+A concurrency cap was the useful stopgap. Sending more simultaneous work into the same constraint made individual calls slower without giving the assistant a meaningful batch-speed improvement. The longer fix belonged in the capacity and request handling behind the MCP endpoint.
+
+The problem was initially reported as a bug in our parallel implementation. I could not defend the team by pointing at `asyncio.gather` and saying the code looked right. I needed measurements. Running the same MCP client without the agent loop and tracing its requests at the transport layer provided them.
+
+[^1]: MCP is an open protocol for connecting AI applications to external tools and data sources. An MCP server publishes the tools it supports and accepts structured requests to invoke them.
+
+[^2]: OpenTelemetry records traces, which follow work across services. A span represents one timed operation inside a trace. Application Insights groups related telemetry under an operation ID and uses parent IDs to preserve the hierarchy between the endpoint request, orchestration span, and tool-call spans.
+
+[^3]: `asyncio` is Python's standard library for asynchronous work. `asyncio.gather` schedules several awaitable operations concurrently and preserves their input order in its result list. A faster operation can complete earlier, but code awaiting `gather` receives the collected list only after every operation is done.
+
+[^4]: The transport layer is where the HTTP client turns a high-level request into network activity and receives the response. Instrumenting there provides a lower-level boundary than timing the agent or MCP-client method around it.
+
+[^5]: `200 OK` is the HTTP status indicating that a server accepted a request and produced a successful response. The headers arrive before a streamed response body has necessarily finished.

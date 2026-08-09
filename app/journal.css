@@ -1,0 +1,577 @@
+/* Journal index */
+
+body:has([data-journal-root]) {
+  padding-left: 0;
+}
+
+.journal-cover {
+  position: relative;
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  border-radius: 7px;
+  padding: 28px 32px;
+  margin-bottom: 36px;
+}
+
+.journal-cover::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 50%, transparent);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.journal-cover h1 {
+  line-height: 0.95;
+}
+
+.journal-filter-btn {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 14px;
+  padding: 2px 14px;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 6px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  cursor: pointer;
+  transform: rotate(-0.5deg);
+  transition: background 0.15s, color 0.15s;
+}
+.journal-filter-btn:nth-child(odd) { transform: rotate(0.5deg); }
+.journal-filter-btn:hover { background: var(--color-paper-2); }
+.journal-filter-btn.is-active {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.journal-year-filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.journal-year-filter::after {
+  content: "⌄";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  translate: 0 -56%;
+  color: var(--color-ink-soft);
+  pointer-events: none;
+}
+
+.journal-year-select {
+  appearance: none;
+  min-width: 104px;
+  padding: 4px 25px 4px 10px;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 6px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.journal-year-select:hover {
+  background: var(--color-paper-2);
+}
+
+.journal-year-select:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.journal-subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+  padding: 4px 9px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 3px;
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.journal-toc-header,
+.journal-toc-row {
+  display: grid;
+  gap: 14px;
+}
+.journal-toc-header {
+  grid-template-columns: 44px 1fr 90px 90px 96px;
+  padding: 0 0 12px 6px;
+}
+.journal-toc-row {
+  grid-template-columns: 44px 1fr 90px 90px;
+  padding: 14px 110px 14px 6px;
+}
+
+.journal-toc-item {
+  position: relative;
+  transition: background 0.15s;
+}
+.journal-toc-item:hover {
+  background: color-mix(in oklab, var(--color-paper-2) 60%, transparent);
+}
+
+.journal-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.journal-sort:hover { color: var(--color-ink); }
+.journal-sort:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+.journal-sort.is-on {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-ink);
+}
+.journal-sort-arrow { opacity: 0.35; }
+.journal-sort.is-on .journal-sort-arrow { opacity: 1; }
+
+.journal-edge-tab {
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tab-w, 90px);
+  padding: 3px 8px 3px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-align: center;
+  cursor: pointer;
+  background: color-mix(in oklab, var(--tab-c) var(--tab-tint, 15%), var(--color-paper));
+  border: 1.2px solid var(--tab-c);
+  border-right: none;
+  border-radius: 3px 0 0 3px;
+  box-shadow: var(--tab-shadow, none);
+  transition: min-width 0.16s, opacity 0.16s, box-shadow 0.16s, background 0.16s;
+}
+.journal-edge-tab:hover,
+.journal-edge-tab:focus-visible {
+  --tab-w: 96px;
+  --tab-tint: 34%;
+  --tab-shadow: -2px 2px 0 color-mix(in oklab, var(--color-ink) 45%, transparent);
+}
+.journal-edge-tab:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+/* Keep this after hover: equal specificity lets the active state win. */
+.journal-edge-tab.is-on {
+  --tab-w: 100px;
+  --tab-shadow: -2px 2px 0 var(--color-ink);
+  font-weight: 500;
+}
+
+.journal-index.has-subject .journal-edge-tab:not(.is-on) { opacity: 0.45; }
+
+.journal-toc-metas {
+  display: contents;
+}
+.journal-toc-chev {
+  display: none;
+}
+.journal-filter-narrow {
+  display: none;
+}
+
+@media (max-width: 720px) {
+
+  .journal-toc-panel {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .journal-toc-rule,
+  .journal-toc-stamp,
+  .journal-toc-header,
+  .journal-toc-case,
+  .journal-toc-leader {
+    display: none;
+  }
+  .journal-toc-list {
+    border-top: 2px solid var(--color-ink);
+  }
+
+  .journal-toc-row {
+    grid-template-columns: 44px 1fr;
+    grid-template-areas:
+      "page title"
+      "page meta";
+    row-gap: 3px;
+    gap: 10px;
+    padding: 11px 20px 11px 0;
+  }
+  .journal-toc-page {
+    grid-area: page;
+    align-self: start;
+    padding-top: 3px;
+  }
+  .journal-toc-title {
+    grid-area: title;
+    flex-wrap: wrap;
+  }
+  /* The title span has no role class; target it structurally. */
+  .journal-toc-title > :first-child {
+    white-space: normal;
+    font-size: 18px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    flex: 0 1 100%;
+  }
+
+  .journal-toc-metas {
+    display: flex;
+    grid-area: meta;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+    padding-right: 84px;
+  }
+  .journal-toc-row .journal-toc-meta {
+    text-align: left;
+  }
+
+  .journal-toc-metas > .journal-toc-meta:first-child {
+    order: 2;
+  }
+  .journal-toc-metas > .journal-toc-meta:last-child {
+    order: 1;
+  }
+  .journal-toc-metas > .journal-toc-meta:first-child::before {
+    content: "·";
+    margin-right: 6px;
+    color: var(--color-ink-faint);
+  }
+  .journal-toc-chev {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 17px;
+    color: var(--color-ink-faint);
+  }
+
+  .journal-edge-tab {
+    top: auto;
+    bottom: 11px;
+    right: 20px;
+    transform: none;
+    min-width: 0;
+    padding: 1px 7px;
+    border-right: 1.2px solid var(--tab-c);
+    border-radius: 3px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .journal-cover .journal-cover-stamp {
+    position: static;
+    display: inline-block;
+    margin-top: 14px;
+  }
+
+  .journal-cover { padding: 20px 18px; }
+  .journal-cover h1 { font-size: 40px; line-height: 1.02; letter-spacing: -0.02em; }
+  .journal-cover > p { font-size: 17px; line-height: 1.5; }
+  .journal-filter-btn { font-size: 13.5px; }
+  .journal-filter-wide,
+  .journal-filter-lbl { display: none; }
+  .journal-filter-narrow { display: inline; }
+}
+
+/* Journal entry */
+
+/* A fixed measure keeps mixed-size article elements on one column edge. */
+/* Use --accent-ink for small text; pure --accent is reserved for graphics. */
+.je{font-family:var(--font-display);color:var(--color-ink);--je-measure:640px;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink));
+  --rail:132px;--colgap:30px;--col:640px;--side-w:330px;--side-gap:34px;
+
+  --tk-key:oklch(.47 .17 305);--tk-str:oklch(.46 .10 168);--tk-num:oklch(.5 .14 38);
+  --tk-fn:oklch(.44 .11 252);
+  --tk-com:color-mix(in oklab,var(--color-ink) 44%,var(--color-paper));
+  --tk-pn:color-mix(in oklab,var(--color-ink) 66%,var(--color-paper))}
+.je-plate{counter-increment:plate}
+/* Built-in decimal-leading-zero pads only to two digits. */
+@counter-style plate-pad{system:extends decimal;pad:3 "0"}
+.je-plate-tab.auto::before{content:"plate " counter(plate,plate-pad)}
+
+.je-progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);z-index:50}
+.je-inner{position:relative;width:1280px;max-width:100%;margin:0 auto;padding:44px 40px 100px}
+
+.je-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:16px;border-bottom:1.5px dashed var(--color-ink-faint);margin-bottom:38px}
+.je-back{font-family:var(--font-mono);font-size:12px;letter-spacing:.4px;color:var(--color-ink);text-decoration:none;border:1.5px solid var(--color-ink);border-radius:999px;padding:6px 14px;background:var(--color-paper)}
+.je-back:hover{background:var(--color-ink);color:var(--color-paper)}
+.je-topmeta{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint)}
+
+.je-mast{max-width:860px;margin-bottom:36px}
+.je-ledger{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);padding:8px 0;border-top:2px solid var(--color-ink);border-bottom:1px solid var(--color-ink);margin-bottom:22px}
+.je-ledger .dash{flex:0 0 auto;width:16px;height:1px;background:var(--color-ink-faint)}
+.je-chips{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+.je-chip{font-family:var(--font-mono);font-weight:400;font-size:12px;letter-spacing:.02em;color:var(--color-ink-soft);border:1.4px solid var(--color-ink);border-radius:999px;padding:4px 12px;background:var(--color-paper)}
+.je-title{font-family:var(--font-display);font-weight:600;font-size:72px;line-height:1;letter-spacing:-1.4px;margin:0 0 18px;color:var(--color-ink);text-wrap:balance}
+.je-dek{font-family:var(--font-display);font-style:italic;font-size:24px;line-height:1.42;color:var(--color-ink-soft);margin:0 0 24px;max-width:680px;text-wrap:pretty}
+.je-byline{display:flex;align-items:center;gap:11px;font-family:var(--font-mono);font-size:11px;letter-spacing:.6px;color:var(--color-ink-faint);padding:13px 0;border-top:1px solid var(--color-ink-faint);border-bottom:1px solid var(--color-ink-faint)}
+.je-byline b{color:var(--color-ink);font-weight:500}
+.je-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-ink);background:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,0,0,.09) 3px 4px);flex:0 0 auto}
+.je-bsub{color:var(--color-ink-soft)}
+.je-grow{flex:1}
+
+.je-plate{position:relative;background:#fffdf7;border:1px solid var(--color-ink);box-shadow:0 8px 22px rgba(0,0,0,.12);padding:14px 14px 12px;margin:0 0 40px;max-width:820px}
+.je-hero{margin-bottom:46px}
+.je-plate img{display:block;width:100%;max-height:420px;object-fit:contain;background:var(--color-paper-2)}
+.je-plate-tab{position:absolute;top:-11px;left:18px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-paper);background:var(--color-ink);padding:3px 9px;border-radius:3px}
+.je-plate figcaption{font-family:var(--font-mono);font-size:11px;line-height:1.55;color:var(--color-ink-faint);margin-top:11px;padding-left:14px;border-left:2px solid var(--accent)}
+.je-tape{position:absolute;top:-12px;right:26px;width:74px;height:24px;background:rgba(216,182,120,.5);border:1px solid rgba(0,0,0,.06);transform:rotate(17deg)}
+
+.je-plate-media .zoom-btn{top:auto;bottom:10px}
+
+.je-body{position:relative;width:100%;max-width:min(100%,calc(var(--rail) + var(--colgap) + var(--col)));padding-left:calc(var(--rail) + var(--colgap));counter-reset:sec plate}
+.je-rule{position:absolute;left:var(--rail);top:-4px;bottom:60px;width:1.4px;background:color-mix(in oklab,var(--accent) 72%,transparent);opacity:.65}
+
+.je-secnav{position:absolute;left:0;top:0;bottom:0;width:var(--rail)}
+.je-secnav-in{position:sticky;top:26px;display:flex;flex-direction:column;gap:1px}
+.je-secnav .hd{font-family:var(--font-mono);font-size:8.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--color-ink-faint);text-align:right;padding:0 13px 9px 0}
+.je-secnav a{display:block;text-align:right;text-decoration:none;padding:6px 11px 7px 4px;border-right:2px solid transparent;border-radius:3px 0 0 3px;transition:background .15s,color .15s,border-color .15s}
+.je-secnav a .n{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:1.4px;color:var(--color-ink-faint)}
+
+.je-secnav a .t{display:-webkit-box;-webkit-line-clamp:4;line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-family:var(--font-accent);font-weight:600;font-size:20px;line-height:1.22;padding:3px 4px 5px;margin:-3px -4px -3px;color:color-mix(in oklab,var(--color-ink) 55%,var(--color-paper))}
+.je-secnav a:hover{background:color-mix(in oklab,var(--color-paper-2) 70%,transparent)}
+.je-secnav a:hover .t{color:var(--color-ink)}
+.je-secnav a.on{background:color-mix(in oklab,var(--accent) 11%,var(--color-paper));border-right-color:var(--accent)}
+.je-secnav a.on .n{color:var(--accent-ink)}
+.je-secnav a.on .t{color:var(--color-ink)}
+
+.je-side{float:right;clear:right;position:relative;width:var(--side-w);margin:5px calc(-1 * (var(--side-w) + var(--side-gap))) 18px var(--side-gap);font-family:var(--font-accent);font-weight:600;font-size:21px;line-height:1.3;color:color-mix(in oklab,var(--color-ink) 68%,var(--color-paper))}
+.je-side::before{content:"";position:absolute;left:calc(6px - var(--side-gap));top:14px;width:18px;height:1.2px;background:color-mix(in oklab,var(--accent) 70%,transparent)}
+
+.je-side.is-fn{font-family:var(--font-display);font-weight:400;font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
+.je-side.is-fn .n{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-right:7px}
+/* remark-gfm emits one terminal footnote list; this is the in-column fallback. */
+.je-fnlist{clear:right;margin:38px 0 0;padding-top:14px;border-top:1px dashed var(--color-ink-faint);max-width:var(--je-measure);font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
+.je-fnlist h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.je-fnlbl{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);margin-bottom:10px}
+
+.je-fnlist ol{margin:0;padding-left:0}
+.je-fnlist li{font-size:15px;line-height:1.5;margin-bottom:8px;padding-left:28px}
+.je-fnlist li::before{top:3px;font-size:11px}
+.je-fnlist p{font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
+
+.je-fnlist li:target{background:color-mix(in oklab,var(--accent) 12%,transparent);border-radius:3px}
+.je-fnlist li:target::before{color:var(--color-ink)}
+
+.je-fnlist li,.je-fnref{scroll-margin-top:120px}
+.je-fnlist a{color:var(--accent-ink)}
+
+.je-fnlist a[data-footnote-backref]{border-bottom:0;padding:0 4px;text-decoration:none}
+.je-fnlist a[data-footnote-backref]:hover{color:var(--color-ink)}
+.je-fnref{font-family:var(--font-mono);font-size:.58em;font-weight:500;color:var(--accent-ink);vertical-align:super;line-height:0;padding-left:2px;text-decoration:none}
+.je-fnref a{color:inherit;text-decoration:none;border-bottom:0}
+.je-fnref a:hover{color:var(--color-ink)}
+
+/* The mobile-only portal sits outside .je, so it redeclares article accent tokens. */
+.je-fnsheet-wrap{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink))}
+
+.je-fnsheet-scrim{position:absolute;inset:0;border:0;padding:0;background:color-mix(in srgb,var(--color-ink) 26%,transparent);animation:je-fnfade .18s ease-out both;cursor:pointer}
+/* Remove animation fill after entry so inline drag styles can take over. */
+.je-fnsheet-scrim.settled{animation:none}
+.je-fnsheet{position:relative;display:flex;flex-direction:column;max-height:calc(100dvh - env(safe-area-inset-top) - 16px);background:var(--color-paper);border-top:1.4px solid var(--color-ink);border-radius:15px 15px 0 0;box-shadow:0 -7px 24px color-mix(in srgb,var(--color-ink) 14%,transparent);padding:9px 18px 26px;animation:je-fnup .27s cubic-bezier(.2,.85,.25,1) both;touch-action:pan-y}
+.je-fnsheet.settled{animation:none}
+.je-fnsheet-drag{touch-action:none}
+.je-fnsheet-grab{display:block;width:36px;height:3.5px;border-radius:3px;background:color-mix(in oklab,var(--color-ink) 20%,transparent);margin:0 auto 13px;cursor:grab}
+.je-fnsheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent-ink)}
+
+.je-fnsheet-x{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-13px -16px -13px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:15px;line-height:1;letter-spacing:0;color:var(--color-ink-soft);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.je-fnsheet-x:active{color:var(--color-ink)}
+
+.je-fnsheet-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
+.je-fnsheet-body p{margin:0;font-size:inherit;line-height:inherit;color:inherit}
+.je-fnsheet-body p+p{margin-top:9px}
+.je-fnsheet-body a{color:var(--accent-ink)}
+.je-fnsheet-body .n{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-right:7px}
+@keyframes je-fnup{from{transform:translateY(101%)}to{transform:translateY(0)}}
+@keyframes je-fnfade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.je-fnsheet,.je-fnsheet-scrim{animation:none}}
+/* Article body */
+.je-body p{font-family:var(--font-display);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:var(--je-measure);color:var(--color-ink);text-wrap:pretty}
+.je-ic{font-family:var(--font-mono);font-size:.8em;background:color-mix(in oklab,var(--color-ink) 7%,var(--color-paper-2));border:1px solid var(--color-ink-faint);border-radius:3px;padding:1px 5px}
+.je-body strong{font-weight:600}
+.je-body a{color:var(--color-electric);text-decoration:none;border-bottom:1.5px dotted color-mix(in oklab,var(--color-electric) 55%,transparent)}
+.je-body a:hover{color:var(--color-ink);border-bottom-color:var(--color-ink)}
+
+.je-hl{background:linear-gradient(180deg,transparent 76%,color-mix(in oklab,var(--accent) 58%,#fff) 76%,color-mix(in oklab,var(--accent) 58%,#fff) 96%,transparent 96%);color:inherit;padding:0 3px}
+
+.je-h2{margin:44px 0 16px;max-width:var(--je-measure);counter-increment:sec}
+.je-secn{display:block;font-family:var(--font-accent);font-weight:600;font-size:20px;color:var(--accent-ink);line-height:1;margin-bottom:2px}
+.je-secn::before{content:"\270E \A7" counter(sec,decimal-leading-zero)}
+.je-h2 h2{font-family:var(--font-display);font-weight:600;font-size:33px;line-height:1.12;margin:0;color:var(--color-ink);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:color-mix(in oklab,var(--accent) 55%,transparent);text-decoration-thickness:1.6px;text-underline-offset:9px}
+.je-body h3{font-family:var(--font-display);font-weight:600;font-size:24px;line-height:1.2;margin:28px 0 10px;max-width:var(--je-measure);color:var(--color-ink)}
+
+.je-ul{list-style:none;padding:0;margin:6px 0 24px;max-width:var(--je-measure)}
+.je-ul li{position:relative;padding-left:28px;font-family:var(--font-display);font-size:19px;line-height:1.6;margin-bottom:11px}
+.je-ul li::before{content:"";position:absolute;left:2px;top:11px;width:8px;height:8px;border:1.6px solid var(--accent);border-radius:2px;transform:rotate(45deg)}
+/* Tailwind preflight removes markers; ordered-list ordinals use a counter. */
+.je-ol{list-style:none;padding-left:2px;margin:6px 0 24px;max-width:var(--je-measure);font-family:var(--font-display);font-size:19px;line-height:1.6;counter-reset:oli}
+.je-ol li{position:relative;padding-left:32px;margin-bottom:9px;counter-increment:oli}
+.je-ol li::before{content:counter(oli,decimal-leading-zero);position:absolute;left:0;top:5px;font-family:var(--font-mono);font-size:12px;color:var(--accent-ink)}
+
+.je-callout{--cal:var(--accent);position:relative;max-width:var(--je-measure);margin:26px 0;padding:15px 20px;background:color-mix(in oklab,var(--cal) 7%,var(--color-paper));border:1px solid color-mix(in oklab,var(--cal) 34%,var(--color-ink-faint));border-left:3px solid var(--cal);border-radius:3px;font-family:var(--font-display);font-weight:400;font-size:19px;line-height:1.6;color:var(--color-ink);text-wrap:pretty}
+
+.je-callout.is-warning{--cal:oklch(.78 .155 85);background:color-mix(in oklab,var(--cal) 26%,var(--color-paper));border-color:color-mix(in oklab,var(--cal) 62%,var(--color-ink-faint));border-left-color:var(--cal)}
+.je-callout.is-tip{--cal:oklch(.5 .04 205);background:color-mix(in oklab,var(--cal) 5%,var(--color-paper));border-color:color-mix(in oklab,var(--cal) 30%,var(--color-ink-faint))}
+
+.je-callout .lbl{display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:9.5px;font-weight:500;letter-spacing:2.2px;text-transform:uppercase;color:color-mix(in oklab,var(--cal) 63%,var(--color-ink));margin-bottom:8px}
+.je-callout.is-warning .lbl{color:color-mix(in oklab,var(--cal) 22%,var(--color-ink))}
+.je-callout.is-tip .lbl{color:color-mix(in oklab,var(--cal) 88%,var(--color-ink))}
+
+/* Code blocks */
+.je-code{margin:28px 0;max-width:var(--je-measure);background:#fffdf7;border:1.4px solid var(--color-ink);border-radius:4px;box-shadow:2px 2px 0 color-mix(in oklab,var(--color-ink) 13%,transparent)}
+.je-code .bar{display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px dashed color-mix(in oklab,var(--color-ink) 38%,var(--color-paper));background:color-mix(in oklab,var(--color-paper-2) 62%,#fff);border-radius:3px 3px 0 0}
+.je-code .fn{font-family:var(--font-mono);font-size:11px;color:var(--color-ink)}
+.je-code .lang{font-family:var(--font-mono);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);border:1px solid color-mix(in oklab,var(--color-ink) 26%,var(--color-paper));border-radius:999px;padding:2px 8px}
+.je-code .copy{margin-left:auto;font-family:var(--font-mono);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 7px;cursor:pointer}
+.je-code .copy:hover{color:var(--color-ink);border-color:color-mix(in oklab,var(--color-ink) 30%,var(--color-paper))}
+/* CodeBlock toggles .more/.less to expose horizontal overflow cues. */
+.je-code .cwrap{position:relative}
+.je-code .cwrap::before,.je-code .cwrap::after{content:"";position:absolute;top:0;bottom:0;width:30px;pointer-events:none;opacity:0;transition:opacity .18s ease-out;z-index:1}
+.je-code .cwrap::after{right:0;background:linear-gradient(90deg,rgba(255,253,247,0),#fffdf7 70%)}
+.je-code .cwrap::before{left:0;background:linear-gradient(270deg,rgba(255,253,247,0),#fffdf7 70%)}
+.je-code .cwrap.more::after{opacity:1}
+.je-code .cwrap.less::before{opacity:1}
+.je-code .cbody{counter-reset:ln;overflow-x:auto;padding:12px 0;background:linear-gradient(90deg,transparent 0 42px,color-mix(in oklab,var(--accent) 40%,transparent) 42px 43px,transparent 43px);scrollbar-width:thin;scrollbar-color:transparent transparent;transition:scrollbar-color .18s ease-out}
+/* Keep the scrollbar track reserved to prevent hover reflow. */
+.je-code:hover .cbody,.je-code .cbody:focus-visible{scrollbar-color:color-mix(in oklab,var(--color-ink) 28%,transparent) transparent}
+.je-code .ln{display:block;position:relative;counter-increment:ln;padding:0 18px 0 58px;font-family:var(--font-mono);font-size:13.5px;line-height:1.72;white-space:pre;color:var(--color-ink)}
+.je-code .ln::before{content:counter(ln);position:absolute;left:0;width:30px;text-align:right;font-size:11px;color:color-mix(in oklab,var(--color-ink) 32%,var(--color-paper))}
+.je-code .ln.hi{background:color-mix(in oklab,var(--accent) 10%,transparent)}
+.je-code .cap{font-family:var(--font-mono);font-size:10.5px;line-height:1.5;color:var(--color-ink-faint);padding:9px 14px 10px;border-top:1px dashed color-mix(in oklab,var(--color-ink) 30%,var(--color-paper))}
+.je-code .t-k{color:var(--tk-key);font-weight:500}
+.je-code .t-s{color:var(--tk-str)}
+.je-code .t-n{color:var(--tk-num)}
+.je-code .t-f{color:var(--tk-fn)}
+.je-code .t-a{color:var(--tk-num);font-weight:500}
+.je-code .t-c{color:var(--tk-com);font-style:italic}
+.je-code .t-p{color:var(--tk-pn)}
+
+.je-quote{position:relative;margin:36px 0 36px -8px;max-width:calc(var(--je-measure) + 8px);padding:6px 0 6px 26px;border-left:3px solid var(--accent)}
+.je-quote p{font-family:var(--font-accent);font-weight:600;font-size:36px;line-height:1.22;color:var(--color-ink);margin:0}
+.je-quote cite{display:block;font-family:var(--font-mono);font-style:normal;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);margin-top:12px}
+
+/* MDX wraps block JSX children in p; reset inherited article paragraph styles. */
+.je-callout p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
+.je-callout p+p{margin-top:10px}
+.je-callout p:last-child{margin-bottom:0}
+.je-plate figcaption p{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
+
+.je-end{display:flex;justify-content:space-between;clear:right;max-width:var(--je-measure);font-family:var(--font-mono);font-size:11px;color:var(--color-ink-faint);margin-top:34px;padding-top:14px;border-top:1px dashed var(--color-ink-faint)}
+
+.je-foot{margin-top:52px;padding-top:24px;border-top:2px solid var(--color-ink)}
+.je-alsolbl{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--color-ink-faint);margin-bottom:9px}
+.je-also{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.je-also .je-chip{text-decoration:none}
+.je-also .je-chip:hover{background:var(--color-paper-2)}
+.je-navlbl{font-family:var(--font-accent);font-weight:600;font-size:22px;color:var(--color-ink-faint);margin-bottom:14px}
+.je-nav{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.je-navcard{border:1.5px solid var(--color-ink);border-radius:8px;padding:18px 20px;text-decoration:none;color:var(--color-ink);background:var(--color-paper);transition:background .15s,transform .15s}
+.je-navcard.is-off{display:block;opacity:.45;border-style:dashed;pointer-events:none}
+.je-navcard.is-off .d,.je-navcard.is-off .t{display:block}
+.je-navcard:hover{background:var(--color-paper-2);transform:translateY(-3px)}
+.je-navcard .d{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint)}
+.je-navcard .t{font-family:var(--font-display);font-weight:600;font-size:25px;line-height:1.08;margin-top:8px}
+.je-navcard .m{font-family:var(--font-mono);font-size:10px;color:var(--color-ink-faint);margin-top:9px}
+.je-navcard.older{text-align:right}
+.je-colophon{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--color-ink-faint);text-align:center;margin-top:34px}
+
+/* Article responsive layout */
+@media (max-width:1300px){
+  .je{--side-w:288px;--side-gap:26px;--col:600px;--je-measure:600px}
+}
+@media (max-width:1140px){
+
+  .je-side{float:none;width:auto;margin:16px 0 20px;padding-left:16px;border-left:1.5px dashed color-mix(in oklab,var(--accent) 45%,transparent)}
+  .je-side::before{display:none}
+  .je-side.is-fn{padding-left:14px}
+}
+@media (max-width:1000px){
+  .je-inner{width:100%;padding:32px 26px 80px}
+  .je-title{font-size:54px}
+  .je{--rail:104px;--colgap:22px}
+  .je-callout{max-width:100%}
+  .je-body p,.je-ul,.je-ol,.je-h2,.je-body h3,.je-code,.je-quote,.je-end{max-width:100%}
+}
+@media (max-width:820px){
+  .je-secnav{display:none}
+  .je{--rail:26px;--colgap:14px}
+}
+
+@media (max-width:640px){
+  .je-inner{padding:24px 18px 72px}
+  .je-ledger{font-size:9px;letter-spacing:2px;gap:9px}
+  .je-chip{font-size:11px}
+  .je-title{font-size:34px;line-height:1.04;letter-spacing:-.8px}
+  .je-dek{font-size:18px;line-height:1.42}
+  .je-byline{font-size:10px;letter-spacing:.4px}
+  .je-plate{padding:10px 10px 10px}
+  .je-plate figcaption{font-size:10px}
+  .je-tape{display:none}
+
+  .je{--rail:14px;--colgap:20px}
+  .je-body p{font-size:17px;line-height:1.7}
+  .je-ul li,.je-ol li{font-size:17px;line-height:1.62}
+  .je-h2{margin:30px 0 12px;position:relative}
+  .je-h2 h2{font-size:21px;line-height:1.15;letter-spacing:-.012em;text-underline-offset:6px;text-decoration-thickness:1.4px;text-decoration-skip-ink:none}
+  .je-secn{position:absolute;left:calc(-1 * (var(--rail) + var(--colgap)));top:3px;width:28px;padding:2px 0;font-family:var(--font-mono);font-size:9.5px;font-weight:400;letter-spacing:.5px;line-height:1;text-align:center;background:var(--color-paper)}
+  .je-secn::before{content:"\A7" counter(sec,decimal-leading-zero)}
+  .je-body h3{font-size:19px;line-height:1.2}
+  .je-quote p{font-size:28px;line-height:1.22}
+  .je-quote cite{font-size:10px;letter-spacing:1.8px}
+  .je-callout{font-size:17px;line-height:1.6;padding:13px 16px}
+  .je-callout .lbl{font-size:9.5px;letter-spacing:2.2px}
+
+  .je-side{font-size:20px;line-height:1.36}
+  .je-side.is-fn{font-size:15px;line-height:1.5}
+  /* Keep the hidden list in the DOM because the mobile sheet clones its bodies. */
+  .je-fnlist{display:none}
+  /* The pseudo-element enlarges the footnote tap target without changing line height. */
+  .je-fnref{position:relative;display:inline-block;vertical-align:.34em;margin:0 1px 0 2px;padding:1px 5px 1.5px;border-radius:20px;background:color-mix(in oklab,var(--accent) 20%,var(--color-paper));font-size:9.5px;line-height:1.3;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .je-fnref::after{content:"";position:absolute;inset:-9px -7px}
+  .je-fnref:active{background:color-mix(in oklab,var(--accent) 34%,var(--color-paper))}
+  .je-fnref.is-on{background:color-mix(in oklab,var(--accent) 40%,var(--color-paper))}
+  .je-code .ln{font-size:12px;line-height:1.7;padding-left:50px}
+  .je-code .cap{font-size:9.5px}
+  .je-nav{grid-template-columns:1fr}
+  .je-navcard.older{text-align:left}
+}

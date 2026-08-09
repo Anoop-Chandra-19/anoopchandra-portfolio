@@ -1,0 +1,174 @@
+---
+title: "Loading my TensorFlow.js models without loading them everywhere"
+kind: note
+date: 2026-08-05
+tag: web
+dek: "I trained two models for my portfolio. Getting them into the browser without making every visitor load TensorFlow.js became a separate frontend problem."
+related: [inside-this-journal, audio-genre-classification]
+---
+
+I trained two machine-learning models for my portfolio because I wanted the Lab section to contain experiments people could actually use. One recognized drawings from Google QuickDraw. The other read the sentiment of a short piece of text. Both ran locally in Python before I started moving them into the website.
+
+The drawing model was a convolutional neural network, or CNN, trained across 50 QuickDraw classes.[^1] I took the original stroke data, rendered up to 2,000 drawings from each class as 28 by 28 grayscale images, and split those images into training, validation, and test sets. The sentiment model was a bidirectional LSTM trained on IMDB movie reviews.[^2] Its input was limited to 64 tokens from a vocabulary of 10,000 words.
+
+I kept the training and conversion code in a separate [model repository](https://github.com/Anoop-Chandra-19/portfolio_models). That repository produced the models. The portfolio still had to download them, prepare their inputs, run them in a browser, and recover when some part of that process failed.
+
+The doodle model is roughly 1.9 MB. The sentiment model is roughly 10.2 MB and also needs a word index to turn text into the numbers it was trained to read. TensorFlow.js brings the runtime that loads those files and executes their graphs. Most people visiting the portfolio will never open either experiment.
+
+That left me with a frontend question after the model work was finished: when should a visitor's browser begin paying for any of it?
+
+## From Keras to files a browser could load
+
+I trained both models with Keras. The saved Python models could not be dropped into the website and imported like a normal TypeScript module. I first exported each one as a TensorFlow SavedModel, then ran the TensorFlow.js converter over that export.[^3]
+
+The converter produced a `model.json` file describing the graph and one or more binary files containing its weights. The doodle model fit in one weight shard. The larger sentiment model was divided across three. I also used float16 quantization for the sentiment conversion, which stores its floating-point weights with less precision to reduce their size.[^4]
+
+The sentiment model needed one more file. Its tokenizer had learned a word index during training, mapping words such as `movie` or `great` to integers. The browser had to use the same mapping before sending a sentence into the model. The complete exported index was about 2.1 MB even though the tokenizer only accepted indices below 10,000. I added a script to keep the usable entries and write a reduced index of about 145 KB.
+
+The inputs also had to follow the shapes used during training. The sentiment lab cleans the text, looks up each word, replaces unknown words with the out-of-vocabulary value, and pads or cuts the result to 64 positions. The drawing lab takes a much larger canvas, finds the bounds of the sketch, centers it, shrinks it to 28 by 28 pixels, and creates the four-dimensional tensor expected by the CNN.
+
+Once that conversion and preprocessing were in place, both models could make predictions in the browser. Loading them well was a separate pass.
+
+## My first version started loading from the home page
+
+I wanted the experiments to feel ready by the time someone selected one. My first loading strategy tried to use the time before that click.
+
+The home page watched for the Lab section to enter the viewport. When it appeared, an `IntersectionObserver` scheduled both models to load during the browser's next idle period.[^5] Moving the pointer over a model card or pressing it could also start that model early. I checked the browser's Data Saver preference before prefetching, so someone who had explicitly enabled it would skip the work.
+
+It seemed like useful preparation. A visitor could read the Lab section, choose an experiment, and arrive after much of the download had already happened.
+
+The trigger was still too broad. Someone only had to scroll far enough down the home page to start fetching both models. They did not have to open the doodle classifier or type anything into the sentiment lab. The site was preparing more than 12 MB of model files, the word index, and the TensorFlow.js runtime for two interactions they might ignore.
+
+I removed the home-page prefetching. The cards could explain what the experiments did without quietly loading them. The selected lab route became the boundary where model work was allowed to begin.
+
+## Waiting for the actual lab
+
+The doodle and sentiment components now request their models after their own page opens. The portfolio uses an ink animation while navigating into a lab, so the request also waits for that transition to finish. I did not want model initialization and the page transition competing at the same moment.
+
+Opening the doodle lab starts the doodle path. Opening sentiment starts the sentiment path. The third experiment, a K-Means and perceptron playground written in TypeScript, never asks for TensorFlow.js at all.
+
+The shared loader contains a type-only TensorFlow.js import so TypeScript can check its models and tensors. That import disappears from the JavaScript sent at runtime. The real library enters through a dynamic import inside the loading function:
+
+```ts title="Loading the TensorFlow.js runtime"
+let tfPromise: Promise<typeof tfType> | null = null;
+
+function loadTf(): Promise<typeof tfType> {
+  if (!tfPromise) {
+    tfPromise = import("@tensorflow/tfjs")
+      .then(async (tf) => {
+        await tf.ready();
+        return tf;
+      })
+      .catch((error: unknown) => {
+        tfPromise = null;
+        throw error;
+      });
+  }
+
+  return tfPromise;
+}
+```
+
+The first model request starts the import and waits for TensorFlow.js to choose and initialize its backend. Later requests share the same promise. If initialization fails, the rejected promise is cleared so pressing Retry can make a fresh attempt instead of receiving the same stored rejection forever.
+
+This keeps the expensive runtime behind the same boundary as the models that need it. A normal portfolio page has no reason to initialize TensorFlow.js.
+
+<Figure
+  src="/journal/loading-my-tensorflowjs-models/loading-boundary.png"
+  alt="A hand-drawn flowchart titled The Loading Boundary. Above the boundary, the home page shows lab cards without loading TensorFlow.js or model weights, and the old prefetch-both-models path is crossed out beside the exported QuickDraw and sentiment models. Below the boundary, opening one lab dynamically imports TensorFlow.js, requests the selected model from IndexedDB or the network, warms it up, and reaches a ready state. A final loop preprocesses input, predicts, copies the result, and disposes temporary tensors."
+>
+  The boundary used by both model labs. The home page only links to the experiments; TensorFlow.js and the selected model begin loading after one lab opens.
+</Figure>
+
+## One runtime and one promise for each model
+
+The runtime can be shared, but loading the doodle model should not pull in sentiment or the other way around. I keep one entry for each model. Each entry holds its current loading promise, progress, and a set of progress listeners.
+
+The first call for a model creates its promise. Another call made while that model is still loading receives the same promise. After it resolves, the loaded graph remains attached to that promise for the rest of the browser session. Navigating away from a lab and returning does not fetch or initialize the model again.
+
+This became useful in places where the interface and prediction handler both need the same resource. The page can start loading as soon as it is ready, then the button handler can call the same function before prediction without having to know whether the work already happened.
+
+A rejected model load follows the same retry rule as the runtime. Its entry returns to an empty state and reports an error. The next call can start over.
+
+## Keeping a copy in IndexedDB
+
+The in-memory promise lasts only while the current page session is alive. I also wanted a repeat visit to avoid downloading the model weights again, so the loader first looks in IndexedDB, the browser's storage system for larger structured data.[^6]
+
+Each model has its own IndexedDB name. If TensorFlow.js finds the saved graph there, the loader marks the weight phase as cached and continues. If the lookup fails, it loads `model.json` and the weight shards from the website. After a network load, it asks TensorFlow.js to save a copy into IndexedDB.
+
+That save is best-effort. Private browsing, a storage quota, or a browser policy can prevent IndexedDB from working. None of those cases should stop a model that has already arrived over the network. A failed save means the next visit may download the files again.
+
+The lookup uses a similar fallback. Failure to read the cached model sends the loader to the network path. IndexedDB improves a later visit when it is available. It is not a requirement for using the lab.
+
+## Loading was more than a percentage
+
+The first UI for this work looked like a small terminal boot transcript. I did not want it to print made-up progress while several different operations were happening underneath it.
+
+The loader reports six phases:
+
+```text
+idle → fetching → word index → warm-up → ready
+                                      ↘ error
+```
+
+During a network model load, TensorFlow.js supplies a real fraction through `loadGraphModel`'s progress callback. The transcript turns that fraction into its ten-step bar and percentage. An IndexedDB hit jumps the weight progress to complete and labels it as cached.
+
+The sentiment route then enters a separate word-index phase. It requests the reduced file first and can fall back to the complete exported index if that request fails. The doodle model has no vocabulary, so it skips that phase.
+
+The transcript does add a short delay between newly available lines. A cached model can move through several phases too quickly to read, and rendering every line at once looked more like a flash than a boot sequence. The delay is presentation. The download fraction, cache result, and phase changes come from the loader.
+
+## Warming the model before the first real input
+
+A loaded graph was still not quite ready for the first button press. TensorFlow.js uses WebGL for these models when that backend is available. The first prediction can include the work of compiling GPU shader programs for the graph.[^7]
+
+I moved that work into an explicit warm-up phase. The loader creates a zero-filled tensor with the correct input shape, runs one prediction, and waits for the first output's data. The doodle warm-up uses `[1, 28, 28, 1]`. Sentiment uses `[1, 64]`.
+
+That prediction is thrown away, but its tensors are real allocations. Both the input and every output have to be disposed even if reading the result fails:
+
+```ts title="Warm-up cleanup"
+let input: Tensor | null = null;
+let output: ModelOutput | null = null;
+
+try {
+  input = tf.zeros(warmShape);
+  output = model.predict(input) as ModelOutput;
+  const [firstOutput] = getModelOutputTensors(output);
+  if (!firstOutput) throw new Error("No output tensors");
+  await firstOutput.data();
+} finally {
+  input?.dispose();
+  disposeModelOutput(output);
+}
+```
+
+The same pattern wraps real predictions in both labs. The input tensor lives long enough to run the graph. The output is copied into ordinary JavaScript values for the interface. A `finally` block disposes the tensors whether prediction succeeds or throws.
+
+I originally treated model output as one tensor because both current models return one. TensorFlow.js can also return an array or a named map of tensors. The cleanup helper accepts all three forms, collects the outputs, and disposes each unique tensor. That keeps the caller correct if an exported graph changes its output shape later.
+
+The graph model itself has a longer lifetime. It remains cached after a successful setup. If the model loads and a later step such as vocabulary loading or warm-up fails, the loader disposes that partially prepared model before reporting the error.
+
+## Letting the visitor retry without starting over
+
+Loading errors and prediction errors need different recovery paths. A model may fail before the lab becomes ready because the runtime, graph, weights, or vocabulary could not load. A prediction can fail later after the visitor has already drawn a sketch or typed a sentence.
+
+The interface keeps those states separate. A loading failure offers another attempt at the model request. An inference failure reruns the prediction. The doodle lab leaves the drawing on its canvas, and the sentiment lab leaves the text in its input, so Retry does not ask the visitor to recreate anything.
+
+The progress subscriptions return cleanup functions that remove their listeners when a component unmounts. The effects that start a model load also mark themselves as cancelled during cleanup. The shared promise may still finish and populate the cache after navigation, but the old component will not try to display an error after it has left the page.
+
+At that point the loading path had grown beyond one `import` and one call to `predict`. It had a route boundary, a shared runtime, separate model promises, two levels of caching, real progress, warm-up, retry behavior, and explicit resource cleanup.
+
+I still get the part I wanted when I trained the models: the drawing and the sentence stay in the visitor's browser, and the prediction runs there too.
+
+[^1]: A convolutional neural network processes an image through learned filters that respond to visual patterns. The QuickDraw model receives one 28 by 28 grayscale image and returns a score for each of its 50 known classes.
+
+[^2]: A long short-term memory network, or LSTM, processes a sequence while carrying information from earlier positions. A bidirectional LSTM reads the sequence in both directions before producing its result. This model was trained on movie reviews, which is why its judgement still has a movie-review bias when given unrelated text.
+
+[^3]: Keras is the high-level library I used to define and train the models. SavedModel is TensorFlow's export format for a complete computation graph and its learned values. The TensorFlow.js converter translates that export into files its browser runtime can load.
+
+[^4]: A 32-bit floating-point number stores more precision than a 16-bit one and takes twice as much space. Float16 quantization reduces the stored precision of the weights. It can make a model smaller, though the converted model still needs to be checked to make sure the accuracy remains acceptable.
+
+[^5]: `IntersectionObserver` is a browser API that reports when an element enters or leaves the visible area of a page. `requestIdleCallback` schedules lower-priority work for a period when the browser is not busy with more immediate tasks.
+
+[^6]: IndexedDB is a browser database designed for more data than small key-value storage such as `localStorage`. TensorFlow.js can save a graph model and its weights there under a named URL.
+
+[^7]: WebGL is a browser interface for running graphics work on the GPU. TensorFlow.js can express model operations through WebGL shader programs so inference runs on the graphics processor rather than only on the CPU.

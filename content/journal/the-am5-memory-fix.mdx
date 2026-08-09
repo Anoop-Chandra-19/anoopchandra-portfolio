@@ -1,0 +1,46 @@
+---
+title: "The AM5 Memory Fix"
+kind: note
+date: 2025-06-30
+tag: hardware
+dek: "My new AM5 build kept showing a memory error. Loosening the CPU cooler fixed it."
+
+---
+
+I thought the first boot would be the easy part.
+
+I had spent hours putting together a new PC with a Ryzen 7 7800X3D. Everything was finally connected, so I pressed the power button and waited. The system powered on, but it would not get through POST.[^1] It kept stopping at a memory error.
+
+## Trying the RAM again and again
+
+Since the board was pointing at memory, I started with the RAM. I swapped the sticks between slots, tried one stick at a time, reseated them, and rebooted more times than I can remember.
+
+Nothing changed. Every attempt ended at the same memory error.
+
+By then I was tired and annoyed, so I stopped for the night. I went to sleep thinking I would probably have to take the whole build apart the next day.
+
+## One random forum post
+
+The next morning, I was doom-scrolling through forum threads when I found a comment that said:
+
+<Quote cite="A forum post I found the next morning">
+“Overtightening the CPU cooler can cause memory controller issues with AM5. Try loosening the screws.”
+</Quote>
+
+It sounded random. The motherboard was complaining about memory, and this person was telling me to touch the CPU cooler. I had already tried everything else I could think of, though, so I loosened the cooler screws a little and powered the PC on again.
+
+This time it started memory training.[^2]
+
+That was it. After all the RAM swapping and rebooting, the thing that made a difference was slightly loosening four screws.
+
+## What the cooler had to do with memory
+
+The suggestion made more sense once I looked into it. The memory controller is inside the processor, and AM5 uses contact pins in the motherboard socket underneath it. The CPU cooler clamps the processor against that socket. Too much or uneven mounting pressure can affect that contact and cause problems that show up as memory errors.
+
+I still do not know exactly what was happening in my build. It could have been poor socket contact or a small amount of motherboard flex. I did not feel like tightening it again just to reproduce the problem. The pressure change worked, and the system moved past the error.
+
+Once memory training finished, I installed Windows. About twenty minutes later, I was finally using the PC I had spent the previous day building.
+
+[^1]: POST, short for power-on self-test, is the hardware check a computer runs before starting the operating system.
+
+[^2]: During memory training, the motherboard works out stable settings for communicating with the RAM. On a new AM5 build, the screen can stay blank for several minutes while this happens.

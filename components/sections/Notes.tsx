@@ -1,0 +1,127 @@
+"use client";
+import Link from "next/link";
+import SectionHeader from "@/components/ui/SectionHeader";
+import { pad, tabColors, type JournalEntryMeta } from "@/lib/journal-meta";
+import { useInkTransition } from "@/components/transition/InkTransitionProvider";
+
+export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
+  const { navigate } = useInkTransition();
+  const pages = entries.map((e) => e.page);
+
+  return (
+    <section id="sec-notes" className="section">
+      <SectionHeader num="05" title="Notes & Stories" meta={`${entries.length} entries · index`} />
+      <p className="faint max-w-[720px] mb-6">
+        A working journal for bug stories, personal projects, opinions, and things I figured out
+        the hard way.
+      </p>
+
+      <div className="relative">
+        <div className="notes-book bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
+          <span
+            aria-hidden="true"
+            className="notes-margin-rule absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
+            style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
+          />
+          <div
+            className="mono faint notes-index-label absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
+            style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
+          >
+            ✎ index — pp. {pad(Math.min(...pages))}–{pad(Math.max(...pages))}
+          </div>
+
+          <div
+            className="mono faint notes-header grid gap-3.5 pt-0 pr-[90px] pb-3 pl-1.5 text-[9px] tracking-[2px] uppercase mb-1.5"
+            style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
+          >
+            <span className="text-right">pg.</span>
+            <span>title</span>
+            <span className="text-right">read</span>
+            <span className="text-right">date</span>
+          </div>
+
+          <ul className="list-none p-0 m-0">
+            {entries.map((e) => (
+              <li key={e.slug}>
+                <Link
+                  href={`/journal/${e.slug}`}
+                  className="notes-row grid gap-3.5 items-baseline py-3 pr-[90px] pl-1.5 relative no-underline transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
+                  /* No aria-label: on a link it replaces the whole subtree, so it
+                     was hiding the page number, read time and date. */
+                  onClick={(ev) => {
+                    // keep native behavior for new-tab/window clicks
+                    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+                    ev.preventDefault();
+                    // the row spans the page — bleed from the click point, not the
+                    // row center (ev.detail === 0 → keyboard activation, no coords)
+                    const originRect =
+                      ev.detail === 0
+                        ? ev.currentTarget.getBoundingClientRect()
+                        : new DOMRect(ev.clientX, ev.clientY, 0, 0);
+                    navigate(`/journal/${e.slug}`, { effect: "bleed", originRect });
+                  }}
+                >
+                  <span className="mono faint notes-date text-[11px] text-right text-ink-soft">
+                    p.{pad(e.page)}
+                  </span>
+
+                  <span className="notes-title flex items-center min-w-0 gap-2 overflow-hidden">
+                    <span className="text-[17px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
+                      {e.title}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="notes-leader flex-1 h-0 min-w-6 -translate-y-1"
+                      style={{ borderBottom: "1.5px dotted var(--color-ink-faint)" }}
+                    />
+                  </span>
+
+                  <span className="mono faint notes-meta notes-read text-[11px] text-right text-ink-soft">
+                    {e.read}
+                  </span>
+
+                  <span className="mono notes-meta notes-when text-[11px] text-right text-ink-soft">
+                    {e.dateDisplay}
+                  </span>
+
+                  <span
+                    className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-2.5 pr-2"
+                    // only the tab colour is dynamic — border/radius live in CSS
+                    // so the mobile pass can turn the edge tab into a pill
+                    style={tabColors(e.kind)}
+                  >
+                    {e.tag}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div
+            className="notes-foot flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
+            style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
+          >
+            <span className="mono faint text-[11px]">
+              {entries.length} entries · pp. {pad(Math.min(...pages))}–{pad(Math.max(...pages))}
+            </span>
+            <Link
+              href="/journal"
+              className="text-[16px] text-electric no-underline"
+              onClick={(e) => {
+                // keep native behavior for new-tab/window clicks
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                e.preventDefault();
+                navigate("/journal", {
+                  effect: "bleed",
+                  originRect: e.currentTarget.getBoundingClientRect(),
+                });
+              }}
+            >
+              see all notes &amp; case studies →
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

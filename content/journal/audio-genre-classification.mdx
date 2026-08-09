@@ -1,0 +1,91 @@
+---
+title: "Audio Genre Classification"
+kind: case
+date: 2025-05-16
+tag: ai/ml
+dek: "I fine-tuned an Audio Spectrogram Transformer on FMA-Small, then put the eight-genre classifier behind a FastAPI upload service."
+sub: "course project · 2025"
+hero: /journal/audio-genre-classification/hero.png
+heroAlt: "The audio genre classifier showing Rock as the top prediction for an uploaded MP3, followed by confidence scores for seven other genres."
+heroCaption: "The upload interface for the deployed classifier."
+related: [stock-prediction-llm-benchmark]
+---
+
+I built this classifier as the final project for a deep learning class. I trained it on 30-second tracks from FMA-Small to choose between eight genres, using a pretrained Audio Spectrogram Transformer. After training, I put the model behind a small upload site.
+
+The final model reached 76.72% accuracy and a macro-F1 score of 0.7645 on the held-out test set.
+
+## Turning a song into model input
+
+FMA-Small contains about 8,000 Creative Commons tracks. Each clip is 30 seconds long, and the dataset is balanced across Electronic, Experimental, Folk, Hip-Hop, Instrumental, International, Pop, and Rock.
+
+The model does not read an MP3 directly. I resampled each track to 16 kHz mono and computed a log-Mel spectrogram using overlapping 1,024-sample windows with a 512-sample hop.[^1] This produces 128 frequency bins and a time axis whose length depends on the clip. Before inference, the model code pads or truncates that axis to 1,024 frames. Brighter areas show where the clip has more energy.
+
+<Figure
+  src="/journal/audio-genre-classification/mel-spectrogram.png"
+  alt="A log-Mel spectrogram for a Hip-Hop track, with time along the horizontal axis, 128 Mel-frequency bins vertically, and the strongest energy concentrated in the lower and middle frequencies."
+>
+  The 128-bin spectrogram for the Hip-Hop track used again in the attention visualization.
+</Figure>
+
+During training, I also used SpecAugment, which masks small bands of time and frequency in the spectrogram. I used an 80/10/10 train, validation, and test split, stratified so each genre stayed represented in all three sets.
+
+## Fine-tuning AST
+
+AST stands for Audio Spectrogram Transformer. It represents the spectrogram as 16 by 16 patches and treats those patches as a sequence. Self-attention lets each patch use information from other times and frequencies in the clip.
+
+I started from an AST checkpoint that had already learned visual patch representations from ImageNet and audio features from AudioSet. This is transfer learning: reuse a model trained on a much larger dataset, replace its classifier for the new labels, and fine-tune it rather than training all 86 million parameters from scratch.[^2]
+
+The encoder has 12 transformer layers with 12 attention heads. I trained it with AdamW, mixed-precision computation, a learning-rate scheduler, and SpecAugment on a single RTX 4090. My final report covers eight experiment runs and records convergence around epoch six.
+
+## The result from run 8
+
+The final report identifies run 8 as the deployed model. Its classification report contains 799 test tracks and records:
+
+- **76.72% accuracy**
+- **0.7645 macro-F1**[^3]
+- **0.8842 F1 for Hip-Hop**, the strongest class
+- **0.5933 F1 for Pop**, the weakest class
+
+<Figure
+  src="/journal/audio-genre-classification/classification-report.png"
+  alt="Classification report for eight music genres showing 76.72 percent overall accuracy and a macro F1 score of 0.7645 across 799 test clips."
+>
+  Precision, recall, and F1 for the final held-out test set.
+</Figure>
+
+The confusion matrix gives a class-by-class view of those results. The model correctly labelled 96 of 107 Electronic clips and 84 of 91 Hip-Hop clips. Pop was much less clear. Of the 106 Pop clips, 17 were labelled Rock, and several others ended up as Electronic or Experimental. Experimental had a similar problem, with 16 clips classified as Pop.
+
+<Figure
+  src="/journal/audio-genre-classification/confusion-matrix.png"
+  alt="An eight-by-eight confusion matrix showing strong results for Electronic and Hip-Hop, with the largest errors occurring between Pop, Rock, and Experimental."
+>
+  The confusion matrix for run 8. Rows are the real labels and columns are the predictions.
+</Figure>
+
+One possible explanation is the dataset's single-label format. Tracks near a boundary such as Pop and Rock still receive only one target genre.
+
+I also visualized CLS-to-patch attention for the same Hip-Hop track shown earlier. The largest weights appeared in the lowest Mel patch, with smaller peaks through the middle-frequency patches. I treated this as a visualization of one input, not evidence of a general rule about Hip-Hop.[^4]
+
+<Figure
+  src="/journal/audio-genre-classification/attention-heatmap.png"
+  alt="A transformer attention heatmap for the Hip-Hop track shown in the earlier spectrogram, with the strongest weights across the lowest Mel-frequency patch and scattered attention through middle-frequency patches over time."
+>
+  CLS-to-patch attention for the same Hip-Hop track shown earlier.
+</Figure>
+
+## Putting it behind an upload button
+
+After training, I wrapped the model in a FastAPI service. The `/predict` endpoint accepts MP3 and WAV files, converts stereo audio to mono, resamples it to 16 kHz when needed, builds the same log-Mel spectrogram used during training, and returns all eight genre probabilities in descending order.
+
+The frontend is a small React interface loaded from a static page. It uploads an MP3 or WAV file and renders the response as a top prediction plus confidence bars for the other seven genres. I packaged the FastAPI backend with Docker and deployed it through AWS Elastic Beanstalk.
+
+The [project code is available on GitHub](https://github.com/Anoop-Chandra-19/audio_classifier).
+
+[^1]: A Mel spectrogram maps sound energy over time onto a frequency scale designed to roughly follow human pitch perception. Taking the logarithm compresses its large range of values into something easier for the model to learn from.
+
+[^2]: The starting checkpoint was `MIT/ast-finetuned-audioset-10-10-0.4593` from Hugging Face.
+
+[^3]: Macro-F1 calculates an F1 score for every genre and averages them equally. A strong class cannot hide a weak class just because it has more examples.
+
+[^4]: Attention weights can show where one transformer layer placed weight for one input, but they are not a complete explanation of the model's decision.

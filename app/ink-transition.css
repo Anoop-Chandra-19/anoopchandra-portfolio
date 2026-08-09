@@ -1,0 +1,95 @@
+/* Ink transition overlay */
+
+.ink-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+
+.ink-layer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  will-change: clip-path;
+  contain: paint;
+  visibility: hidden;
+}
+
+/* Keep this paper texture synchronized with body in globals.css. */
+.ink-layer-paper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 113, 91, 0.05), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(30, 168, 150, 0.04), transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0, 0, 0, 0.018) 28px, rgba(0, 0, 0, 0.018) 29px);
+}
+
+/* Keep this gutter and breakpoint synchronized with globals.css. */
+.ink-layer-home {
+  padding-left: 140px;
+}
+@media (max-width: 900px) {
+  .ink-layer-home {
+    padding-left: 0;
+  }
+}
+
+/* Document-bound texture keeps ruled lines aligned while scrolling; sync with globals.css. */
+.ink-doc {
+  min-height: 100vh;
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 113, 91, 0.05), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(30, 168, 150, 0.04), transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0, 0, 0, 0.018) 28px, rgba(0, 0, 0, 0.018) 29px);
+}
+
+/* The SVG mask cuts reveal holes through the origin-page copy. */
+.ink-origin {
+  visibility: visible;
+  will-change: mask;
+  -webkit-mask: url(#ink-hole-mask);
+  mask: url(#ink-hole-mask);
+}
+
+.ink-drop {
+  position: fixed;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* The pre-rendered halo scales on the compositor during each frame. */
+.ink-halo {
+  position: fixed;
+  transform: scale(0);
+  will-change: transform, opacity;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  visibility: hidden;
+}
+
+.ink-peel-shadow {
+  position: absolute;
+  transform: rotate(135deg);
+  transform-origin: center center;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.32) 50%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  visibility: hidden;
+}
+
+.ink-dim {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+}

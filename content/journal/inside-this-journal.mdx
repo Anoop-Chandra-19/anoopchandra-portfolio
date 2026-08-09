@@ -1,0 +1,297 @@
+---
+title: "Inside this journal"
+kind: case
+date: 2026-08-02
+tag: meta
+dek: "How one MDX file becomes a complete journal entry, and the components I can use while writing it."
+sub: "this portfolio · 2026"
+hero: /journal/inside-this-journal/hero.png
+heroAlt: "The Inside this journal MDX source open in Zed beside the rendered page, showing matching note, warning, tip, code, and quotation components."
+heroCaption: "The MDX source on the left and the journal components it produces on the right."
+---
+
+I wanted a place on this portfolio where I could write about projects after the code was working. A project card can show what I built and link to a repository. It has very little room for the wrong turns, the decisions that took several attempts, or the small bug that changed how I understood the whole system.
+
+The first version of that writing area looked like a notebook, but maintaining it felt like editing an application. Article titles, dates, reading times, page numbers, summaries, and complete bodies all lived inside a React component.[^1] Every paragraph was an object in an array. A heading used one object shape, a quote used another, and a code block used another.
+
+That was manageable while the entries were placeholder text for the design. Opening the same component to turn a placeholder into a real article made the problem clearer. I would have to wrap every paragraph in TypeScript, keep two collections connected by title, and update several pieces of metadata around the body.
+
+I moved the writing into MDX files. Over the next two weeks, the journal grew around those files. [Building fand](/journal/building-fand) was the first article I prepared for publication with the finished workflow, and it showed me which parts of writing the system could handle and which parts still needed my attention.
+
+I also wanted this entry to work as a live reference. The later examples use every MDX component currently available to me and place the source beside the rendered result. I can return to this page when I forget the syntax, while a reader can see how the journal is assembled.
+
+## When the articles lived in React
+
+The old notes component contained a list of tuples. A tuple is a short list where the position of each value gives it meaning. In this one, the first value was the date, the second was the title, and the remaining positions held the reading time, subject, accent colour, and page number. A second object used the article title as a key and stored the body as an array of blocks.
+
+A simplified entry looked like this:
+
+```ts title="Notes.tsx"
+type Block =
+  | { type: "p"; text: string }
+  | { type: "heading"; text: string }
+  | { type: "code"; text: string };
+
+const articles = {
+  "An article title": {
+    summary: "A short description.",
+    body: [
+      { type: "p", text: "The opening paragraph." },
+      { type: "heading", text: "What happened next" },
+    ],
+  },
+};
+```
+
+The renderer inspected each block and selected a React component for it. The title appeared in the tuple and again as the key for its body, so both spellings had to stay identical. Reading time and page number were also values I had to estimate and keep current by hand.
+
+The component opened an article as an overlay on the home page. There was no address for an individual entry. Sharing one meant linking to the portfolio and explaining which row to open.
+
+I replaced that arrangement with a journal index and real article pages. The bodies moved into `content/journal`, with one MDX file for each page. The home-page component shrank to an index that receives article metadata. When I opened one of the new files, the body was paragraphs and headings again instead of an array of block objects.
+
+## Making one file enough
+
+MDX starts with Markdown, the plain-text format that uses marks such as `##` for a heading and `-` for a list. It also allows React components inside the document.[^2] I can write ordinary paragraphs without any surrounding code, then use a component when a screenshot, callout, or other designed block helps the article.
+
+Every entry begins with a small frontmatter block.[^3] This article begins with the same required fields as the rest of the journal:
+
+```yaml title="inside-this-journal.mdx"
+title: "Inside this journal"
+kind: case
+date: 2026-08-02
+tag: meta
+dek: "How one MDX file becomes a complete journal entry."
+```
+
+The filename becomes the final part of the URL. `inside-this-journal.mdx` becomes `/journal/inside-this-journal`. I do not maintain a separate route table or copy the slug into the file.
+
+The frontmatter contains information that cannot be derived from the prose, including the title, date, entry kind, subject, and short description. The body contains the article. Optional frontmatter can add a subtitle, hero image, caption, and a list of related entry slugs.
+
+At build time, `lib/journal.ts` reads every `.mdx` file in the directory. `gray-matter` separates the frontmatter from the body, and the loader turns them into a journal entry with the types expected by the rest of the site.
+
+Next.js asks the loader for every known slug and generates those article pages ahead of a visit.[^4] An unknown slug reaches the normal 404 page. The frontmatter also supplies the title and description shown by browsers, search results, and link previews. A hero image can become the preview image.
+
+I use the same metadata list for the journal index, the smaller journal section on the portfolio, the animated page transition, and the sitemap that tells search engines which pages exist. I no longer add an entry to each place separately.
+
+## Letting the build reject mistakes
+
+Moving content into plain text removed TypeScript from the article body. It also removed the compiler checks I had received from the old block objects. I replaced the useful part of that safety with validation in the content loader.
+
+The loader requires a title, kind, date, tag, and description. Entry kinds and tags come from short allowlists, so a misspelling cannot quietly create a nearly identical filter category. A hero image requires alternative text for readers who cannot see it. Every slug listed under `related` has to resolve to an entry in the journal.
+
+The errors include the source filename and the field that needs attention. A hero without alternative text produces a message like this:
+
+```text
+content/journal/example.mdx: "heroAlt" is required when "hero" is set
+```
+
+The production build reads the same files through the same loader, so the message appears before an invalid entry can deploy.
+
+Figures added another source of mistakes. I write a public path and alternative text in the MDX, then the rendering code opens the file during the build and reads its real pixel dimensions from the PNG, JPEG, or WebP header. Next.js uses those dimensions to reserve the correct amount of space before the image loads. A missing file or unsupported format stops the build.
+
+I had previously supplied image dimensions by hand. Reading them from the file removed those two values from every figure and stopped a guessed aspect ratio from reaching the layout.
+
+## Deriving the notebook around the writing
+
+The notebook design added details that did not belong in the article text. The index needed entry and page numbers. Headings needed section marks, and images needed plate numbers. I had entered several of those values manually in the first MDX version.
+
+Reading time was the first easy value to remove. The loader replaces each fenced code block with a single placeholder word, removes component tags, counts what remains, and divides the result by 200 words per minute. It rounds upward and always reports at least one minute. The number is only a rough indication of length.
+
+Page numbers took another pass. The first MDX version stored a chosen page in every file and rejected duplicates. A later pass made the journal read as one notebook where pages move forward with the dates. I changed the loader to order entries by their frontmatter date and assign pages from that order. The cover uses pages one and two, so entries begin on page three. Longer entries receive more of the fictional notebook according to reading time.
+
+The section rail is the list of section names beside the article. Selecting one needs to move the page to its matching heading, so every section heading receives an invisible address. `## Making one file enough` becomes `making-one-file-enough`, and the rail points to that address. A repeated heading receives a numbered ending such as `making-one-file-enough-1` to keep the addresses distinct. For the plain text headings I use, the loader creates these addresses before the page reaches the browser. It follows the same rules as `rehype-slug`, the tool that adds them to the rendered headings.
+
+Section numbers and inline figure numbers are CSS counters.[^5] I write `## Making one file enough` and `<Figure>`, while the stylesheet adds labels such as `§02` and `plate 001` according to their position. The optional hero is always `plate 000`. Inserting a new section or inline image updates everything after it. This is also why image files are named for what they show instead of a plate number.
+
+The ordered entry list supplies the newer and older links at the bottom of each article. The index uses it for counts, subject filters, and sorting. Those features arrived at different points, but they all read the same metadata produced by the loader.
+
+## Giving Markdown the notebook design
+
+When I redesigned the article page, I replaced the original two-page spread with the current single reading column. The page kept its ruled paper, ink borders, taped image plates, handwritten annotations, and ledger labels. The body changed to a wider serif column that worked better for a long entry.
+
+The MDX component map applies that design to ordinary document elements. A `##` heading renders through the journal's heading component. A fenced code block always receives a language label, overflow treatment, and copy button. Optional fence properties add a filename, highlighted lines, or a caption. Native footnote markup receives the journal's reference and footnote-list styles.
+
+A few custom components cover blocks that Markdown does not provide:
+
+```mdx title="entry.mdx"
+<Callout variant="tip">
+  Keep the explanation beside the part of the story where it matters.
+</Callout>
+
+<Figure src="/journal/inside-this-journal/pipeline-flow-diagram.png" alt="A hand-drawn diagram of the MDX journal pipeline.">
+  The path from one MDX file to the finished journal.
+</Figure>
+```
+
+`<Figure>` reads the image dimensions and mounts the same zoomable image used elsewhere on the portfolio. `<Callout>` provides note, warning, and tip treatments. `<Hl>` adds a marker-style highlight, `<Quote>` accepts an optional citation, and `<Side>` places a short annotation in the page margin on wide screens.
+
+I stopped after the blocks I could already see myself using in technical entries. Most of *Building fand* is still made from paragraphs, headings, one code fence, one figure, and footnotes. The custom vocabulary stays small enough that I can remember it while writing.
+
+The article shell and MDX body render on the server. They reach the browser as complete HTML, so reading the page does not depend on JavaScript assembling the prose.[^6] Interactive parts are small client components mounted inside that server-rendered page. The copy button, reading-progress line, section tracker, image viewer, and mobile footnote sheet each own the browser behavior they need.
+
+That boundary also keeps the filesystem loader away from client code. `lib/journal.ts` can read local files because it is marked server-only. Browser components import their shared types and display helpers from `lib/journal-meta.ts`, which contains no filesystem access.
+
+## Using the component shelf
+
+This section is the working reference I wanted beside the story. Everything below is rendered by the same MDX file that contains its source. The examples are small enough to copy into another entry and change in place.
+
+Markdown already handles most of the writing:
+
+- `##` and `###` create section and subsection headings.
+- Asterisks add *emphasis* or **strong emphasis**.
+- Dashes and numbers create unordered and ordered lists.
+- A `>` creates a blockquote.
+- Square brackets create [links to another entry](/journal/building-fand).
+- A reference such as `[^1]` creates a footnote.
+
+The custom components are for the parts that need the notebook treatment. I currently have five of them:
+
+1. `<Hl>` for a marker highlight.
+2. `<Side>` for a margin note.
+3. `<Callout>` for notes, warnings, and tips.
+4. `<Quote>` for a quotation with an optional source.
+5. `<Figure>` for a measured, numbered, and zoomable image.
+
+### Highlights and side notes
+
+<Side n={1}>
+  A numbered side note floats in the right margin on a wide screen. On a narrower screen it returns to the article column. Leaving out `n` removes the number.
+</Side>
+
+A highlight belongs inside a sentence. I use it to give <Hl>one short phrase</Hl> the effect of a marker dragged across the paper. The surrounding paragraph remains ordinary Markdown.
+
+The side note is placed immediately before the paragraph it annotates:
+
+```mdx title="highlight-and-side-note.mdx" hi="1,5" cap="Code fences can carry a filename, highlighted lines, and a caption."
+<Side n={1}>
+  This note explains the paragraph beside it.
+</Side>
+
+A sentence can contain <Hl>one marked phrase</Hl>.
+```
+
+That code card also demonstrates the optional properties available on a fenced block. `title` labels the file, `hi` accepts one or more line numbers, and `cap` adds the caption under the code.
+
+### Notes, warnings, and tips
+
+A callout can interrupt the article more clearly than a side note. The default note has no label because it is meant to feel like part of the page.
+
+<Callout>
+  This is the default note. I use it for context that deserves its own block without signalling a problem or recommendation.
+</Callout>
+
+<Callout variant="warning">
+  A warning is reserved for a risk, limitation, or step where getting the detail wrong has a real consequence.
+</Callout>
+
+<Callout variant="tip">
+  A tip holds a practical shortcut or a small detail that may save the reader some time.
+</Callout>
+
+The three treatments come from one component:
+
+```mdx title="callouts.mdx" hi="1,5,9"
+<Callout>
+  An unlabelled note.
+</Callout>
+
+<Callout variant="warning">
+  Something the reader should check carefully.
+</Callout>
+
+<Callout variant="tip">
+  A useful shortcut.
+</Callout>
+```
+
+### Two kinds of quotation
+
+A line beginning with `>` uses Markdown's blockquote. It works well when the words are the only part that matters.
+
+> The page should remain readable even when every custom component is removed.
+
+`<Quote>` adds the handwritten journal treatment and accepts an optional citation. This example comes from the journal implementation plan:
+
+<Quote cite="journal implementation plan">
+  Adding an entry = one file.
+</Quote>
+
+```mdx title="quote.mdx"
+<Quote cite="journal implementation plan">
+  Adding an entry = one file.
+</Quote>
+```
+
+### Figures
+
+A figure combines the image, alternative text, caption, zoom interaction, intrinsic dimensions, and the next plate number. This diagram summarizes the two paths an entry takes after the journal loader separates its metadata from its article body.
+
+<Figure
+  src="/journal/inside-this-journal/pipeline-flow-diagram.png"
+  alt="A hand-drawn flow diagram showing one MDX file passing through the journal loader, splitting into metadata and article-body branches, and joining again as the finished statically generated journal."
+>
+  The MDX pipeline. Metadata supplies the index and surrounding site details while the body passes through the journal components to become the rendered article.
+</Figure>
+
+The author supplies the path, alternative text, and optional caption. Width, height, and plate number come from the build and stylesheet.
+
+```mdx title="figure.mdx" hi="2,3"
+<Figure
+  src="/journal/inside-this-journal/pipeline-flow-diagram.png"
+  alt="A hand-drawn diagram of the MDX journal pipeline."
+>
+  An optional caption goes here.
+</Figure>
+```
+
+### The native pieces still matter
+
+The component shelf is small because ordinary Markdown carries most entries. Paragraphs, both list types, headings, links, inline `code`, code fences, blockquotes, and footnotes already map to the journal styles. The custom pieces are available when the subject needs them.
+
+A simple writing pass still follows three steps:
+
+1. Write the explanation with ordinary Markdown.
+2. Add a custom block where it makes the idea easier to understand.
+3. Read the page without the optional notes and check that the main story still works.
+
+## Writing footnotes for different readers
+
+I wanted the implementation to stay precise while keeping the story understandable for readers meeting some of its terminology for the first time.
+
+*Building fand* needed terms such as firmware, Linux driver, daemon, Unix socket, hysteresis, and PWM. Replacing those terms with vague language would remove useful detail. Explaining each one at full length in the main paragraph would keep interrupting the story. I introduced each term briefly and moved the optional background into footnotes.
+
+The journal uses ordinary Markdown footnote syntax. `remark-gfm` turns each reference into a link and collects the notes at the bottom of the article. On a desktop, the reader can follow the link to the note and return through its backlink.
+
+A normal footnote link on a phone sends the reader from the current paragraph to the bottom of a long page. During the mobile pass, I changed the same reference to open its note in a bottom sheet. The article stays at the same scroll position behind it.
+
+The sheet copies the already rendered note from the page, preserving emphasis, inline code, and links.[^7] The close button, a tap on the dimmed area, and a downward swipe can all dismiss it. The sheet opens and closes without sliding when a reader has enabled reduced motion.
+
+The original footnote list remains at the end of the document. Desktop links, assistive technology, and the mobile sheet all begin with the same rendered notes.
+
+
+
+## Publishing an entry now
+
+A new article starts as one file under `content/journal`. I write the frontmatter and body, then place any images under a public directory with the same slug. Before committing it, I run the type check, linter, and production build.
+
+There is no database, administration screen, or hosted content service. Committed drafts and code changes share the same Git history.[^8] Publishing requires a code deployment, which is reasonable for a journal with one author inside a portfolio repository.
+
+While writing *Building fand*, I went back through the project's code to make sure the details were right. I corrected the explanation of the PWM deadband and added footnotes for Linux terms that needed more context. Once the article was ready, the MDX system handled the page around it.
+
+After the writing and screenshots were ready, I added the MDX file and image directory. The production build listed `/journal/building-fand` among the generated static pages. I did not edit the article route, journal index, page sequence, or sitemap for it.
+
+[^1]: React is a library for building interfaces from components. In the first version, the component contained both the code for displaying an article and the data representing every paragraph inside it.
+
+[^2]: Markdown is a plain-text writing format. MDX extends it with JSX, the component syntax commonly used with React. This lets a document remain mostly readable text while still supporting purpose-built interface blocks.
+
+[^3]: Frontmatter is structured metadata placed between `---` lines at the beginning of a text file. A parser reads it separately from the article body. This journal uses YAML-style keys and values inside that block.
+
+[^4]: Static generation creates the HTML for known pages during the production build. The server does not need to read and compile the MDX again for each visitor. Next.js receives the list of journal slugs from `generateStaticParams` and builds a route for each one.
+
+[^5]: A CSS counter is a number maintained by the stylesheet according to document order. Elements can increment the counter and display its formatted value through generated content. It behaves like automatic numbering in a word processor.
+
+[^6]: A Server Component runs as part of the server or build rendering process and can access server resources. A Client Component sends JavaScript to the browser and can respond to clicks, scrolling, and other browser events. Keeping most of the article on the server reduces the client-side code needed to read it.
+
+[^7]: The DOM, or Document Object Model, is the browser's in-memory representation of the rendered page. Cloning the existing footnote element keeps the formatting produced by MDX without parsing or rendering the note a second time.
+
+[^8]: Git is a version-control system. It records committed versions of text files over time, which makes it possible to inspect an earlier committed draft, compare revisions, and review article edits beside code changes.

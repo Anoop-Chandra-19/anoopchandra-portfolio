@@ -1,240 +1,124 @@
-# 🚀 anoopchandra.dev – AI/ML Engineer Portfolio
+# anoopchandra.dev
 
-A modern, interactive portfolio showcasing AI/ML engineering skills through **real, client-side machine learning demos**. Built with Next.js, featuring cinematic animations and hands-on AI experiences that run entirely in your browser.
+My portfolio and engineering journal. It is a statically generated Next.js site with an MDX writing section and a Lab of machine-learning experiments that run entirely in the visitor's browser, with no inference server behind them.
 
-<div align="center">
+**Live site:** [anoopchandra.dev](https://anoopchandra.dev)
 
-![Hero Section](./public/screenshots/hero-section.png)
+![The anoopchandra.dev cover: the name Anoopchandra set in large serif type beside a portrait, over notebook paper](public/og-image.png)
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-anoopchandra.dev-cc00e6?style=for-the-badge)](https://anoopchandra.dev)
-[![Next.js](https://img.shields.io/badge/Next.js-15.3.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-4.22-orange?style=for-the-badge&logo=tensorflow)](https://www.tensorflow.org/js)
+## What was actually hard
 
-</div>
+### Shipping two neural networks without charging every visitor for them
 
----
+The Lab runs a doodle classifier and a sentiment model as real TensorFlow.js graph models. TensorFlow.js is by far the heaviest dependency in the project, and the sentiment weights alone are about 9 MB across three shards. A plain top-level import would have put all of that into every page bundle, including pages that never touch a model.
 
-## ✨ Portfolio Showcase
+`lib/lab-models.ts` handles the whole lifecycle:
 
-<details>
-<summary>🏠 <strong>Hero Section</strong> - Clean, animated introduction</summary>
-<br>
-<img src="./public/screenshots/hero-section.png" alt="Hero Section" width="100%">
-</details>
+- TensorFlow.js is loaded through a dynamic import, so it stays out of the bundle for every route that does not need it.
+- Each model resolves through one shared module-level promise, so concurrent callers and repeat visits across client-side navigation reuse a single load instead of racing.
+- Loads try IndexedDB before the network. Persistence is best effort, because private browsing and quota limits should cost a visitor one network fetch, not a broken experiment.
+- A dummy `predict` over a zero tensor compiles the WebGL shaders during loading, so the first real classification a visitor triggers is not the one that pays for compilation.
+- Progress is reported from the actual fetch, and a failed load clears the shared promise so a retry is possible.
 
-<details>
-<summary>💼 <strong>Featured Projects</strong> - Real-world AI/ML applications</summary>
-<br>
-<img src="./public/screenshots/projects-section.png" alt="Projects Section" width="100%">
-</details>
+The sentiment tokenizer shipped as a 2.1 MB `word_index.json`, but the model only ever looks up indices below 10,000. `scripts/prune-word-index.mjs` reduces it to 142 KB losslessly, with the original kept as a fallback fetch.
 
-<details>
-<summary>👨‍💻 <strong>About Me</strong> - Skills, background, and story</summary>
-<br>
-<img src="./public/screenshots/about-section.png" alt="About Section" width="100%">
-</details>
+I wrote about this in more detail in [Loading my TensorFlow.js models without loading them everywhere](https://anoopchandra.dev/journal/loading-my-tensorflowjs-models).
 
-<details>
-<summary>🤖 <strong>AI Demos</strong> - Interactive terminal with live ML models</summary>
-<br>
-<img src="./public/screenshots/demos-section.png" alt="AI Demos Terminal" width="100%">
-</details>
+### A route transition that neither shimmers nor stalls
 
----
+Navigation runs a custom ink-bleed animation over the outgoing page. Two details did most of the work:
 
-## 🚀 Key Features
+- Edge noise comes from a seeded mulberry32 PRNG rather than `Math.random()`. Random noise regenerated per frame shimmers; a deterministic sequence gives a stable ragged edge.
+- Duration is chosen once at navigate time from the captured viewport and never re-tracked mid-flight. Phone viewports run a shorter version, because desktop timing reads as a stall when there is less screen for the ink to cross.
 
-- **🤖 Interactive AI Demos**: Real machine learning models running client-side
-  - **🖌️ Doodle Classifier**: Draw sketches, AI identifies them instantly
-  - **😊 Sentiment Analysis**: Type text, get real-time emotion analysis
-  - **🔬 ML Playground**: Visual K-means clustering (coming soon)
-- **🎨 Modern Design**: Smooth animations with Framer Motion and GSAP
-- **⚡ Performance**: Zero cold starts - everything runs in your browser
-- **📱 Responsive**: Works seamlessly across all devices
-- **♿ Accessible**: WCAG compliant with keyboard navigation
-- **💻 Terminal Interface**: Unique CLI-style demo launcher
+Geometry lives in `lib/ink-bleed.ts` as pure functions, separate from the React layers that draw it, which makes the timing curves testable in isolation.
 
----
+### Content that fails the build instead of the page
 
-## 🛠️ Tech Stack
+Journal entries are plain MDX on disk, so nothing stops a typo from reaching production except validation. `lib/journal.ts` is marked `server-only` and validates frontmatter as it loads: malformed metadata, a missing image alternative, or a `related` slug that points at nothing throws with the offending filename and fails the build. Reading times are derived from word count rather than maintained by hand, so they cannot drift from the prose.
 
-### Frontend
-- **[Next.js 15](https://nextjs.org/)** - React framework with App Router
-- **[TypeScript](https://www.typescriptlang.org/)** - Type-safe development
-- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first styling
-- **[Framer Motion](https://www.framer.com/motion/)** - Smooth animations
+## The journal
 
-### AI/ML
-- **[TensorFlow.js](https://www.tensorflow.org/js)** - Browser-based ML inference
-- **Custom CNN** - Doodle classification (trained on QuickDraw dataset)
-- **LSTM Model** - Sentiment analysis (trained on IMDB reviews)
+Nine entries, mostly about things that broke and what the debugging actually looked like. A representative few:
 
-### UI Components
-- **[@studio-freight/lenis](https://lenis.studiofreight.com/)** - Smooth scrolling
-- **[Lucide React](https://lucide.dev/)** - Icon library
-- **Custom components** - Terminal interface, modals, interactive demos
+| Entry | About |
+| --- | --- |
+| [The requests were concurrent. The responses were not.](https://anoopchandra.dev/journal/the-requests-were-concurrent) | Five calls hit the network within a millisecond; four came back together. Transport-level production debugging. |
+| [The session expired mid-answer](https://anoopchandra.dev/journal/the-session-expired-mid-answer) | A streamed response that stopped mid-sentence with no error, traced across the stack. |
+| [Building fand](https://anoopchandra.dev/journal/building-fand) | Writing a Rust daemon to read and control fan curves from Linux. |
+| [Stock Prediction LLM Benchmark](https://anoopchandra.dev/journal/stock-prediction-llm-benchmark) | Eleven language models given identical pre-market evidence. Every one lost money on average. |
+| [Audio Genre Classification](https://anoopchandra.dev/journal/audio-genre-classification) | Fine-tuning an Audio Spectrogram Transformer on FMA-Small, served behind FastAPI. |
 
----
+## Stack
 
-## 🎨 Design System
+| Area | Technology |
+| --- | --- |
+| Framework | Next.js 16 App Router, React 19 |
+| Language | TypeScript 6 in strict mode |
+| Styling | Tailwind CSS 4 and feature-level CSS |
+| Content | MDX through `next-mdx-remote`, `gray-matter`, Remark, and Rehype |
+| Machine learning | TensorFlow.js graph models running in the browser |
+| Motion | CSS, requestAnimationFrame, Lenis, and a custom transition system |
+| Observability | Vercel Analytics and Speed Insights |
 
-| Color        | Hex       | Usage                    |
-|--------------|-----------|--------------------------|
-| **Electric** | `#cc00e6` | Primary accent, headings |
-| **Coral**    | `#ff715b` | Secondary accent, CTAs   |
-| **Teal**     | `#1ea896` | Success states, skills   |
-| **Navy**     | `#25283d` | Background gradients     |
-| **White**    | `#ffffff` | Text, canvas backgrounds |
+## Architecture
 
----
+```text
+app/                       Routes, metadata, sitemap, and global style systems
+  journal/                 Journal index and statically generated entry routes
+  lab/                     Statically generated interactive experiment routes
+components/
+  journal/                 MDX rendering and journal interaction
+  lab/                     TensorFlow.js and algorithm demos
+  nav/                     Desktop and mobile navigation
+  sections/                Home-page sections
+  transition/              Ink transition provider, layers, and animation overlay
+  ui/                      Shared interface primitives
+content/journal/           Local MDX journal entries
+hooks/                     Shared client hooks
+lib/
+  journal.ts               Server-only content loading and validation
+  journal-meta.ts          Serializable journal metadata and display helpers
+  lab-meta.ts              Experiment registry shared by routes and the home page
+  lab-models.ts            Lazy model loading, progress, caching, and retries
+  work-data.ts             Project entries rendered by the work section
+  ink-bleed.ts             Pure transition geometry
+public/models/             TensorFlow.js manifests, weights, and vocabulary
+scripts/                   Maintenance utilities for generated model assets
+docs/                      Design and implementation notes
+```
 
-## 🤖 AI Demo Features
+Server Components are the default. Interactive behavior sits behind explicit client boundaries, and filesystem-backed journal loading stays server-only. Every journal and lab slug is known at build time and generated statically.
 
-### 🖌️ Doodle Classifier
-- **Model**: Custom CNN trained on 50+ QuickDraw categories
-- **Input**: 280×280 drawing canvas (mouse/touch)
-- **Output**: Top-3 predictions with confidence scores
-- **Performance**: Instant inference, no server calls
+The three Lab experiments are registered in `lib/lab-meta.ts` and rendered at `/lab/<slug>`:
 
-### 😊 Sentiment Analysis  
-- **Model**: LSTM trained on IMDB movie reviews
-- **Input**: Text input with CLI-style interface
-- **Output**: Positive/Negative sentiment with confidence
-- **Features**: Real-time analysis, conversation history
+| Slug | Experiment | What it runs |
+| --- | --- | --- |
+| `doodle` | Doodle Classifier | A TensorFlow.js graph model reading a sketch from a canvas |
+| `sentiment` | Sentiment Analysis | A TensorFlow.js text model with a pruned word index |
+| `kmeans` | Cluster & Classify | K-Means and perceptron training implemented directly in the browser |
 
-### 🔬 ML Playground
-- **Algorithm**: K-means clustering visualization
-- **Input**: Interactive point placement
-- **Output**: Animated clustering process
-- **Educational**: Step-by-step algorithm visualization
+## Running it locally
 
----
-
-## 🚀 Quick Start
+Next.js 16 requires Node.js **20.9.0 or newer**. This repository uses npm and commits its lockfile.
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/anoopchandra-portfolio.git
+git clone https://github.com/Anoop-Chandra-19/anoopchandra-portfolio.git
 cd anoopchandra-portfolio
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-npm start
+npm ci
+npm run dev        # http://localhost:3000
 ```
-
-Visit [http://localhost:3000](http://localhost:3000) to see the portfolio.
-
----
-
-## 📁 Project Structure
-
-```
-├── app/                    # Next.js App Router
-│   ├── layout.tsx         # Root layout with theme provider
-│   ├── page.tsx           # Main page with all sections
-│   └── globals.css        # Global styles and CSS variables
-├── components/            # React components
-│   ├── demos/            # AI demo components
-│   │   ├── DemoCard.tsx  # Terminal-style demo launcher
-│   │   ├── DoodleClassifier.tsx
-│   │   ├── SentimentDemo.tsx
-│   │   └── PlaygroundDemo.tsx
-│   ├── SectionHero.tsx   # Landing section
-│   ├── SectionProjects.tsx # Featured projects
-│   ├── SectionAbout.tsx  # About me and skills
-│   ├── SectionDemos.tsx  # AI demos section
-│   ├── Navbar.tsx        # Navigation with smooth scrolling
-│   └── ThemeProvider.tsx # Dark theme context
-├── hooks/                # Custom React hooks
-│   ├── useDoodleModel.ts # CNN model loading and inference
-│   ├── useSentimentModel.ts # LSTM model management
-│   └── useLenis.ts       # Smooth scroll integration
-├── public/               # Static assets
-│   ├── models/          # TensorFlow.js model files
-│   │   ├── doodle/      # CNN model for sketch recognition
-│   │   └── sentiment/   # LSTM model for text analysis
-│   ├── projects/        # Project screenshots
-│   └── anoopchandra.jpg # Profile photo
-└── package.json         # Dependencies and scripts
-```
-
----
-
-## 🎯 Key Sections
-
-### 🏠 Hero
-- Animated introduction with typewriter effect
-- Professional tagline and contact info
-- Smooth scroll indicators
-
-### 💼 Projects
-- **Audio Genre Classification**: PyTorch transformer with 85% accuracy
-- **Stock Price Prediction**: LLM-powered financial analysis
-- **LegalRescue.ai**: Enterprise AI backend (NDA)
-
-### 👨‍💻 About
-- Professional background and education
-- Technical skills with interactive icons
-- Personal story and philosophy
-
-### 🤖 AI Demos
-- Terminal-style interface for launching demos
-- Real ML models with instant feedback
-- Educational explanations for each demo
-
----
-
-## 🔧 Development
-
-### Model Training
-The AI models are trained separately and exported to TensorFlow.js format:
-- **Doodle CNN**: Trained on Google's QuickDraw dataset
-- **Sentiment LSTM**: Fine-tuned on IMDB movie reviews
-
-Training scripts: [portfolio_models repository](https://github.com/Anoop-Chandra-19/portfolio_models)
-
-### Performance Optimizations
-- **Lazy loading**: Demo components load on demand
-- **Model caching**: TensorFlow.js models cached after first load
-- **Smooth scrolling**: Hardware-accelerated with Lenis
-- **Responsive images**: Next.js Image optimization
-
----
-
-## 🚀 Deployment
-
-Deploy to [Vercel](https://vercel.com/) with zero configuration:
 
 ```bash
-npm run build
+npm run typecheck  # TypeScript compiler check
+npm run lint       # ESLint with Next.js Core Web Vitals rules
+npm run build      # Production build and static generation
 ```
 
-The site is optimized for:
-- **Edge runtime** for fast global delivery
-- **Static generation** for optimal performance  
-- **Progressive enhancement** for all device types
+Deployment is a standard Next.js production build, hosted on Vercel. No secrets or runtime environment variables are required, since inference and model persistence happen in the visitor's browser.
 
----
+Journal entries live at `content/journal/<slug>.mdx`, where the filename becomes the route slug. See `AGENTS.md` for the frontmatter contract and repository-specific development guidance.
 
-## 📞 Contact
+## License
 
-**Anoopchandra Parampalli**  
-AI/ML Engineer • Boston, MA
-
-- 🌐 **Website**: [anoopchandra.dev](https://anoopchandra.dev)
-- 📧 **Email**: [anoopchandraparampalli@email.com](mailto:anoopchandraparampalli@email.com)
-- 💼 **LinkedIn**: [Connect with me](https://linkedin.com/in/your-profile)
-- 🐙 **GitHub**: [View my code](https://github.com/Anoop-Chandra-19)
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+[MIT](LICENSE)
