@@ -166,7 +166,7 @@ tag: web               # ai/ml | backend | web | linux | hardware | meta
 dek: "Short summary"
 ```
 
-Optional fields include `status` (`published` or `draft`), `sub`, `hero`, `heroAlt`, `heroCaption`, and `related`. A `hero` requires `heroAlt`; every `related` value must name an existing journal slug. Add a tag only by deliberately extending the allowlist in `lib/journal.ts`.
+Optional fields include `sub`, `hero`, `heroAlt`, `heroCaption`, and `related`. There is no `status`/draft field: every `.mdx` file in `content/journal/` publishes. Draft gating would be a new feature, not a field waiting to be wired up — keep unfinished entries out of the directory. A `hero` requires `heroAlt`; every `related` value must name an existing journal slug. Add a tag only by deliberately extending the allowlist in `lib/journal.ts`.
 
 Journal table-of-contents entries are generated from level-two (`##`) headings. Avoid manually assigning metadata that `lib/journal.ts` derives, including reading time, entry number, and page number.
 
