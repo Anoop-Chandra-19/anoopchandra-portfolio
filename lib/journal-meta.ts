@@ -31,6 +31,22 @@ export type JournalEntryMeta = {
   related: string[];
 };
 
+/* The tag is a shelf label, not a taxonomy — one 90px pill on the index, where
+   the colour already carries case-vs-note. A closed list keeps it that way:
+   left free-form it drifts toward one tag per entry, and the pill stops
+   sorting anything. Adding a tag is a deliberate edit here, not a typo. */
+export const TAGS = ["ai/ml", "backend", "web", "linux", "hardware", "meta"] as const;
+
+export type Filter = "all" | "case" | "note";
+export type JournalQuery = { filter: Filter; tag: string | null; year: string | null };
+
+/** The index list and the filter sheet's result count must never disagree, so
+ *  both go through this rather than each filtering for themselves. */
+export const matchesEntry = (e: JournalEntryMeta, q: JournalQuery) =>
+  (q.filter === "all" || e.kind === q.filter) &&
+  (!q.tag || e.tag === q.tag) &&
+  (!q.year || e.date.startsWith(`${q.year}-`));
+
 const HOME_JOURNAL_ENTRY_LIMIT = 5;
 
 /** The newest entries shown in the compact home-page index. The loader already
@@ -60,10 +76,13 @@ export const tabColors = (kind: JournalEntryMeta["kind"]) =>
  *  tint DEPTH is a state (rest 15% / hover 34%), so `.journal-edge-tab`
  *  composes the background itself from `--tab-c` rather than being handed a
  *  finished colour. §05's tabs are static and keep `tabColors`. */
+/* This rides on the row `<li>`, not the tab, because the phone kind label needs
+   the same hue. Hence `--tab-ink` rather than `color`: a bare colour would
+   inherit into the title and meta line. Consumers opt in explicitly. */
 export const tabAccent = (kind: JournalEntryMeta["kind"]): CSSProperties =>
   ({
     "--tab-c": kind === "case" ? "var(--color-coral)" : "var(--color-teal)",
-    color:
+    "--tab-ink":
       kind === "case"
         ? "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))"
         : "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",

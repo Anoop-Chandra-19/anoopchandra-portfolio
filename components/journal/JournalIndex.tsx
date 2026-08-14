@@ -1,23 +1,34 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { pad, tabAccent, type JournalEntryMeta } from "@/lib/journal-meta";
+import {
+  matchesEntry,
+  pad,
+  tabAccent,
+  type Filter,
+  type JournalEntryMeta,
+} from "@/lib/journal-meta";
 import JournalBackLink from "@/components/journal/JournalBackLink";
+import JournalFilterSheet, {
+  type Sort,
+  type SortKey,
+} from "@/components/journal/JournalFilterSheet";
 
-type Filter = "all" | "case" | "note";
-type SortKey = "title" | "read" | "date";
-type Sort = { key: SortKey; dir: "asc" | "desc" };
-
-/** [key, desktop label, phone label]. Both render so CSS can select by viewport. */
-const FILTERS: ReadonlyArray<[Filter, string, string]> = [
-  ["all", "all entries", "all"],
-  ["case", "case studies", "case"],
-  ["note", "notes & stories", "notes"],
+const FILTERS: ReadonlyArray<[Filter, string]> = [
+  ["all", "all entries"],
+  ["case", "case studies"],
+  ["note", "notes & stories"],
 ];
 
 const KIND_LABEL: Record<Exclude<Filter, "all">, string> = {
   case: "case studies",
   note: "notes & stories",
+};
+
+const SORT_LABEL: Record<SortKey, string> = {
+  date: "date",
+  read: "read time",
+  title: "title",
 };
 
 /** `no` is the chronological entry number, so date sorts without re-parsing the
@@ -82,6 +93,9 @@ export default function JournalIndex({
   const [tag, setTag] = useState<string | null>(null);
   const [year, setYear] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
+  const [sheetOpen, setSheetOpen] = useState(false);
+  /* The element, not a ref: useModalLifecycle returns focus here on close. */
+  const [opener, setOpener] = useState<HTMLElement | null>(null);
 
   const counts = useMemo(
     () => ({
@@ -101,12 +115,7 @@ export default function JournalIndex({
   // one page. Apply kind, subject, year, and future search filters before
   // slicing entries so every filter continues to cover the full archive.
   const visible = useMemo(() => {
-    const rows = entries.filter(
-      (entry) =>
-        (filter === "all" || entry.kind === filter) &&
-        (!tag || entry.tag === tag) &&
-        (!year || entry.date.startsWith(`${year}-`))
-    );
+    const rows = entries.filter((entry) => matchesEntry(entry, { filter, tag, year }));
     const compare = SORTERS[sort.key];
     return rows.sort((left, right) =>
       sort.dir === "asc" ? compare(left, right) : -compare(left, right)
@@ -120,6 +129,19 @@ export default function JournalIndex({
         ? { key, dir: s.dir === "asc" ? "desc" : "asc" }
         : { key, dir: key === "title" ? "asc" : "desc" }
     );
+
+  const isFiltered = filter !== "all" || tag !== null || year !== null;
+  const clearAll = () => {
+    setFilter("all");
+    setTag(null);
+    setYear(null);
+  };
+
+  const sortLabel = `${SORT_LABEL[sort.key]} ${sort.dir === "asc" ? "↑" : "↓"}`;
+  const facets = [filter !== "all" ? KIND_LABEL[filter] : null, tag, year].filter(Boolean);
+  const pillText = facets.length
+    ? [...facets, sortLabel].join(" · ")
+    : `all · all years · ${sortLabel}`;
 
   const pages = entries.map((e) => e.page);
   const first = book?.first ?? Math.min(...pages);
@@ -166,20 +188,20 @@ export default function JournalIndex({
         </div>
       </div>
 
-      {/* Kind uses the top filters; subject uses each row's edge tab. */}
-      <div className="flex items-center flex-wrap gap-2.5 mb-[22px]">
+      {/* Kind uses the top filters; subject uses each row's edge tab. Below the
+          breakpoint this whole row is replaced by the filter pill. */}
+      <div className="journal-filter-row flex items-center flex-wrap gap-2.5 mb-[22px]">
         <span className="mono journal-filter-lbl text-[11px] tracking-[1px] uppercase text-ink-soft">
           filter ↦
         </span>
-        {FILTERS.map(([k, label, shortLabel]) => (
+        {FILTERS.map(([k, label]) => (
           <button
             key={k}
             type="button"
             className={`journal-filter-btn ${filter === k ? "is-active" : ""}`}
             onClick={() => setFilter(k)}
           >
-            <span className="journal-filter-wide">{label}</span>
-            <span className="journal-filter-narrow">{shortLabel}</span>
+            {label}
             <span className="mono text-[11px] opacity-70 ml-1">({counts[k]})</span>
           </button>
         ))}
@@ -213,6 +235,80 @@ export default function JournalIndex({
           </button>
         )}
       </div>
+
+      {/* Phone-only. The ✕ is a sibling, not a child: nesting it inside the pill
+          would be a button in a button. */}
+      <div className="journal-pill-row">
+        <button
+          type="button"
+          className={`journal-pill ${isFiltered ? "is-on" : ""}`}
+          aria-expanded={sheetOpen}
+          aria-controls="journal-filter-sheet"
+          onClick={(e) => {
+            setOpener(e.currentTarget);
+            setSheetOpen(true);
+          }}
+        >
+          <span className="journal-pill-lbl">filter</span>
+          <span className="journal-pill-val">{pillText}</span>
+          <span className="journal-pill-cnt">{visible.length}</span>
+        </button>
+        {isFiltered && (
+          <button
+            type="button"
+            className="journal-pill-x"
+            aria-label="clear all filters"
+            onClick={clearAll}
+          >
+            <span aria-hidden="true">✕</span>
+          </button>
+        )}
+      </div>
+
+      {isFiltered && (
+        <div className="journal-applied">
+          <span>
+            {filter !== "all" && (
+              <>
+                <b>{KIND_LABEL[filter]}</b>
+                {" · "}
+              </>
+            )}
+            {tag && (
+              <>
+                subject <b>{tag}</b>
+                {" · "}
+              </>
+            )}
+            {year && (
+              <>
+                year <b>{year}</b>
+                {" · "}
+              </>
+            )}
+            {visible.length} of {entries.length}
+          </span>
+          <button type="button" className="journal-applied-undo" onClick={clearAll}>
+            show all {entries.length}
+          </button>
+        </div>
+      )}
+
+      <JournalFilterSheet
+        open={sheetOpen}
+        id="journal-filter-sheet"
+        entries={entries}
+        years={years}
+        value={{ filter, tag, year, sort }}
+        opener={opener}
+        onApplyAction={(next) => {
+          setFilter(next.filter);
+          setTag(next.tag);
+          setYear(next.year);
+          setSort(next.sort);
+        }}
+        onCloseAction={() => setSheetOpen(false)}
+      />
 
       <div className="journal-toc-panel bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
         <span
@@ -277,7 +373,9 @@ export default function JournalIndex({
 
         <ul className="journal-toc-list list-none p-0 m-0">
           {visible.map((e) => (
-            <li key={e.slug} className="journal-toc-item">
+            /* On the row, not the tab: the phone kind label needs the same
+               hue and sits inside the link. */
+            <li key={e.slug} className="journal-toc-item" style={tabAccent(e.kind)}>
               <Link
                 href={`/journal/${e.slug}`}
                 className="journal-toc-row items-baseline no-underline"
@@ -307,20 +405,27 @@ export default function JournalIndex({
                 </span>
 
                 {/* `display: contents` above the phone breakpoint, so the ledger
-                    grid still owns these as its read and date cells. On a phone
-                    it becomes the one meta line under the title, where the two
-                    swap into reading order — date, then how long it takes. */}
+                    grid still owns read and date as its own cells; below it, these
+                    collapse into the one meta line under the title. */}
                 <span className="journal-toc-metas">
-                  <span className="mono faint journal-toc-meta text-[11px] text-right text-ink-soft">
+                  {/* The ★ badge above is desktop-only; this is its phone
+                      equivalent, and it has to read for notes too. */}
+                  <span className="journal-toc-kind">
+                    {e.kind === "case" ? (
+                      <>
+                        <span aria-hidden="true">★ </span>case
+                      </>
+                    ) : (
+                      "note"
+                    )}
+                  </span>
+                  <span className="journal-toc-tag">{e.tag}</span>
+                  <span className="mono faint journal-toc-meta journal-toc-read text-[11px] text-right text-ink-soft">
                     {e.read}
                   </span>
-                  <span className="mono journal-toc-meta text-[11px] text-right text-ink-soft">
+                  <span className="mono journal-toc-meta journal-toc-date text-[11px] text-right text-ink-soft">
                     {e.dateDisplay}
                   </span>
-                </span>
-
-                <span className="journal-toc-chev" aria-hidden="true">
-                  ›
                 </span>
               </Link>
 
@@ -329,7 +434,6 @@ export default function JournalIndex({
               <button
                 type="button"
                 className={`journal-edge-tab ${tag === e.tag ? "is-on" : ""}`}
-                style={tabAccent(e.kind)}
                 title={tag === e.tag ? `showing ${e.tag}; click to clear` : `filter to ${e.tag}`}
                 onClick={() => setTag(tag === e.tag ? null : e.tag)}
               >
@@ -340,7 +444,7 @@ export default function JournalIndex({
         </ul>
 
         <div
-          className="flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
+          className="journal-toc-foot flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
           <span className="mono faint text-[11px]">
@@ -360,7 +464,7 @@ export default function JournalIndex({
             {" · "}
             {counts.case} case studies + {counts.note} notes · pp. {pad(first)}–{pad(last)}
           </span>
-          <span className="text-[15px] italic text-ink-faint">
+          <span className="journal-toc-hint text-[15px] italic text-ink-faint">
             tap a line to open it · tap a tab to filter ↦
           </span>
         </div>

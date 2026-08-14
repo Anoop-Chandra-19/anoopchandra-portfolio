@@ -167,6 +167,9 @@ body:has([data-journal-root]) {
   letter-spacing: 1px;
   text-align: center;
   cursor: pointer;
+  /* `tabAccent` sets --tab-ink on the row rather than a bare colour, so that the
+     phone kind label can share the hue without it inheriting into the title. */
+  color: var(--tab-ink);
   background: color-mix(in oklab, var(--tab-c) var(--tab-tint, 15%), var(--color-paper));
   border: 1.2px solid var(--tab-c);
   border-right: none;
@@ -196,23 +199,22 @@ body:has([data-journal-root]) {
 .journal-toc-metas {
   display: contents;
 }
-.journal-toc-chev {
-  display: none;
-}
-.journal-filter-narrow {
+.journal-toc-kind,
+.journal-toc-tag,
+.journal-pill-row,
+.journal-applied {
   display: none;
 }
 
 @media (max-width: 720px) {
 
+  /* The notebook stays on phones: it is the page's only paper cue. */
   .journal-toc-panel {
-    background: none;
-    border: 0;
-    border-radius: 0;
-    padding: 0;
-    overflow: visible;
+    padding: 8px 14px 12px 40px;
   }
-  .journal-toc-rule,
+  .journal-toc-rule {
+    left: 28px;
+  }
   .journal-toc-stamp,
   .journal-toc-header,
   .journal-toc-case,
@@ -220,22 +222,25 @@ body:has([data-journal-root]) {
     display: none;
   }
   .journal-toc-list {
-    border-top: 2px solid var(--color-ink);
+    border-top: 0;
   }
 
+  /* Areas, not reordering: the `page → title → metas` source order stays. */
   .journal-toc-row {
-    grid-template-columns: 44px 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-areas:
-      "page title"
-      "page meta";
-    row-gap: 3px;
-    gap: 10px;
-    padding: 11px 20px 11px 0;
+      "title page"
+      "meta meta";
+    row-gap: 7px;
+    column-gap: 10px;
+    padding: 13px 0 12px;
   }
   .journal-toc-page {
     grid-area: page;
-    align-self: start;
-    padding-top: 3px;
+    align-self: baseline;
+    padding-top: 0;
+    font-size: 10.5px;
+    color: var(--color-ink-faint);
   }
   .journal-toc-title {
     grid-area: title;
@@ -244,58 +249,172 @@ body:has([data-journal-root]) {
   /* The title span has no role class; target it structurally. */
   .journal-toc-title > :first-child {
     white-space: normal;
-    font-size: 18px;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    font-size: 17.5px;
+    line-height: 1.28;
+    letter-spacing: -0.012em;
     flex: 0 1 100%;
   }
 
   .journal-toc-metas {
     display: flex;
     grid-area: meta;
-    align-items: baseline;
-    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
     min-width: 0;
-    padding-right: 84px;
   }
+  /* The line wraps at 320px; a date breaking after its comma reads as two values. */
   .journal-toc-row .journal-toc-meta {
     text-align: left;
+    white-space: nowrap;
   }
-
-  .journal-toc-metas > .journal-toc-meta:first-child {
-    order: 2;
+  .journal-toc-kind,
+  .journal-toc-tag {
+    display: inline;
   }
-  .journal-toc-metas > .journal-toc-meta:last-child {
-    order: 1;
-  }
-  .journal-toc-metas > .journal-toc-meta:first-child::before {
-    content: "·";
-    margin-right: 6px;
-    color: var(--color-ink-faint);
-  }
-  .journal-toc-chev {
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+  .journal-toc-kind {
     font-family: var(--font-mono);
-    font-size: 17px;
+    font-size: 9px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--tab-ink);
+  }
+  .journal-toc-tag {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--color-ink-soft);
+  }
+
+  /* Source order is the desktop column order, read then date; the phone line
+     reads date first. */
+  .journal-toc-kind { order: 1; }
+  .journal-toc-tag { order: 2; }
+  .journal-toc-date { order: 3; }
+  .journal-toc-read { order: 4; }
+  /* On the items so they follow `order`, and trailing so a wrapped line never
+     opens with a stray dot. Read time is last in `order`, so it gets none. */
+  .journal-toc-kind::after,
+  .journal-toc-tag::after,
+  .journal-toc-date::after {
+    content: "·";
+    margin-left: 7px;
     color: var(--color-ink-faint);
   }
 
+  /* The sheet owns subject filtering below this width. `display:none` rather
+     than a visual hide: it is a button and would otherwise stay tabbable. */
   .journal-edge-tab {
-    top: auto;
-    bottom: 11px;
-    right: 20px;
-    transform: none;
+    display: none;
+  }
+
+  /* One pill replaces the kind buttons, the year select, and the sort controls
+     that lived in the display:none ledger header. */
+  .journal-filter-row {
+    display: none;
+  }
+  .journal-pill-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .journal-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex: 1;
     min-width: 0;
-    padding: 1px 7px;
-    border-right: 1.2px solid var(--tab-c);
-    border-radius: 3px;
-    font-size: 10px;
-    letter-spacing: 1px;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 999px;
+    padding: 0 14px;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 color-mix(in oklab, var(--color-ink) 16%, transparent);
+  }
+  .journal-pill-lbl {
+    font-size: 9px;
+    letter-spacing: 1.6px;
     text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+  .journal-pill-val {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .journal-pill-cnt {
+    margin-left: auto;
+    color: var(--color-ink-faint);
+  }
+  .journal-pill.is-on {
+    border-color: var(--color-coral);
+    box-shadow: 2px 2px 0 color-mix(in oklab, var(--color-coral) 30%, transparent);
+  }
+  .journal-pill.is-on .journal-pill-val {
+    color: color-mix(in oklab, var(--color-coral) 58%, var(--color-ink));
+  }
+  .journal-pill-x {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+  }
+
+  .journal-applied {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: -8px 0 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+  .journal-applied b {
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .journal-applied-undo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin: -11px 0 -11px auto;
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink-soft);
+    border-bottom: 1px dotted var(--color-ink-faint);
+    cursor: pointer;
+  }
+
+  /* The edge tabs it points at are gone; the sheet is the filter now. */
+  .journal-toc-hint {
+    display: none;
+  }
+  .journal-toc-foot {
+    justify-content: center;
+    text-align: center;
   }
 
   .journal-cover .journal-cover-stamp {
@@ -307,10 +426,6 @@ body:has([data-journal-root]) {
   .journal-cover { padding: 20px 18px; }
   .journal-cover h1 { font-size: 40px; line-height: 1.02; letter-spacing: -0.02em; }
   .journal-cover > p { font-size: 17px; line-height: 1.5; }
-  .journal-filter-btn { font-size: 13.5px; }
-  .journal-filter-wide,
-  .journal-filter-lbl { display: none; }
-  .journal-filter-narrow { display: inline; }
 }
 
 /* Journal entry */
@@ -403,28 +518,45 @@ body:has([data-journal-root]) {
 .je-fnref a:hover{color:var(--color-ink)}
 
 /* The mobile-only portal sits outside .je, so it redeclares article accent tokens. */
-.je-fnsheet-wrap{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink))}
+.je-fnsheet-wrap,.je-filtersheet-wrap{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink))}
 
-.je-fnsheet-scrim{position:absolute;inset:0;border:0;padding:0;background:color-mix(in srgb,var(--color-ink) 26%,transparent);animation:je-fnfade .18s ease-out both;cursor:pointer}
+.je-fnsheet-scrim,.je-filtersheet-scrim{position:absolute;inset:0;border:0;padding:0;background:color-mix(in srgb,var(--color-ink) 26%,transparent);animation:je-fnfade .18s ease-out both;cursor:pointer}
 /* Remove animation fill after entry so inline drag styles can take over. */
-.je-fnsheet-scrim.settled{animation:none}
-.je-fnsheet{position:relative;display:flex;flex-direction:column;max-height:calc(100dvh - env(safe-area-inset-top) - 16px);background:var(--color-paper);border-top:1.4px solid var(--color-ink);border-radius:15px 15px 0 0;box-shadow:0 -7px 24px color-mix(in srgb,var(--color-ink) 14%,transparent);padding:9px 18px 26px;animation:je-fnup .27s cubic-bezier(.2,.85,.25,1) both;touch-action:pan-y}
-.je-fnsheet.settled{animation:none}
-.je-fnsheet-drag{touch-action:none}
-.je-fnsheet-grab{display:block;width:36px;height:3.5px;border-radius:3px;background:color-mix(in oklab,var(--color-ink) 20%,transparent);margin:0 auto 13px;cursor:grab}
-.je-fnsheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent-ink)}
+.je-fnsheet-scrim.settled,.je-filtersheet-scrim.settled{animation:none}
+.je-fnsheet,.je-filtersheet{position:relative;display:flex;flex-direction:column;max-height:calc(100dvh - env(safe-area-inset-top) - 16px);background:var(--color-paper);border-top:1.4px solid var(--color-ink);border-radius:15px 15px 0 0;box-shadow:0 -7px 24px color-mix(in srgb,var(--color-ink) 14%,transparent);padding:9px 18px 26px;animation:je-fnup .27s cubic-bezier(.2,.85,.25,1) both;touch-action:pan-y}
+.je-fnsheet.settled,.je-filtersheet.settled{animation:none}
+.je-fnsheet-drag,.je-filtersheet-drag{touch-action:none}
+.je-fnsheet-grab,.je-filtersheet-grab{display:block;width:36px;height:3.5px;border-radius:3px;background:color-mix(in oklab,var(--color-ink) 20%,transparent);margin:0 auto 13px;cursor:grab}
+.je-fnsheet-head,.je-filtersheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent-ink)}
 
-.je-fnsheet-x{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-13px -16px -13px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:15px;line-height:1;letter-spacing:0;color:var(--color-ink-soft);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.je-fnsheet-x:active{color:var(--color-ink)}
+.je-fnsheet-x,.je-filtersheet-x{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-13px -16px -13px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:15px;line-height:1;letter-spacing:0;color:var(--color-ink-soft);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.je-fnsheet-x:active,.je-filtersheet-x:active{color:var(--color-ink)}
 
-.je-fnsheet-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
+.je-fnsheet-body,.je-filtersheet-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
 .je-fnsheet-body p{margin:0;font-size:inherit;line-height:inherit;color:inherit}
 .je-fnsheet-body p+p{margin-top:9px}
 .je-fnsheet-body a{color:var(--accent-ink)}
 .je-fnsheet-body .n{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-right:7px}
+.je-filtersheet-body{font-family:var(--font-mono)}
+.journal-chipgrp{margin-bottom:15px}
+.journal-chipgrp-lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);margin-bottom:8px}
+.journal-chips{display:flex;flex-wrap:wrap;gap:7px}
+.journal-chip{display:inline-flex;align-items:center;gap:5px;min-height:44px;box-sizing:border-box;font-family:var(--font-mono);font-size:12px;padding:0 13px;border:1.4px solid var(--color-ink);border-radius:7px;background:var(--color-paper);color:var(--color-ink);cursor:pointer}
+.journal-chip.is-on{background:var(--color-ink);color:var(--color-paper)}
+.journal-chip-n{font-size:11px;opacity:.7}
+.journal-chip-dir{opacity:.8}
+.journal-chip.is-tag{border-color:color-mix(in oklab,var(--color-ink) 34%,transparent);color:var(--color-ink-soft)}
+.journal-chip.is-tag.is-on{background:color-mix(in oklab,var(--color-teal) 16%,var(--color-paper));border-color:var(--color-teal);color:color-mix(in oklab,var(--color-teal) 62%,var(--color-ink))}
+/* Filed but empty, not absent — the taxonomy is the allowlist, not the archive. */
+.journal-chip:disabled{opacity:.4;cursor:default;border-style:dashed}
+
+.journal-sheet-foot{display:flex;align-items:center;gap:10px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--color-ink-faint)}
+.journal-sheet-clear{display:inline-flex;align-items:center;min-height:44px;margin:-4px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:11px;color:var(--color-ink-soft);cursor:pointer}
+.journal-sheet-apply{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;margin-left:auto;font-family:var(--font-mono);font-size:12px;padding:0 17px;border:1.5px solid var(--color-ink);border-radius:999px;background:var(--color-ink);color:var(--color-paper);cursor:pointer}
+
 @keyframes je-fnup{from{transform:translateY(101%)}to{transform:translateY(0)}}
 @keyframes je-fnfade{from{opacity:0}to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.je-fnsheet,.je-fnsheet-scrim{animation:none}}
+@media (prefers-reduced-motion:reduce){.je-fnsheet,.je-filtersheet,.je-fnsheet-scrim,.je-filtersheet-scrim{animation:none}}
 /* Article body */
 .je-body p{font-family:var(--font-display);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:var(--je-measure);color:var(--color-ink);text-wrap:pretty}
 .je-ic{font-family:var(--font-mono);font-size:.8em;background:color-mix(in oklab,var(--color-ink) 7%,var(--color-paper-2));border:1px solid var(--color-ink-faint);border-radius:3px;padding:1px 5px}
@@ -563,6 +695,16 @@ body:has([data-journal-root]) {
 
   .je-side{font-size:20px;line-height:1.36}
   .je-side.is-fn{font-size:15px;line-height:1.5}
+  .je-code .ln{font-size:12px;line-height:1.7;padding-left:50px}
+  .je-code .cap{font-size:9.5px}
+  .je-nav{grid-template-columns:1fr}
+  .je-navcard.older{text-align:left}
+}
+
+/* Separate from the 640px block: this is the site's phone breakpoint, not an
+   article column-width step. Moves with `PHONE_QUERY` in lib/breakpoints.ts —
+   split them and the ref becomes a plain anchor that opens a sheet. */
+@media (max-width:720px){
   /* Keep the hidden list in the DOM because the mobile sheet clones its bodies. */
   .je-fnlist{display:none}
   /* The pseudo-element enlarges the footnote tap target without changing line height. */
@@ -570,8 +712,4 @@ body:has([data-journal-root]) {
   .je-fnref::after{content:"";position:absolute;inset:-9px -7px}
   .je-fnref:active{background:color-mix(in oklab,var(--accent) 34%,var(--color-paper))}
   .je-fnref.is-on{background:color-mix(in oklab,var(--accent) 40%,var(--color-paper))}
-  .je-code .ln{font-size:12px;line-height:1.7;padding-left:50px}
-  .je-code .cap{font-size:9.5px}
-  .je-nav{grid-template-columns:1fr}
-  .je-navcard.older{text-align:left}
 }

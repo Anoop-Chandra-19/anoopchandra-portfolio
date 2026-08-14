@@ -4,7 +4,7 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import type { JournalEntryMeta, Section } from "@/lib/journal-meta";
+import { TAGS, type JournalEntryMeta, type Section } from "@/lib/journal-meta";
 
 export type { JournalEntryMeta, Section };
 export { pad, tabColors } from "@/lib/journal-meta";
@@ -33,11 +33,6 @@ export type JournalEntry = JournalEntryMeta & {
 
 const CONTENT_DIR = path.join(process.cwd(), "content", "journal");
 const KINDS = ["case", "note"] as const;
-/* The tag is a shelf label, not a taxonomy — one 90px pill on the index, where
-   the colour already carries case-vs-note. A closed list keeps it that way:
-   left free-form it drifts toward one tag per entry, and the pill stops
-   sorting anything. Adding a tag is a deliberate edit here, not a typo. */
-const TAGS = ["ai/ml", "backend", "web", "linux", "hardware", "meta"] as const;
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 function fail(file: string, msg: string): never {
