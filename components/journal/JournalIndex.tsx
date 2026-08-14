@@ -277,7 +277,9 @@ export default function JournalIndex({
 
         <ul className="journal-toc-list list-none p-0 m-0">
           {visible.map((e) => (
-            <li key={e.slug} className="journal-toc-item">
+            /* The accent rides on the row, not the tab: the phone kind label
+               needs the same hue and sits inside the link. */
+            <li key={e.slug} className="journal-toc-item" style={tabAccent(e.kind)}>
               <Link
                 href={`/journal/${e.slug}`}
                 className="journal-toc-row items-baseline no-underline"
@@ -307,20 +309,29 @@ export default function JournalIndex({
                 </span>
 
                 {/* `display: contents` above the phone breakpoint, so the ledger
-                    grid still owns these as its read and date cells. On a phone
-                    it becomes the one meta line under the title, where the two
-                    swap into reading order — date, then how long it takes. */}
+                    grid still owns read and date as its own cells. On a phone it
+                    collapses to the one meta line under the title, where kind and
+                    subject join them and the two swap into reading order — date,
+                    then how long it takes. */}
                 <span className="journal-toc-metas">
-                  <span className="mono faint journal-toc-meta text-[11px] text-right text-ink-soft">
+                  {/* Kind as words. The ★ badge above is desktop-only, so this is
+                      its phone equivalent and has to read for notes too. */}
+                  <span className="journal-toc-kind">
+                    {e.kind === "case" ? (
+                      <>
+                        <span aria-hidden="true">★ </span>case
+                      </>
+                    ) : (
+                      "note"
+                    )}
+                  </span>
+                  <span className="journal-toc-tag">{e.tag}</span>
+                  <span className="mono faint journal-toc-meta journal-toc-read text-[11px] text-right text-ink-soft">
                     {e.read}
                   </span>
-                  <span className="mono journal-toc-meta text-[11px] text-right text-ink-soft">
+                  <span className="mono journal-toc-meta journal-toc-date text-[11px] text-right text-ink-soft">
                     {e.dateDisplay}
                   </span>
-                </span>
-
-                <span className="journal-toc-chev" aria-hidden="true">
-                  ›
                 </span>
               </Link>
 
@@ -329,7 +340,6 @@ export default function JournalIndex({
               <button
                 type="button"
                 className={`journal-edge-tab ${tag === e.tag ? "is-on" : ""}`}
-                style={tabAccent(e.kind)}
                 title={tag === e.tag ? `showing ${e.tag}; click to clear` : `filter to ${e.tag}`}
                 onClick={() => setTag(tag === e.tag ? null : e.tag)}
               >

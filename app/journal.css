@@ -167,6 +167,9 @@ body:has([data-journal-root]) {
   letter-spacing: 1px;
   text-align: center;
   cursor: pointer;
+  /* `tabAccent` sets --tab-ink on the row rather than a bare colour, so that the
+     phone kind label can share the hue without it inheriting into the title. */
+  color: var(--tab-ink);
   background: color-mix(in oklab, var(--tab-c) var(--tab-tint, 15%), var(--color-paper));
   border: 1.2px solid var(--tab-c);
   border-right: none;
@@ -196,7 +199,10 @@ body:has([data-journal-root]) {
 .journal-toc-metas {
   display: contents;
 }
-.journal-toc-chev {
+/* Phone-only row parts. Kind is a badge and subject an edge tab up here; below
+   the breakpoint both become words on the meta line. */
+.journal-toc-kind,
+.journal-toc-tag {
   display: none;
 }
 .journal-filter-narrow {
@@ -205,14 +211,16 @@ body:has([data-journal-root]) {
 
 @media (max-width: 720px) {
 
+  /* The notebook stays on phones: it is the page's only paper cue, and the
+     article view keeps its equivalent. Left padding clears the margin rule. */
   .journal-toc-panel {
-    background: none;
-    border: 0;
-    border-radius: 0;
-    padding: 0;
-    overflow: visible;
+    padding: 8px 14px 12px 40px;
   }
-  .journal-toc-rule,
+  .journal-toc-rule {
+    left: 28px;
+  }
+  /* No room for the rotated spine stamp, and the ledger's column headings have
+     nothing to head once the row stops being five columns. */
   .journal-toc-stamp,
   .journal-toc-header,
   .journal-toc-case,
@@ -220,22 +228,26 @@ body:has([data-journal-root]) {
     display: none;
   }
   .journal-toc-list {
-    border-top: 2px solid var(--color-ink);
+    border-top: 0;
   }
 
+  /* Two lines, no page gutter, nothing absolutely positioned. Grid areas mean
+     the `page → title → metas` source order survives unreordered. */
   .journal-toc-row {
-    grid-template-columns: 44px 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-areas:
-      "page title"
-      "page meta";
-    row-gap: 3px;
-    gap: 10px;
-    padding: 11px 20px 11px 0;
+      "title page"
+      "meta meta";
+    row-gap: 7px;
+    column-gap: 10px;
+    padding: 13px 0 12px;
   }
   .journal-toc-page {
     grid-area: page;
-    align-self: start;
-    padding-top: 3px;
+    align-self: baseline;
+    padding-top: 0;
+    font-size: 10.5px;
+    color: var(--color-ink-faint);
   }
   .journal-toc-title {
     grid-area: title;
@@ -244,58 +256,66 @@ body:has([data-journal-root]) {
   /* The title span has no role class; target it structurally. */
   .journal-toc-title > :first-child {
     white-space: normal;
-    font-size: 18px;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    font-size: 17.5px;
+    line-height: 1.28;
+    letter-spacing: -0.012em;
     flex: 0 1 100%;
   }
 
   .journal-toc-metas {
     display: flex;
     grid-area: meta;
-    align-items: baseline;
-    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
     min-width: 0;
-    padding-right: 84px;
   }
+  /* Wrap between items, never inside one: a date breaking after the comma reads
+     as two values. At 320px the line does wrap, and this is what keeps it legible. */
   .journal-toc-row .journal-toc-meta {
     text-align: left;
+    white-space: nowrap;
   }
-
-  .journal-toc-metas > .journal-toc-meta:first-child {
-    order: 2;
+  .journal-toc-kind,
+  .journal-toc-tag {
+    display: inline;
   }
-  .journal-toc-metas > .journal-toc-meta:last-child {
-    order: 1;
-  }
-  .journal-toc-metas > .journal-toc-meta:first-child::before {
-    content: "·";
-    margin-right: 6px;
-    color: var(--color-ink-faint);
-  }
-  .journal-toc-chev {
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+  .journal-toc-kind {
     font-family: var(--font-mono);
-    font-size: 17px;
+    font-size: 9px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--tab-ink);
+  }
+  .journal-toc-tag {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--color-ink-soft);
+  }
+
+  /* Source order is the desktop column order (read, then date); the phone line
+     reads date first, so the two swap here rather than in the DOM. */
+  .journal-toc-kind { order: 1; }
+  .journal-toc-tag { order: 2; }
+  .journal-toc-date { order: 3; }
+  .journal-toc-read { order: 4; }
+  /* Separators ride on the items so they follow `order` — a standalone span
+     would need ordering of its own. Trailing rather than leading: at 320px the
+     line wraps, and a row that opens with a stray dot reads as a list bullet.
+     Read time is last in `order`, so it gets none. */
+  .journal-toc-kind::after,
+  .journal-toc-tag::after,
+  .journal-toc-date::after {
+    content: "·";
+    margin-left: 7px;
     color: var(--color-ink-faint);
   }
 
+  /* The sheet owns subject filtering below this width. `display:none` rather
+     than a visual hide: it is a button and would otherwise stay tabbable. */
   .journal-edge-tab {
-    top: auto;
-    bottom: 11px;
-    right: 20px;
-    transform: none;
-    min-width: 0;
-    padding: 1px 7px;
-    border-right: 1.2px solid var(--tab-c);
-    border-radius: 3px;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    display: none;
   }
 
   .journal-cover .journal-cover-stamp {

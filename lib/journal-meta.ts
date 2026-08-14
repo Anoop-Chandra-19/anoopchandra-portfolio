@@ -60,10 +60,13 @@ export const tabColors = (kind: JournalEntryMeta["kind"]) =>
  *  tint DEPTH is a state (rest 15% / hover 34%), so `.journal-edge-tab`
  *  composes the background itself from `--tab-c` rather than being handed a
  *  finished colour. §05's tabs are static and keep `tabColors`. */
+/* This rides on the row `<li>`, not the tab, because the phone kind label needs
+   the same hue. Hence `--tab-ink` rather than `color`: a bare colour would
+   inherit into the title and meta line. Consumers opt in explicitly. */
 export const tabAccent = (kind: JournalEntryMeta["kind"]): CSSProperties =>
   ({
     "--tab-c": kind === "case" ? "var(--color-coral)" : "var(--color-teal)",
-    color:
+    "--tab-ink":
       kind === "case"
         ? "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))"
         : "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
