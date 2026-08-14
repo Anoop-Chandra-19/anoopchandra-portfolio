@@ -1,5 +1,9 @@
 // A drag-dismissable bottom sheet: the portal, scrim and drag physics on top of
 // useModalLifecycle, which already handles focus, scroll lock and Escape.
+//
+// `open` going false starts the exit; the portal outlives it and unmounts when
+// the transition ends. Every dismissal — drag, scrim, ✕, Escape, or the caller
+// closing itself — therefore animates out the same way.
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
@@ -14,8 +18,14 @@ const FLICK_V = 0.5;
 /** Matches the mount animation. Until it finishes the animation owns the
  *  transform and the drag can't move the sheet, so the handle is inert. */
 const SETTLE_MS = 300;
-const OUT_PX = 420;
-const OUT_MS = 170;
+/** Snap back when a drag falls short of dismissing. */
+const SPRING_MS = 200;
+/** Slide out on dismiss. */
+const EXIT_MS = 260;
+/** Backstop if transitionend never arrives — interrupted transition, sheet
+ *  already offscreen, backgrounded tab. Without it the portal would stick. */
+const EXIT_FALLBACK_MS = EXIT_MS + 90;
+/** How far down the drag has to go for the scrim to reach transparent. */
 const SCRIM_FADE_PX = 260;
 
 type Drag = { y0: number; t0: number };
@@ -53,49 +63,66 @@ export default function BottomSheet({
   children,
   footer,
 }: BottomSheetProps) {
+  /** Tracks `open`, but lags it by the exit animation. */
+  const [visible, setVisible] = useState(open);
   const [settled, setSettled] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [dy, setDy] = useState(0);
   const [dragging, setDragging] = useState(false);
   const drag = useRef<Drag | null>(null);
-  const outTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const lenis = useLenisInstance();
   const shouldReduceMotion = useReducedMotion();
 
-  // Callers pass inline arrows, and `close` is a dependency of both the resize
-  // effect and useModalLifecycle, so it has to keep one identity.
+  // Callers pass inline arrows, and `close` is a dependency of the resize
+  // effect, so it has to keep one identity.
   const closeActionRef = useRef(onCloseAction);
   useEffect(() => {
     closeActionRef.current = onCloseAction;
   });
 
-  const close = useCallback(() => {
-    if (outTimer.current) clearTimeout(outTimer.current);
-    outTimer.current = null;
-    drag.current = null;
-    setDragging(false);
-    closeActionRef.current();
-  }, []);
+  /** Ask the caller to close. The exit runs when `open` comes back false. */
+  const close = useCallback(() => closeActionRef.current(), []);
 
-  // Only the portal unmounts on close, so without this a re-opened sheet is
-  // still `settled` and skips its entry animation. During render, not in an
-  // effect: an effect commits the stale offset first and the sheet flashes at
-  // its last dragged position.
+  // Drag state outlives a single opening, so it is reset on the way in rather
+  // than on the way out — the sheet is still on screen during the exit and
+  // needs to keep the offset it is sliding from.
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
     setWasOpen(open);
+    setDragging(false);
     if (open) {
-      setDy(0);
+      setVisible(true);
+      setClosing(false);
       setSettled(false);
+      setDy(0);
+    } else if (shouldReduceMotion) {
+      setVisible(false);
+    } else {
+      // `settled` too: it is what drops the mount animation, whose `both` fill
+      // would otherwise outrank the exit transform.
+      setClosing(true);
+      setSettled(true);
     }
   }
 
+  const finish = useCallback(() => {
+    setVisible(false);
+    setClosing(false);
+  }, []);
+
   useEffect(() => {
-    if (!open) return;
+    if (!visible || closing) return;
     const timer = setTimeout(() => setSettled(true), shouldReduceMotion ? 0 : SETTLE_MS);
     return () => clearTimeout(timer);
-  }, [open, shouldReduceMotion]);
+  }, [visible, closing, shouldReduceMotion]);
+
+  useEffect(() => {
+    if (!closing) return;
+    const timer = setTimeout(finish, EXIT_FALLBACK_MS);
+    return () => clearTimeout(timer);
+  }, [closing, finish]);
 
   useEffect(() => {
     if (!open || !dismissQuery) return;
@@ -107,15 +134,8 @@ export default function BottomSheet({
     return () => mq.removeEventListener("change", onChange);
   }, [open, close, dismissQuery]);
 
-  useEffect(
-    () => () => {
-      if (outTimer.current) clearTimeout(outTimer.current);
-    },
-    []
-  );
-
   useModalLifecycle({
-    isOpen: open,
+    isOpen: visible,
     containerRef: dialogRef,
     initialFocusRef: closeRef,
     onCloseAction: close,
@@ -123,11 +143,12 @@ export default function BottomSheet({
     opener,
   });
 
-  if (!open) return null;
+  if (!visible) return null;
 
   const down = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (
       !settled ||
+      closing ||
       !e.isPrimary ||
       (e.pointerType === "mouse" && e.button !== 0) ||
       (e.target as Element).closest(`.${classPrefix}-x`)
@@ -149,14 +170,10 @@ export default function BottomSheet({
     setDragging(false);
     const d = Math.max(0, e.clientY - g.y0);
     const v = d / Math.max(1, performance.now() - g.t0);
-    if (d > CLOSE_PX || v > FLICK_V) {
-      if (shouldReduceMotion) {
-        close();
-        return;
-      }
-      setDy(OUT_PX);
-      outTimer.current = setTimeout(close, OUT_MS);
-    } else setDy(0);
+    // The exit picks up from the offset the drag left behind, so releasing past
+    // the threshold reads as one continuous throw.
+    if (d > CLOSE_PX || v > FLICK_V) close();
+    else setDy(0);
   };
   const cancel = () => {
     drag.current = null;
@@ -173,7 +190,9 @@ export default function BottomSheet({
         aria-label={closeLabel ?? `close ${label}`}
         tabIndex={-1}
         style={{
-          opacity: Math.max(0, 1 - dy / SCRIM_FADE_PX),
+          opacity: closing ? 0 : Math.max(0, 1 - dy / SCRIM_FADE_PX),
+          // Untransitioned during a drag, where it tracks the finger directly.
+          transition: closing ? `opacity ${EXIT_MS}ms ease-out` : "none",
           animation: shouldReduceMotion ? "none" : undefined,
         }}
       />
@@ -185,14 +204,23 @@ export default function BottomSheet({
         aria-modal="true"
         aria-label={ariaLabel ?? label}
         tabIndex={-1}
+        onTransitionEnd={(e) => {
+          if (closing && e.propertyName === "transform" && e.target === e.currentTarget) finish();
+        }}
         // Once the entry animation has played the inline transform owns the
         // sheet; before that its fill would outrank whatever we set here.
+        // The exit is a percentage so it clears the sheet whatever its height.
         style={{
-          transform: settled ? `translateY(${dy}px)` : undefined,
-          transition:
-            settled && !dragging && !shouldReduceMotion
-              ? "transform .2s cubic-bezier(.2,.8,.2,1)"
-              : "none",
+          transform: closing
+            ? "translateY(calc(100% + 32px))"
+            : settled
+              ? `translateY(${dy}px)`
+              : undefined,
+          transition: closing
+            ? `transform ${EXIT_MS}ms cubic-bezier(.32,.72,0,1)`
+            : !settled || dragging || shouldReduceMotion
+              ? "none"
+              : `transform ${SPRING_MS}ms cubic-bezier(.2,.8,.2,1)`,
         }}
       >
         <div
