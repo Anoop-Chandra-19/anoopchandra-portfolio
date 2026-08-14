@@ -200,10 +200,9 @@ body:has([data-journal-root]) {
   display: contents;
 }
 .journal-toc-kind,
-.journal-toc-tag {
-  display: none;
-}
-.journal-filter-narrow {
+.journal-toc-tag,
+.journal-pill-row,
+.journal-applied {
   display: none;
 }
 
@@ -309,6 +308,115 @@ body:has([data-journal-root]) {
     display: none;
   }
 
+  /* One pill replaces the kind buttons, the year select, and the sort controls
+     that lived in the display:none ledger header. */
+  .journal-filter-row {
+    display: none;
+  }
+  .journal-pill-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .journal-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1.5px solid var(--color-ink);
+    border-radius: 999px;
+    padding: 0 14px;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 color-mix(in oklab, var(--color-ink) 16%, transparent);
+  }
+  .journal-pill-lbl {
+    font-size: 9px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+  .journal-pill-val {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .journal-pill-cnt {
+    margin-left: auto;
+    color: var(--color-ink-faint);
+  }
+  .journal-pill.is-on {
+    border-color: var(--color-coral);
+    box-shadow: 2px 2px 0 color-mix(in oklab, var(--color-coral) 30%, transparent);
+  }
+  .journal-pill.is-on .journal-pill-val {
+    color: color-mix(in oklab, var(--color-coral) 58%, var(--color-ink));
+  }
+  .journal-pill-x {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+  }
+
+  .journal-applied {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: -8px 0 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+  .journal-applied b {
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .journal-applied-undo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin: -11px 0 -11px auto;
+    border: 0;
+    background: none;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink-soft);
+    border-bottom: 1px dotted var(--color-ink-faint);
+    cursor: pointer;
+  }
+
+  /* The edge tabs it points at are gone; the sheet is the filter now. */
+  .journal-toc-hint {
+    display: none;
+  }
+  .journal-toc-foot {
+    justify-content: center;
+    text-align: center;
+  }
+
   .journal-cover .journal-cover-stamp {
     position: static;
     display: inline-block;
@@ -318,10 +426,6 @@ body:has([data-journal-root]) {
   .journal-cover { padding: 20px 18px; }
   .journal-cover h1 { font-size: 40px; line-height: 1.02; letter-spacing: -0.02em; }
   .journal-cover > p { font-size: 17px; line-height: 1.5; }
-  .journal-filter-btn { font-size: 13.5px; }
-  .journal-filter-wide,
-  .journal-filter-lbl { display: none; }
-  .journal-filter-narrow { display: inline; }
 }
 
 /* Journal entry */
@@ -414,28 +518,45 @@ body:has([data-journal-root]) {
 .je-fnref a:hover{color:var(--color-ink)}
 
 /* The mobile-only portal sits outside .je, so it redeclares article accent tokens. */
-.je-fnsheet-wrap{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink))}
+.je-fnsheet-wrap,.je-filtersheet-wrap{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;--accent:var(--color-coral);--accent-ink:color-mix(in oklab,var(--accent) 63%,var(--color-ink))}
 
-.je-fnsheet-scrim{position:absolute;inset:0;border:0;padding:0;background:color-mix(in srgb,var(--color-ink) 26%,transparent);animation:je-fnfade .18s ease-out both;cursor:pointer}
+.je-fnsheet-scrim,.je-filtersheet-scrim{position:absolute;inset:0;border:0;padding:0;background:color-mix(in srgb,var(--color-ink) 26%,transparent);animation:je-fnfade .18s ease-out both;cursor:pointer}
 /* Remove animation fill after entry so inline drag styles can take over. */
-.je-fnsheet-scrim.settled{animation:none}
-.je-fnsheet{position:relative;display:flex;flex-direction:column;max-height:calc(100dvh - env(safe-area-inset-top) - 16px);background:var(--color-paper);border-top:1.4px solid var(--color-ink);border-radius:15px 15px 0 0;box-shadow:0 -7px 24px color-mix(in srgb,var(--color-ink) 14%,transparent);padding:9px 18px 26px;animation:je-fnup .27s cubic-bezier(.2,.85,.25,1) both;touch-action:pan-y}
-.je-fnsheet.settled{animation:none}
-.je-fnsheet-drag{touch-action:none}
-.je-fnsheet-grab{display:block;width:36px;height:3.5px;border-radius:3px;background:color-mix(in oklab,var(--color-ink) 20%,transparent);margin:0 auto 13px;cursor:grab}
-.je-fnsheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent-ink)}
+.je-fnsheet-scrim.settled,.je-filtersheet-scrim.settled{animation:none}
+.je-fnsheet,.je-filtersheet{position:relative;display:flex;flex-direction:column;max-height:calc(100dvh - env(safe-area-inset-top) - 16px);background:var(--color-paper);border-top:1.4px solid var(--color-ink);border-radius:15px 15px 0 0;box-shadow:0 -7px 24px color-mix(in srgb,var(--color-ink) 14%,transparent);padding:9px 18px 26px;animation:je-fnup .27s cubic-bezier(.2,.85,.25,1) both;touch-action:pan-y}
+.je-fnsheet.settled,.je-filtersheet.settled{animation:none}
+.je-fnsheet-drag,.je-filtersheet-drag{touch-action:none}
+.je-fnsheet-grab,.je-filtersheet-grab{display:block;width:36px;height:3.5px;border-radius:3px;background:color-mix(in oklab,var(--color-ink) 20%,transparent);margin:0 auto 13px;cursor:grab}
+.je-fnsheet-head,.je-filtersheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent-ink)}
 
-.je-fnsheet-x{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-13px -16px -13px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:15px;line-height:1;letter-spacing:0;color:var(--color-ink-soft);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.je-fnsheet-x:active{color:var(--color-ink)}
+.je-fnsheet-x,.je-filtersheet-x{display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin:-13px -16px -13px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:15px;line-height:1;letter-spacing:0;color:var(--color-ink-soft);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.je-fnsheet-x:active,.je-filtersheet-x:active{color:var(--color-ink)}
 
-.je-fnsheet-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
+.je-fnsheet-body,.je-filtersheet-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;font-family:var(--font-display);font-size:15px;line-height:1.5;color:var(--color-ink-soft)}
 .je-fnsheet-body p{margin:0;font-size:inherit;line-height:inherit;color:inherit}
 .je-fnsheet-body p+p{margin-top:9px}
 .je-fnsheet-body a{color:var(--accent-ink)}
 .je-fnsheet-body .n{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-right:7px}
+.je-filtersheet-body{font-family:var(--font-mono)}
+.journal-chipgrp{margin-bottom:15px}
+.journal-chipgrp-lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--color-ink-faint);margin-bottom:8px}
+.journal-chips{display:flex;flex-wrap:wrap;gap:7px}
+.journal-chip{display:inline-flex;align-items:center;gap:5px;min-height:44px;box-sizing:border-box;font-family:var(--font-mono);font-size:12px;padding:0 13px;border:1.4px solid var(--color-ink);border-radius:7px;background:var(--color-paper);color:var(--color-ink);cursor:pointer}
+.journal-chip.is-on{background:var(--color-ink);color:var(--color-paper)}
+.journal-chip-n{font-size:11px;opacity:.7}
+.journal-chip-dir{opacity:.8}
+.journal-chip.is-tag{border-color:color-mix(in oklab,var(--color-ink) 34%,transparent);color:var(--color-ink-soft)}
+.journal-chip.is-tag.is-on{background:color-mix(in oklab,var(--color-teal) 16%,var(--color-paper));border-color:var(--color-teal);color:color-mix(in oklab,var(--color-teal) 62%,var(--color-ink))}
+/* Filed but empty, not absent — the taxonomy is the allowlist, not the archive. */
+.journal-chip:disabled{opacity:.4;cursor:default;border-style:dashed}
+
+.journal-sheet-foot{display:flex;align-items:center;gap:10px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--color-ink-faint)}
+.journal-sheet-clear{display:inline-flex;align-items:center;min-height:44px;margin:-4px 0;border:0;background:none;padding:0;font-family:var(--font-mono);font-size:11px;color:var(--color-ink-soft);cursor:pointer}
+.journal-sheet-apply{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;margin-left:auto;font-family:var(--font-mono);font-size:12px;padding:0 17px;border:1.5px solid var(--color-ink);border-radius:999px;background:var(--color-ink);color:var(--color-paper);cursor:pointer}
+
 @keyframes je-fnup{from{transform:translateY(101%)}to{transform:translateY(0)}}
 @keyframes je-fnfade{from{opacity:0}to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.je-fnsheet,.je-fnsheet-scrim{animation:none}}
+@media (prefers-reduced-motion:reduce){.je-fnsheet,.je-filtersheet,.je-fnsheet-scrim,.je-filtersheet-scrim{animation:none}}
 /* Article body */
 .je-body p{font-family:var(--font-display);font-size:20px;line-height:1.75;margin:0 0 22px;max-width:var(--je-measure);color:var(--color-ink);text-wrap:pretty}
 .je-ic{font-family:var(--font-mono);font-size:.8em;background:color-mix(in oklab,var(--color-ink) 7%,var(--color-paper-2));border:1px solid var(--color-ink-faint);border-radius:3px;padding:1px 5px}

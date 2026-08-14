@@ -31,6 +31,22 @@ export type JournalEntryMeta = {
   related: string[];
 };
 
+/* The tag is a shelf label, not a taxonomy — one 90px pill on the index, where
+   the colour already carries case-vs-note. A closed list keeps it that way:
+   left free-form it drifts toward one tag per entry, and the pill stops
+   sorting anything. Adding a tag is a deliberate edit here, not a typo. */
+export const TAGS = ["ai/ml", "backend", "web", "linux", "hardware", "meta"] as const;
+
+export type Filter = "all" | "case" | "note";
+export type JournalQuery = { filter: Filter; tag: string | null; year: string | null };
+
+/** The index list and the filter sheet's result count must never disagree, so
+ *  both go through this rather than each filtering for themselves. */
+export const matchesEntry = (e: JournalEntryMeta, q: JournalQuery) =>
+  (q.filter === "all" || e.kind === q.filter) &&
+  (!q.tag || e.tag === q.tag) &&
+  (!q.year || e.date.startsWith(`${q.year}-`));
+
 const HOME_JOURNAL_ENTRY_LIMIT = 5;
 
 /** The newest entries shown in the compact home-page index. The loader already

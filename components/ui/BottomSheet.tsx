@@ -22,6 +22,8 @@ type Drag = { y0: number; t0: number };
 
 export type BottomSheetProps = {
   open: boolean;
+  /** Put on the dialog, so an opener can point `aria-controls` at it. */
+  id?: string;
   label: string;
   ariaLabel?: string;
   closeLabel?: string;
@@ -40,6 +42,7 @@ export type BottomSheetProps = {
 
 export default function BottomSheet({
   open,
+  id,
   label,
   ariaLabel,
   closeLabel,
@@ -176,6 +179,7 @@ export default function BottomSheet({
       />
       <div
         ref={dialogRef}
+        id={id}
         className={`${classPrefix}${settled ? " settled" : ""}`}
         role="dialog"
         aria-modal="true"
