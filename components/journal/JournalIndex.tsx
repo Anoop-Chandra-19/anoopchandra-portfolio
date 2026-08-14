@@ -277,8 +277,8 @@ export default function JournalIndex({
 
         <ul className="journal-toc-list list-none p-0 m-0">
           {visible.map((e) => (
-            /* The accent rides on the row, not the tab: the phone kind label
-               needs the same hue and sits inside the link. */
+            /* On the row, not the tab: the phone kind label needs the same
+               hue and sits inside the link. */
             <li key={e.slug} className="journal-toc-item" style={tabAccent(e.kind)}>
               <Link
                 href={`/journal/${e.slug}`}
@@ -309,13 +309,11 @@ export default function JournalIndex({
                 </span>
 
                 {/* `display: contents` above the phone breakpoint, so the ledger
-                    grid still owns read and date as its own cells. On a phone it
-                    collapses to the one meta line under the title, where kind and
-                    subject join them and the two swap into reading order — date,
-                    then how long it takes. */}
+                    grid still owns read and date as its own cells; below it, these
+                    collapse into the one meta line under the title. */}
                 <span className="journal-toc-metas">
-                  {/* Kind as words. The ★ badge above is desktop-only, so this is
-                      its phone equivalent and has to read for notes too. */}
+                  {/* The ★ badge above is desktop-only; this is its phone
+                      equivalent, and it has to read for notes too. */}
                   <span className="journal-toc-kind">
                     {e.kind === "case" ? (
                       <>

@@ -199,8 +199,6 @@ body:has([data-journal-root]) {
 .journal-toc-metas {
   display: contents;
 }
-/* Phone-only row parts. Kind is a badge and subject an edge tab up here; below
-   the breakpoint both become words on the meta line. */
 .journal-toc-kind,
 .journal-toc-tag {
   display: none;
@@ -211,16 +209,13 @@ body:has([data-journal-root]) {
 
 @media (max-width: 720px) {
 
-  /* The notebook stays on phones: it is the page's only paper cue, and the
-     article view keeps its equivalent. Left padding clears the margin rule. */
+  /* The notebook stays on phones: it is the page's only paper cue. */
   .journal-toc-panel {
     padding: 8px 14px 12px 40px;
   }
   .journal-toc-rule {
     left: 28px;
   }
-  /* No room for the rotated spine stamp, and the ledger's column headings have
-     nothing to head once the row stops being five columns. */
   .journal-toc-stamp,
   .journal-toc-header,
   .journal-toc-case,
@@ -231,8 +226,7 @@ body:has([data-journal-root]) {
     border-top: 0;
   }
 
-  /* Two lines, no page gutter, nothing absolutely positioned. Grid areas mean
-     the `page → title → metas` source order survives unreordered. */
+  /* Areas, not reordering: the `page → title → metas` source order stays. */
   .journal-toc-row {
     grid-template-columns: 1fr auto;
     grid-template-areas:
@@ -270,8 +264,7 @@ body:has([data-journal-root]) {
     gap: 7px;
     min-width: 0;
   }
-  /* Wrap between items, never inside one: a date breaking after the comma reads
-     as two values. At 320px the line does wrap, and this is what keeps it legible. */
+  /* The line wraps at 320px; a date breaking after its comma reads as two values. */
   .journal-toc-row .journal-toc-meta {
     text-align: left;
     white-space: nowrap;
@@ -294,16 +287,14 @@ body:has([data-journal-root]) {
     color: var(--color-ink-soft);
   }
 
-  /* Source order is the desktop column order (read, then date); the phone line
-     reads date first, so the two swap here rather than in the DOM. */
+  /* Source order is the desktop column order, read then date; the phone line
+     reads date first. */
   .journal-toc-kind { order: 1; }
   .journal-toc-tag { order: 2; }
   .journal-toc-date { order: 3; }
   .journal-toc-read { order: 4; }
-  /* Separators ride on the items so they follow `order` — a standalone span
-     would need ordering of its own. Trailing rather than leading: at 320px the
-     line wraps, and a row that opens with a stray dot reads as a list bullet.
-     Read time is last in `order`, so it gets none. */
+  /* On the items so they follow `order`, and trailing so a wrapped line never
+     opens with a stray dot. Read time is last in `order`, so it gets none. */
   .journal-toc-kind::after,
   .journal-toc-tag::after,
   .journal-toc-date::after {
@@ -583,6 +574,16 @@ body:has([data-journal-root]) {
 
   .je-side{font-size:20px;line-height:1.36}
   .je-side.is-fn{font-size:15px;line-height:1.5}
+  .je-code .ln{font-size:12px;line-height:1.7;padding-left:50px}
+  .je-code .cap{font-size:9.5px}
+  .je-nav{grid-template-columns:1fr}
+  .je-navcard.older{text-align:left}
+}
+
+/* Separate from the 640px block: this is the site's phone breakpoint, not an
+   article column-width step. Moves with `PHONE_QUERY` in lib/breakpoints.ts —
+   split them and the ref becomes a plain anchor that opens a sheet. */
+@media (max-width:720px){
   /* Keep the hidden list in the DOM because the mobile sheet clones its bodies. */
   .je-fnlist{display:none}
   /* The pseudo-element enlarges the footnote tap target without changing line height. */
@@ -590,8 +591,4 @@ body:has([data-journal-root]) {
   .je-fnref::after{content:"";position:absolute;inset:-9px -7px}
   .je-fnref:active{background:color-mix(in oklab,var(--accent) 34%,var(--color-paper))}
   .je-fnref.is-on{background:color-mix(in oklab,var(--accent) 40%,var(--color-paper))}
-  .je-code .ln{font-size:12px;line-height:1.7;padding-left:50px}
-  .je-code .cap{font-size:9.5px}
-  .je-nav{grid-template-columns:1fr}
-  .je-navcard.older{text-align:left}
 }
