@@ -4,7 +4,7 @@ Guidance for coding agents working on this portfolio. Keep changes focused, pres
 
 ## Project Snapshot
 
-- **Framework:** Next.js 16.2.12, App Router
+- **Framework:** Next.js 16.4.3, App Router
 - **UI:** React 19.2.8
 - **Language:** TypeScript 6.0.3 with strict checking
 - **Styling:** Tailwind CSS 4.1.11 plus global CSS
