@@ -1,5 +1,6 @@
 import { SectionHeaderStamp } from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
+import Label from "@/components/ui/Label";
 import Postmark from "./Postmark";
 
 export default function Contact() {
@@ -43,9 +44,9 @@ export default function Contact() {
           />
 
           <div className="pt-11 px-9 pb-9 relative z-[2] max-wide:pt-[26px] max-wide:px-[20px] max-wide:pb-[20px]">
-            <div className="mono faint text-tag uppercase">
+            <Label kind="tag">
               ✎ message side
-            </div>
+            </Label>
             <h2 className="text-[46px] mt-2 mb-3.5 leading-[1.08] tracking-[-0.016em] max-wide:text-[34px] max-wide:leading-[1.03] max-wide:tracking-[-0.018em]">
               Let&apos;s
               <br />
@@ -115,16 +116,16 @@ export default function Contact() {
                   style={{ border: "1px dashed color-mix(in oklab, var(--color-ink) 50%, transparent)" }}
                 />
                 <div className="accent text-[26px] leading-none text-teal max-wide:text-[20px]">★</div>
-                <div className="mono text-caption mt-1.5 text-ink-soft max-wide:mt-[4px] max-wide:leading-[1.3]">
+                <Label kind="caption" tone="soft" className="mt-1.5 max-wide:mt-[4px] max-wide:leading-[1.3]">
                   HAND
                   <br />
                   BUILT
-                </div>
-                <div className="mono text-meta font-medium mt-2 text-ink max-wide:mt-[4px] max-wide:leading-[1.3] max-wide:text-[10px]">$0.42</div>
+                </Label>
+                <Label kind="meta" tone="ink" className="font-medium mt-2 max-wide:mt-[4px] max-wide:leading-[1.3] max-wide:text-[10px]">$0.42</Label>
               </div>
             </div>
 
-            <div className="mono faint text-tag uppercase mb-2.5">to —</div>
+            <Label kind="tag" className="mb-2.5">to —</Label>
             <div className="flex flex-col gap-2.5 mb-[18px] max-wide:*:text-[20px]">
               <div className="accent text-[22px] text-ink pb-1 border-b-[1.2px] border-ink-faint">
                 whoever&apos;s reading this
@@ -138,14 +139,14 @@ export default function Contact() {
             </div>
 
             <div className="mt-auto pt-3" style={{ borderTop: "1px dashed var(--color-ink-faint)" }}>
-              <div className="mono faint text-tag uppercase mb-1.5">from —</div>
-              <div className="mono text-meta leading-[1.7] text-ink-soft">
+              <Label kind="tag" className="mb-1.5">from —</Label>
+              <Label kind="meta" tone="soft" className="leading-[1.7]">
                 Anoopchandra Parampalli
                 <br />
                 Cleveland, OH
                 <br />
                 Source Serif 4 / JetBrains Mono / Caveat · Next.js + Vercel
-              </div>
+              </Label>
             </div>
           </div>
         </article>

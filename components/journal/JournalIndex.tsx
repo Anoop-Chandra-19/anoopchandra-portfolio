@@ -9,6 +9,7 @@ import {
   type JournalEntryMeta,
 } from "@/lib/journal-meta";
 import JournalBackLink from "@/components/journal/JournalBackLink";
+import Label from "@/components/ui/Label";
 import JournalFilterSheet, {
   type Sort,
   type SortKey,
@@ -161,15 +162,15 @@ export default function JournalIndex({
         <JournalBackLink href="/" peel>
           ← back to portfolio
         </JournalBackLink>
-        <div className="mono faint text-eyebrow uppercase">
+        <Label kind="eyebrow">
           anoop parampalli · journal · vol. 02
-        </div>
+        </Label>
       </div>
 
       <div className="journal-cover">
-        <div className="mono faint text-eyebrow uppercase mb-3.5">
+        <Label kind="eyebrow" className="mb-3.5">
           a working notebook · {ppRange}
-        </div>
+        </Label>
         <h1 className="mb-2">
           The <span className="text-coral">Journal</span>
         </h1>
@@ -177,15 +178,17 @@ export default function JournalIndex({
           A working notebook for bug stories, personal projects, opinions, and things I figured
           out the hard way.
         </p>
-        <div
-          className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-tag uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
+        <Label
+          kind="tag"
+          tone="inherit"
+          className="journal-cover-stamp absolute top-[22px] right-[26px] py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
           style={{
             transform: "rotate(3deg)",
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
           }}
         >
           est. 2025
-        </div>
+        </Label>
       </div>
 
       {/* Kind uses the top filters; subject uses each row's edge tab. Below the
@@ -202,7 +205,7 @@ export default function JournalIndex({
             onClick={() => setFilter(k)}
           >
             {label}
-            <span className="mono text-meta opacity-70 ml-1">({counts[k]})</span>
+            <Label kind="meta" tone="inherit" as="span" className="opacity-70 ml-1">({counts[k]})</Label>
           </button>
         ))}
         {years.length > 1 && (
@@ -316,15 +319,17 @@ export default function JournalIndex({
           className="journal-toc-rule absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
           style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
         />
-        <div
-          className="mono faint journal-toc-stamp absolute left-2 top-7 text-stamp uppercase whitespace-nowrap"
+        <Label
+          kind="stamp"
+          className="journal-toc-stamp absolute left-2 top-7 whitespace-nowrap"
           style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
         >
           ✎ index — {visible.length} of {entries.length}
-        </div>
+        </Label>
 
-        <div
-          className="mono faint journal-toc-header text-stamp uppercase mb-1.5"
+        <Label
+          kind="stamp"
+          className="journal-toc-header mb-1.5"
           style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
         >
           <span className="text-right">pg.</span>
@@ -337,7 +342,7 @@ export default function JournalIndex({
               subject
             </span>
           </span>
-        </div>
+        </Label>
 
         {visible.length === 0 && (
           <div className="pt-[26px] pb-[22px] px-1.5">
@@ -383,9 +388,9 @@ export default function JournalIndex({
                    was hiding the page number, kind, read time and date from
                    screen readers. The row's own text is the better name. */
               >
-                <span className="mono faint journal-toc-page text-meta text-right text-ink-soft">
+                <Label kind="meta" tone="soft" as="span" className="journal-toc-page text-right">
                   p.{pad(e.page)}
-                </span>
+                </Label>
 
                 <span className="journal-toc-title flex items-baseline min-w-0 gap-2 overflow-hidden">
                   <span className="text-[18px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
@@ -393,9 +398,9 @@ export default function JournalIndex({
                   </span>
                   {/* The case badge provides a non-colour kind signal; mobile uses the tab. */}
                   {e.kind === "case" && (
-                    <span className="mono journal-toc-case text-stamp uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
+                    <Label kind="stamp" tone="ink" as="span" className="journal-toc-case bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
                       <span aria-hidden="true">★ </span>case study
-                    </span>
+                    </Label>
                   )}
                   <span
                     aria-hidden="true"
@@ -420,12 +425,12 @@ export default function JournalIndex({
                     )}
                   </span>
                   <span className="journal-toc-tag">{e.tag}</span>
-                  <span className="mono faint journal-toc-meta journal-toc-read text-meta text-right text-ink-soft">
+                  <Label kind="meta" tone="soft" as="span" className="journal-toc-meta journal-toc-read text-right">
                     {e.read}
-                  </span>
-                  <span className="mono journal-toc-meta journal-toc-date text-meta text-right text-ink-soft">
+                  </Label>
+                  <Label kind="meta" tone="soft" as="span" className="journal-toc-meta journal-toc-date text-right">
                     {e.dateDisplay}
-                  </span>
+                  </Label>
                 </span>
               </Link>
 
@@ -447,7 +452,7 @@ export default function JournalIndex({
           className="journal-toc-foot flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
-          <span className="mono faint text-meta">
+          <Label kind="meta" as="span">
             {visible.length} shown
             {tag && (
               <>
@@ -463,7 +468,7 @@ export default function JournalIndex({
             )}
             {" · "}
             {counts.case} case studies + {counts.note} notes · pp. {pad(first)}–{pad(last)}
-          </span>
+          </Label>
           <span className="journal-toc-hint text-[15px] italic text-ink-faint">
             tap a line to open it · tap a tab to filter ↦
           </span>

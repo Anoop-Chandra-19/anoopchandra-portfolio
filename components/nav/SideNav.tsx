@@ -1,4 +1,5 @@
 "use client";
+import Label from "@/components/ui/Label";
 import { NAV_ITEMS, useActiveSection, useSectionJump } from "@/hooks/useActiveSection";
 
 /** Desktop-only vertical left rail (>900px). Below that the index chip +
@@ -48,13 +49,16 @@ export default function SideNav({
                 isActive ? "w-[28px] bg-electric" : "w-[10px] bg-ink"
               }`}
             />
-            <span
-              className={`mono text-meta tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
+            <Label
+              kind="meta"
+              tone="inherit"
+              as="span"
+              className={`tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
                 isActive ? "text-electric translate-x-0" : "text-ink -translate-x-[1px]"
               }`}
             >
               {label}
-            </span>
+            </Label>
           </a>
         );
       })}

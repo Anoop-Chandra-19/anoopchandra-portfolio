@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
+import Label from "@/components/ui/Label";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 import { LAB_EXPS } from "@/lib/lab-meta";
 import type { LabSlug } from "@/lib/lab-meta";
@@ -70,13 +71,15 @@ export default function Lab() {
                 style={{ borderTop: `4px solid var(--color-${e.accent})` }}
               >
                 <div className="flex justify-between items-center px-[18px] pt-[12px]">
-                  <span
-                    className="mono text-caption"
+                  <Label
+                    kind="caption"
+                    tone="inherit"
+                    as="span"
                     style={{ color: `var(--color-${e.accent}-ink)` }}
                   >
                     {e.num}
-                  </span>
-                  <span className="mono faint text-caption">in your browser</span>
+                  </Label>
+                  <Label kind="caption" as="span">in your browser</Label>
                 </div>
                 <div
                   className="mx-[18px] mt-[8px] pb-[8px]"

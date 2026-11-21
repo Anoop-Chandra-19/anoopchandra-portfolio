@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Chip from "@/components/ui/Chip";
+import Label from "@/components/ui/Label";
 import Annotation from "@/components/ui/Annotation";
 import ScrollLink from "@/components/ui/ScrollLink";
 
@@ -8,9 +9,9 @@ export default function Hero() {
     <section id="sec-home" className="section min-h-[560px] pt-10 max-wide:min-h-[calc(100svh-26px)] max-wide:mt-0 max-wide:pt-0 max-wide:flex max-wide:flex-col max-wide:justify-center">
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-10 items-center max-wide:flex max-wide:flex-col max-wide:items-stretch max-wide:gap-0">
         <div className="min-w-0 max-wide:contents">
-          <div className="mono faint anim-rise d-hello text-eyebrow uppercase max-wide:order-1 max-wide:pr-[116px] max-wide:text-[10px]">
+          <Label kind="eyebrow" className="anim-rise d-hello max-wide:order-1 max-wide:pr-[116px] max-wide:text-[10px]">
             {"// hello.tsx"}
-          </div>
+          </Label>
           {/* The only fluid type on the site. opsz rides font-size, so the top
               of the clamp gets the display cut for free. */}
           <h1 className="mt-3.5 mb-1.5 leading-[1.02] text-[clamp(44px,5.8vw,72px)] max-wide:order-3 max-wide:mt-0 max-wide:mb-[4px] max-wide:text-[42px] max-wide:leading-[1.03]">

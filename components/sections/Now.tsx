@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import SectionHeader from "@/components/ui/SectionHeader";
+import Label from "@/components/ui/Label";
 
 const CARDS = [
   {
@@ -39,7 +40,7 @@ export default function Now() {
               // it in CSS — an inline transform would need !important to undo
               style={{ "--rot": `${c.rot}deg` } as CSSProperties}
             >
-              <div className="mono faint text-meta mb-1.5">{c.tag}</div>
+              <Label kind="meta" className="mb-1.5">{c.tag}</Label>
               <h3 className="card-title">{c.h}</h3>
               <ul className="pl-[18px] mt-2 text-[16px] leading-[1.6]">
                 {c.items.map((i) => (

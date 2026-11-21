@@ -127,7 +127,7 @@ Use these naming conventions:
   - `--color-teal`: `#1ea896`
   - `--color-navy`: `#25283d`
 - Preserve the editorial notebook aesthetic: paper backgrounds, ink borders, measured typography, and restrained accents.
-- Small mono labels use the type roles in `@theme` (`text-eyebrow`, `text-tag`, `text-stamp`, `text-meta`, `text-caption`), with `uppercase` at the call site, rather than a typed `text-[11px] tracking-[2px]`.
+- Small mono labels use `<Label kind="eyebrow|tag|stamp|meta|caption">` from `components/ui/Label.tsx`, which applies the `@theme` type role, the case and the colour (`tone`, default faint), rather than a typed `text-[11px] tracking-[2px]`. Set colour with `tone`, not a colour utility in `className`.
 - Phone changes go on the element as `max-wide:` variants (`max-xs:` for 360px, `max-mid:` for 1000px), not as a named class picked up by an `@media` block. Breakpoint tokens are in px because the rem basis is 17px; check `--breakpoint-nav` (900px) before adding a nearby breakpoint.
 - Named CSS in `app/styles/` sits in `@layer components`, so a utility beats it; keep it for what utilities can't express (pseudo-elements, `details`, descendant selectors, the lightbox).
 - Avoid inline styles unless values are computed dynamically or CSS custom properties are the cleanest bridge.

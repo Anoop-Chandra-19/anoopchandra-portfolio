@@ -2,17 +2,21 @@ import { Fragment, type ReactNode } from "react";
 import ZoomableImage from "@/components/ui/ZoomableImage";
 import { SectionHeaderArrow } from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
+import Label from "@/components/ui/Label";
 import { ROLE, PLATFORM, FLAGSHIP, PARTS, ALSO, PROJECTS, MINOR } from "@/lib/work-data";
 import type { Diagram, Minor, Part, Project, WorkStatus } from "@/lib/work-data";
 
 function TagPill({ t }: { t: string }) {
   return (
-    <span
-      className="mono text-meta py-[3px] px-2.5 rounded-full text-ink-soft"
+    <Label
+      kind="meta"
+      tone="soft"
+      as="span"
+      className="py-[3px] px-2.5 rounded-full"
       style={{ border: "1.2px solid var(--color-ink-soft)" }}
     >
       {t}
-    </span>
+    </Label>
   );
 }
 
@@ -74,11 +78,11 @@ function RoleBlock() {
       <div className="flex items-baseline gap-4 flex-wrap mb-3">
         <span className="hand text-[34px] leading-none text-electric max-wide:text-[26px]">{ROLE.org}</span>
         <div>
-          <div className="mono faint text-eyebrow uppercase">
+          <Label kind="eyebrow">
             {ROLE.role} · {ROLE.period}
-          </div>
+          </Label>
           {ROLE.note && (
-            <div className="mono faint text-meta mt-[4px]">{ROLE.note}</div>
+            <Label kind="meta" className="mt-[4px]">{ROLE.note}</Label>
           )}
         </div>
       </div>
@@ -97,16 +101,14 @@ const STATUS_DOT: Record<WorkStatus, string> = {
 
 function StatusDot({ status, className = "" }: { status: WorkStatus; className?: string }) {
   return (
-    <span
-      className={`mono inline-flex items-center gap-[7px] text-tag uppercase text-ink-soft ${className}`.trim()}
-    >
+    <Label kind="tag" tone="soft" as="span" className={`inline-flex items-center gap-[7px] ${className}`.trim()}>
       <span
         aria-hidden="true"
         className="w-[7px] h-[7px] rounded-full shrink-0"
         style={{ background: STATUS_DOT[status] }}
       />
       {status}
-    </span>
+    </Label>
   );
 }
 
@@ -154,16 +156,16 @@ function FlagshipPart() {
   return (
     <section className="part" aria-label={`Part ${f.n}, ${f.t}`}>
       <div className="pt-[18px] px-[22px] pb-[12px] border-b-2 border-ink max-wide:pt-[12px] max-wide:px-[14px] max-wide:pb-[8px]">
-        <div className="diagram-cap mono faint text-tag uppercase">
+        <Label kind="tag" className="diagram-cap">
           <span>
             <Copy long={f.bandCap} short={f.shortBandCap} />
           </span>
-        </div>
+        </Label>
         <DiagramImg d={f.diagram} caption={f.bandCap} sizes="720px" className="max-wide:hidden max-w-[720px] mx-auto" />
         <DiagramImg d={f.shortDiagram} caption={f.bandCap} sizes="100vw" className="wide:hidden" />
-        <div className="max-wide:hidden mono faint text-caption text-center mt-[8px]">
+        <Label kind="caption" className="max-wide:hidden text-center mt-[8px]">
           {f.bandFoot}
-        </div>
+        </Label>
       </div>
 
       <div className="grid grid-cols-[170px_minmax(0,1fr)] gap-[28px] pt-[28px] px-[30px] pb-[26px] max-wide:block max-wide:py-[18px] max-wide:px-[16px]">
@@ -171,14 +173,14 @@ function FlagshipPart() {
           <div className="hand text-[58px] leading-[0.9]" style={{ color: accent }}>
             {f.n}
           </div>
-          <div className="mono faint text-eyebrow uppercase mt-[10px] mb-[12px] leading-[1.6]">
+          <Label kind="eyebrow" className="mt-[10px] mb-[12px] leading-[1.6]">
             {f.kind.map((line, i) => (
               <Fragment key={line}>
                 {i > 0 && <br />}
                 {line}
               </Fragment>
             ))}
-          </div>
+          </Label>
           <StatusDot status={f.status} />
         </div>
 
@@ -187,7 +189,7 @@ function FlagshipPart() {
             <span className="hand text-[40px] leading-[0.9]" style={{ color: accent }}>
               {f.n}
             </span>
-            <span className="mono faint text-tag uppercase">{f.shortKind}</span>
+            <Label kind="tag" as="span">{f.shortKind}</Label>
             <StatusDot status={f.status} className="ml-auto" />
           </div>
           <h3 className="mt-0 mb-[12px] text-[31px] leading-[1.1] max-wide:text-[23px]">{f.t}</h3>
@@ -200,12 +202,15 @@ function FlagshipPart() {
           <Details label={<Copy long={f.detailsLabel} short="details" />}>
             <Bullets items={f.bullets} short={f.shortBullets} className={DETAIL_LIST} />
             <p className="max-wide:hidden mt-[14px] mb-0 text-[15px]">
-              <span
-                className="mono text-tag uppercase mr-[8px]"
+              <Label
+                kind="tag"
+                tone="inherit"
+                as="span"
+                className="mr-[8px]"
                 style={{ color: `var(--color-${f.k}-ink)` }}
               >
                 ↳ impact
-              </span>
+              </Label>
               {f.impact}
             </p>
             <TagRow tags={f.tags} short={f.shortTags} className="mt-[14px]" />
@@ -222,9 +227,9 @@ function CompactPart({ p }: { p: Part }) {
       <div className="part-pic max-wide:hidden flex-[0_0_320px] flex flex-col justify-center gap-[4px] py-[16px] px-[18px] border-r-2 border-ink">
         {p.sketches.map((s) => (
           <Fragment key={s.src}>
-            <div className="pic-cap diagram-cap mono faint text-tag uppercase">
+            <Label kind="tag" className="pic-cap diagram-cap">
               <span>{s.caption}</span>
-            </div>
+            </Label>
             <DiagramImg d={s} caption={s.caption} sizes="284px" />
           </Fragment>
         ))}
@@ -234,9 +239,9 @@ function CompactPart({ p }: { p: Part }) {
           <span className="hand text-[36px] leading-[0.9]" style={{ color: `var(--color-${p.k})` }}>
             {p.n}
           </span>
-          <span className="mono faint text-tag uppercase">
+          <Label kind="tag" as="span">
             <Copy long={p.kind} short={p.shortKind} />
-          </span>
+          </Label>
           <StatusDot status={p.status} className="ml-auto" />
         </div>
         <h3 className="mt-[4px] mb-[8px] text-[22px] leading-[1.2] max-wide:text-[19px]">{p.t}</h3>
@@ -245,12 +250,15 @@ function CompactPart({ p }: { p: Part }) {
         </p>
         {p.xref && (
           <p className="mt-[-4px] mb-0 text-[14.5px] text-ink-soft">
-            <span
-              className="mono text-tag uppercase mr-[8px]"
+            <Label
+              kind="tag"
+              tone="inherit"
+              as="span"
+              className="mr-[8px]"
               style={{ color: `var(--color-${p.xref.tone}-ink)` }}
             >
               {p.xref.label}
-            </span>
+            </Label>
             <Copy long={p.xref.text} short={p.xref.shortText} />
           </p>
         )}
@@ -269,9 +277,9 @@ function PlatformCard() {
   return (
     <article className="sketch-box p-0 overflow-hidden">
       <header className="pt-[26px] px-[30px] pb-[18px] border-b-2 border-ink max-wide:pt-[16px] max-wide:px-[14px] max-wide:pb-[12px]">
-        <div className="mono faint text-eyebrow uppercase">
+        <Label kind="eyebrow">
           <Copy long={PLATFORM.kicker} short={PLATFORM.shortKicker} />
-        </div>
+        </Label>
         <h3 className="mt-[6px] mb-[10px] text-[30px] leading-[1.12] max-wide:text-[22px]">{PLATFORM.title}</h3>
         <p className="mt-0 mb-[12px] text-[17.5px] leading-[1.58] max-w-[720px] max-wide:text-[15.5px]">
           <Copy long={PLATFORM.lead} short={PLATFORM.shortLead} />
@@ -312,7 +320,7 @@ function MinorRow({ m }: { m: Minor }) {
     >
       <div className="max-wide:flex max-wide:items-baseline max-wide:justify-between max-wide:gap-[10px]">
         <div className="text-[16px] font-semibold leading-[1.3]">{m.t}</div>
-        <div className="mono faint text-meta mt-[3px] max-wide:shrink-0 max-wide:mt-0">{m.y}</div>
+        <Label kind="meta" className="mt-[3px] max-wide:shrink-0 max-wide:mt-0">{m.y}</Label>
       </div>
       <p className="m-0 text-[14.5px] leading-[1.6]">{m.d}</p>
     </div>
@@ -344,9 +352,9 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
     >
       {!flip && <ProjectMedia p={p} />}
       <div className="p-8 max-mid:order-2 max-mid:p-[24px] max-wide:p-[18px]">
-        <div className="mono faint text-eyebrow uppercase">
+        <Label kind="eyebrow">
           {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
-        </div>
+        </Label>
         <h3 className="mt-2 mb-3.5 text-[25px] leading-[1.18] tracking-[-0.012em] max-mid:text-[24px] max-wide:text-[20px] max-wide:leading-[1.2]">{p.t}</h3>
         <p className="mt-0 text-[17px] max-w-[520px] mb-4 max-wide:text-[16px] max-wide:leading-[1.62]">
           <Copy long={p.d} short={p.shortD} />
@@ -377,12 +385,12 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
 function GroupRule({ label, count }: { label: string; count: ReactNode }) {
   return (
     <div className="flex items-center gap-[18px] max-wide:gap-[10px]">
-      <span className="mono faint text-eyebrow uppercase">{label}</span>
+      <Label kind="eyebrow" as="span">{label}</Label>
       <span
         className="flex-1 h-px max-wide:shrink-0 max-wide:min-w-[20px]"
         style={{ borderTop: "1.5px dashed var(--color-ink-faint)" }}
       />
-      <span className="mono faint text-meta">{count}</span>
+      <Label kind="meta" as="span">{count}</Label>
     </div>
   );
 }

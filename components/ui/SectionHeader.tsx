@@ -1,3 +1,5 @@
+import Label from "./Label";
+
 export default function SectionHeader({
   num,
   title,
@@ -91,9 +93,9 @@ export function SectionHeaderStamp({
           className="absolute inset-1 rounded-[1px] pointer-events-none"
           style={{ border: "1px dashed color-mix(in oklab, var(--color-ink) 50%, transparent)" }}
         />
-        <div className="mono text-tag uppercase text-ink-soft -mb-0.5">
+        <Label kind="tag" tone="soft" className="-mb-0.5">
           § {num} · postage paid
-        </div>
+        </Label>
         <h2 className="m-0 text-[40px] leading-[1.08] tracking-[-0.016em] max-wide:text-[28px] max-wide:leading-[1.1] max-wide:tracking-[-0.014em]">{title}</h2>
       </div>
       <svg

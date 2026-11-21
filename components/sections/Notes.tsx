@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import SectionHeader from "@/components/ui/SectionHeader";
+import Label from "@/components/ui/Label";
 import { pad, tabColors, type JournalEntryMeta } from "@/lib/journal-meta";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 
@@ -23,22 +24,24 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
             className="absolute left-12 max-wide:left-[30px] max-xs:left-[24px] top-0 bottom-0 w-[1.2px] opacity-60"
             style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
           />
-          <div
-            className="mono faint max-wide:hidden absolute left-2 top-7 text-stamp uppercase whitespace-nowrap"
+          <Label
+            kind="stamp"
+            className="max-wide:hidden absolute left-2 top-7 whitespace-nowrap"
             style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
           >
             ✎ index — pp. {pad(Math.min(...pages))}–{pad(Math.max(...pages))}
-          </div>
+          </Label>
 
-          <div
-            className="mono faint max-wide:hidden grid grid-cols-[44px_1fr_90px_64px] gap-3.5 pt-0 pr-[90px] pb-3 pl-1.5 text-stamp uppercase mb-1.5"
+          <Label
+            kind="stamp"
+            className="max-wide:hidden grid grid-cols-[44px_1fr_90px_64px] gap-3.5 pt-0 pr-[90px] pb-3 pl-1.5 mb-1.5"
             style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
           >
             <span className="text-right">pg.</span>
             <span>title</span>
             <span className="text-right">read</span>
             <span className="text-right">date</span>
-          </div>
+          </Label>
 
           <ul className="list-none p-0 m-0">
             {entries.map((e) => (
@@ -61,9 +64,9 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                     navigate(`/journal/${e.slug}`, { effect: "bleed", originRect });
                   }}
                 >
-                  <span className="mono faint text-meta text-right text-ink-soft max-wide:[grid-area:1/1/3/2] max-wide:self-start max-wide:pt-[3px] max-wide:text-[10.5px]">
+                  <Label kind="meta" tone="soft" as="span" className="text-right max-wide:[grid-area:1/1/3/2] max-wide:self-start max-wide:pt-[3px] max-wide:text-[10.5px]">
                     p.{pad(e.page)}
-                  </span>
+                  </Label>
 
                   <span className="flex items-center min-w-0 gap-2 overflow-hidden max-wide:[grid-area:1/2/2/5] max-xs:[grid-area:1/2/2/4]">
                     <span className="text-[17px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink max-wide:whitespace-normal max-wide:text-[18px] max-wide:leading-[1.25] max-wide:tracking-[-0.01em]">
@@ -76,13 +79,13 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                     />
                   </span>
 
-                  <span className="mono faint text-meta text-right text-ink-soft max-wide:[grid-area:2/2/3/3] max-wide:text-left max-wide:text-[9.5px] max-wide:tracking-[0.5px] max-xs:hidden">
+                  <Label kind="meta" tone="soft" as="span" className="text-right max-wide:[grid-area:2/2/3/3] max-wide:text-left max-wide:text-[9.5px] max-wide:tracking-[0.5px] max-xs:hidden">
                     {e.read}
-                  </span>
+                  </Label>
 
-                  <span className="mono text-meta text-right text-ink-soft max-wide:[grid-area:2/3/3/4] max-wide:text-left max-wide:text-[9.5px] max-wide:tracking-[0.5px] max-xs:[grid-area:2/2/3/3]">
+                  <Label kind="meta" tone="soft" as="span" className="text-right max-wide:[grid-area:2/3/3/4] max-wide:text-left max-wide:text-[9.5px] max-wide:tracking-[0.5px] max-xs:[grid-area:2/2/3/3]">
                     {e.dateDisplay}
-                  </span>
+                  </Label>
 
                   <span
                     className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-2.5 pr-2 max-wide:static max-wide:[grid-area:2/4/3/5] max-wide:justify-self-end max-wide:self-center max-wide:min-w-0 max-wide:py-[1px] max-wide:px-[7px] max-wide:text-[9px] max-xs:[grid-area:2/3/3/4]"
@@ -101,9 +104,9 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
             className="flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3 max-wide:mt-[10px] max-wide:pt-[10px]"
             style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
           >
-            <span className="mono faint text-meta">
+            <Label kind="meta" as="span">
               {entries.length} entries · pp. {pad(Math.min(...pages))}–{pad(Math.max(...pages))}
-            </span>
+            </Label>
             <Link
               href="/journal"
               className="text-[16px] text-electric no-underline"
