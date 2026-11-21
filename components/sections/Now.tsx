@@ -49,9 +49,6 @@ export default function Now() {
             </div>
           ))}
         </div>
-        <div className="mono faint mt-[18px] text-[11px] text-right">
-          ↻ a snapshot, updated by hand
-        </div>
       </div>
     </section>
   );

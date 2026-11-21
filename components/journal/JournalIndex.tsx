@@ -184,7 +184,7 @@ export default function JournalIndex({
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
           }}
         >
-          est. 2025 · written by hand
+          est. 2025
         </div>
       </div>
 
@@ -470,12 +470,8 @@ export default function JournalIndex({
         </div>
       </div>
 
-      <div className="mono faint text-center mt-10 text-[11px]">
-        ✎ working notebook — entries are typeset by hand
-      </div>
-
       <div style={{ marginTop: 40, textAlign: "center" }} className="mono faint">
-        — © 2026 Anoop Parampalli · journal · made by hand —
+        — © 2026 Anoop Parampalli · journal —
       </div>
     </main>
   );

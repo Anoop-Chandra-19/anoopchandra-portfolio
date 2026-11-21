@@ -143,7 +143,7 @@ export default function ArticleEntry({
               </span>
             )}
           </div>
-          <div className="je-colophon">✦ © 2026 {AUTHOR} · journal · typeset by hand ✦</div>
+          <div className="je-colophon">✦ © 2026 {AUTHOR} · journal ✦</div>
         </footer>
       </div>
     </main>

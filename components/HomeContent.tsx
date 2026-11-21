@@ -31,7 +31,7 @@ export default function HomeContent({
       <hr className="divider" />
       <Contact />
       <div style={{ marginTop: 40, textAlign: "center" }} className="mono faint">
-        — © 2026 Anoopchandra Parampalli · made by hand —
+        — © 2026 Anoopchandra Parampalli —
       </div>
     </>
   );

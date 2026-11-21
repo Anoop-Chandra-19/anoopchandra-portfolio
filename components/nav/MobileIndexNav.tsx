@@ -164,7 +164,7 @@ export default function MobileIndexNav({
             })}
           </ul>
           <div className="mono faint m-nav-overlay-foot">
-            — © 2026 Anoopchandra Parampalli · made by hand —
+            — © 2026 Anoopchandra Parampalli —
           </div>
         </div>
       )}
