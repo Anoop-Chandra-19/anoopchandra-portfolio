@@ -31,7 +31,7 @@ export default function Now() {
         className="p-10 rounded-lg max-wide:p-[18px] max-wide:rounded-[8px]"
         style={{ background: "color-mix(in oklab, var(--color-coral) 8%, var(--color-paper-2))" }}
       >
-        <div className="row items-stretch">
+        <div className="flex items-stretch gap-[18px] max-wide:flex-col max-wide:gap-[14px]">
           {CARDS.map((c) => (
             <div
               key={c.h}

@@ -1,11 +1,5 @@
-/* Navigation */
-@media (max-width: 900px) {
-  .side-nav-desktop { display: none !important; }
-}
-@media (min-width: 901px) {
-  .m-nav-tab, .m-nav-overlay { display: none !important; }
-}
-
+/* Navigation: the phone index tab and its overlay. Visibility at the 900px
+   switch is set on the elements (nav:hidden / max-nav:hidden). */
 .m-nav-tab {
   position: fixed;
   top: 16px;
@@ -23,7 +17,6 @@
   cursor: pointer;
   transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.12s;
 }
-.m-nav-tab .mono { font-size: 11px; letter-spacing: 1px; }
 .m-nav-tab:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 var(--color-ink);
@@ -38,9 +31,6 @@
   .m-nav-tab { transition: opacity 0.12s; }
   .m-nav-tab.tucked:not(:focus-visible) { transform: none; }
 }
-.m-nav-tab-lines { display: inline-flex; flex-direction: column; gap: 3px; width: 16px; }
-.m-nav-tab-lines i { height: 2px; background: var(--color-ink); border-radius: 2px; }
-.m-nav-tab-lines i:nth-child(2) { width: 70%; }
 
 .m-nav-overlay {
   position: fixed;
@@ -65,54 +55,3 @@
 @media (prefers-reduced-motion: reduce) {
   .m-nav-overlay { animation: none; }
 }
-.m-nav-overlay-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 14px;
-  margin-bottom: 14px;
-  border-bottom: 2px dashed var(--color-ink);
-  font-size: 10px;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-}
-.m-nav-close {
-  padding: 4px 8px;
-  margin: -4px -8px;
-  border: none;
-  background: none;
-  color: var(--color-ink);
-  font-size: 10px;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-.m-nav-overlay-list { flex: 1; list-style: none; padding: 0; margin: 0; }
-.m-nav-overlay-list li {
-  border-bottom: 1px dashed color-mix(in oklab, var(--color-ink) 14%, transparent);
-}
-.m-nav-overlay-list a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 0;
-  color: var(--color-ink);
-  text-decoration: none;
-}
-
-.m-nav-ov-num { font-size: 11px; letter-spacing: 1px; color: var(--color-ink-faint); min-width: 22px; }
-.m-nav-ov-label { font-size: 19px; line-height: 1.1; font-weight: 500; letter-spacing: -0.02em; }
-.m-nav-overlay-list li.on .m-nav-ov-label { color: var(--color-electric); }
-.m-nav-ov-rule {
-  flex: 1;
-  min-width: 16px;
-  border-bottom: 1.5px dotted var(--color-ink-faint);
-}
-.m-nav-ov-here {
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--color-electric);
-}
-.m-nav-overlay-foot { font-size: 9.5px; letter-spacing: 1.5px; text-align: center; margin-top: 14px; }

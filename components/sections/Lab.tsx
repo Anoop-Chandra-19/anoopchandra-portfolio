@@ -36,7 +36,7 @@ export default function Lab() {
   return (
     <section id="sec-lab" className="section">
       <SectionHeader num="03" title="The Lab" meta="3 experiments · run in your browser" />
-      <p className="faint max-w-[720px] mb-7 max-wide:mb-[16px]">
+      <p className="faint max-w-[720px] mb-7 max-wide:mb-[16px] max-wide:leading-[1.6]">
         Real ML runs entirely in your browser with TensorFlow.js. There is no server and no cold
         start. Everything below is live, so open an experiment and try it.
       </p>

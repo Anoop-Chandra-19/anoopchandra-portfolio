@@ -35,6 +35,6 @@ export default function Label({
   className,
   ...rest
 }: LabelProps) {
-  const cls = ["mono", TONE[tone], KIND[kind], className].filter(Boolean).join(" ");
+  const cls = ["font-mono", TONE[tone], KIND[kind], className].filter(Boolean).join(" ");
   return <Tag className={cls} {...rest} />;
 }

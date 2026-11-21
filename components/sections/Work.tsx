@@ -403,7 +403,7 @@ export default function Work() {
         title="Work"
         meta={`${1 + PARTS.length + PROJECTS.length + MINOR.length} entries · 2025 to present`}
       />
-      <p className="faint max-w-[740px] mb-7 text-[16px] max-wide:mb-[16px]">
+      <p className="faint max-w-[740px] mb-7 text-[16px] max-wide:mb-[16px] max-wide:leading-[1.6]">
         <span className="marker-highlight">Panacea Financial</span>: selected work from my current
         role, alongside projects I build on my own time.
       </p>
@@ -426,7 +426,7 @@ export default function Work() {
       <div className="mt-12 mb-6">
         <GroupRule label="on my own time" count={`${PROJECTS.length} projects`} />
       </div>
-      <div className="col">
+      <div className="flex flex-col gap-[18px] max-wide:gap-[14px]">
         {PROJECTS.map((p, i) => (
           <ProjectSlab key={p.t} p={p} i={i} />
         ))}

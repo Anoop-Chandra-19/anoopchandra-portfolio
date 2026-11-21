@@ -18,7 +18,7 @@ export default function SideNav({
        land on fractions and the row pitch drifts, which puts each 2px dash on
        a different sub-pixel phase and antialiases them to different weights. */
     <nav
-      className="side-nav-desktop fixed left-[30px] top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-[2px] py-[14px] pr-[10px] pl-[14px]"
+      className="max-nav:hidden fixed left-[30px] top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-[2px] py-[14px] pr-[10px] pl-[14px]"
       aria-label="Section navigation"
     >
       <div className="mono faint anim-rail d-rail-h text-[9px] leading-[12px] tracking-[3px] uppercase mb-[10px] pl-[2px]">

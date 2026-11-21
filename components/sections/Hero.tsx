@@ -63,6 +63,7 @@ export default function Hero() {
                 alt="Anoopchandra Parampalli"
                 width={460}
                 height={460}
+                sizes="(max-width: 720px) min(300px, 74vw), 460px"
                 priority
               />
             </div>

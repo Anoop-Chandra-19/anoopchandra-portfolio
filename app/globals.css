@@ -31,7 +31,8 @@
   --color-navy: #25283d;
 
   /* Mono label roles. No line-height: labels inherit it, as they always have.
-     Case is set at the call site (`uppercase`), as Mosaic does. */
+     Case is set at the call site (`uppercase`), as Mosaic does. meta's
+     -0.2px was the old .mono default, now said on the role itself. */
   --text-eyebrow: 11px;
   --text-eyebrow--letter-spacing: 3px;
   --text-tag: 10.5px;
@@ -39,6 +40,7 @@
   --text-stamp: 9px;
   --text-stamp--letter-spacing: 2px;
   --text-meta: 11px;
+  --text-meta--letter-spacing: -0.2px;
   --text-caption: 10.5px;
   --text-caption--letter-spacing: 1px;
 

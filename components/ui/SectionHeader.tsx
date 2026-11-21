@@ -10,10 +10,10 @@ export default function SectionHeader({
   meta: string;
 }) {
   return (
-    <div className="section-header">
-      <span className="num">{num}.</span>
-      <h2>{title}</h2>
-      <span className="meta">{meta}</span>
+    <div className="flex items-baseline gap-[18px] mb-[24px] pb-[8px] border-b-2 border-dashed border-ink max-wide:flex-wrap max-wide:gap-x-[14px] max-wide:gap-y-[6px] max-wide:mb-[20px] max-wide:pb-[8px]">
+      <span className="font-mono text-[14px] text-ink-soft max-wide:order-1 max-wide:text-[11px] max-wide:tracking-[1px]">{num}.</span>
+      <h2 className="flex-1 max-wide:order-3 max-wide:flex-[1_0_100%] max-wide:mt-[6px] max-wide:mb-0 max-wide:mx-0">{title}</h2>
+      <span className="font-mono text-[12px] text-ink-soft text-right max-wide:order-2 max-wide:ml-auto max-wide:text-[10.5px] max-wide:tracking-[0.5px]">{meta}</span>
     </div>
   );
 }

@@ -106,7 +106,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 
   .hand { font-family: var(--font-display); }
   .accent { font-family: var(--font-accent); font-weight: 600; }
-  .tiny { font-size: 13px; color: var(--color-ink-soft); }
   .faint { color: var(--color-ink-faint); }
 }
 

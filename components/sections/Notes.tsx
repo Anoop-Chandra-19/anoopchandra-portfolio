@@ -12,7 +12,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
   return (
     <section id="sec-notes" className="section">
       <SectionHeader num="05" title="Notes & Stories" meta={`${entries.length} entries · index`} />
-      <p className="faint max-w-[720px] mb-6 max-wide:mb-[16px]">
+      <p className="faint max-w-[720px] mb-6 max-wide:mb-[16px] max-wide:leading-[1.6]">
         A working journal for bug stories, personal projects, opinions, and things I figured out
         the hard way.
       </p>
