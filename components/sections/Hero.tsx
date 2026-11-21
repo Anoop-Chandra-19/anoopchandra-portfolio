@@ -6,15 +6,15 @@ import ScrollLink from "@/components/ui/ScrollLink";
 
 export default function Hero() {
   return (
-    <section id="sec-home" className="section min-h-[560px] pt-10 max-wide:min-h-[calc(100svh-26px)] max-wide:mt-0 max-wide:pt-0 max-wide:flex max-wide:flex-col max-wide:justify-center">
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-10 items-center max-wide:flex max-wide:flex-col max-wide:items-stretch max-wide:gap-0">
+    <section id="sec-home" className="section min-h-[560px] pt-10.5 max-wide:min-h-[calc(100svh-26px)] max-wide:mt-0 max-wide:pt-0 max-wide:flex max-wide:flex-col max-wide:justify-center">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-10.5 items-center max-wide:flex max-wide:flex-col max-wide:items-stretch max-wide:gap-0">
         <div className="min-w-0 max-wide:contents">
           <Label kind="eyebrow" className="anim-rise d-hello max-wide:order-1 max-wide:pr-[116px] max-wide:text-[10px]">
             {"// hello.tsx"}
           </Label>
           {/* The only fluid type on the site. opsz rides font-size, so the top
               of the clamp gets the display cut for free. */}
-          <h1 className="mt-3.5 mb-1.5 leading-[1.02] text-[clamp(44px,5.8vw,72px)] max-wide:order-3 max-wide:mt-0 max-wide:mb-[4px] max-wide:text-[42px] max-wide:leading-[1.03]">
+          <h1 className="mt-[15px] mb-1.5 leading-[1.02] text-[clamp(44px,5.8vw,72px)] max-wide:order-3 max-wide:mt-0 max-wide:mb-[4px] max-wide:text-[42px] max-wide:leading-[1.03]">
             <span className="anim-swipe d-name1 inline-block">Anoop</span>
             <br />
             <span className="anim-swipe d-name2 inline-block text-electric">chandra.</span>
@@ -31,7 +31,7 @@ export default function Hero() {
             <span className="marker-highlight teal d-marker3">scalable backends</span> around the people
             who use them.
           </div>
-          <div className="mt-[26px] flex gap-2.5 flex-wrap max-wide:order-6 max-wide:mt-[18px] max-wide:gap-[8px] max-xs:mt-[14px]">
+          <div className="mt-[26px] flex gap-[11px] flex-wrap max-wide:order-6 max-wide:mt-[18px] max-wide:gap-[8px] max-xs:mt-[14px]">
             <ScrollLink href="#sec-contact" className="no-underline anim-stamp d-chip1">
               <Chip kind="electric">say hi →</Chip>
             </ScrollLink>
@@ -47,7 +47,7 @@ export default function Hero() {
               <Chip>resume.pdf</Chip>
             </a>
           </div>
-          <div className="mono faint anim-rise d-meta mt-7 text-xs max-wide:order-7 max-wide:mt-[20px] max-wide:text-[10.5px] max-wide:tracking-[0.5px] max-xs:mt-[14px]">
+          <div className="mono faint anim-rise d-meta mt-7.5 text-[12px] leading-[17px] max-wide:order-7 max-wide:mt-[20px] max-wide:text-[10.5px] max-wide:tracking-[0.5px] max-xs:mt-[14px]">
             open to interesting work · Cleveland, OH
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function Hero() {
               />
             </svg>
           </div>
-          <div className="anim-stamp d-annot1 absolute -top-2.5 right-2.5 max-wide:-top-[10px] max-wide:-left-[10px] max-wide:right-auto">
+          <div className="anim-stamp d-annot1 absolute -top-[11px] right-[11px] max-wide:-top-[10px] max-wide:-left-[10px] max-wide:right-auto">
             <Annotation color="coral">👋 hi!</Annotation>
           </div>
           <div className="anim-stamp d-annot2 absolute bottom-[7%] left-[3%] max-wide:hidden">

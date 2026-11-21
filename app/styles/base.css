@@ -1,6 +1,7 @@
 * { box-sizing: border-box; }
 
-/* Keep html at 17px: it is Tailwind's rem basis; body owns the reading size. */
+/* html stays 17px; body owns the reading size. Tailwind's scales are set in
+   px in globals.css, so nothing depends on this value. */
 html, body {
   margin: 0;
   padding: 0;
@@ -118,7 +119,7 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 }
 
 @media (max-width: 720px) {
-  /* Keep body unlayered and preserve html's 17px Tailwind rem basis. */
+  /* Keep body unlayered. */
   body { font-size: 16px; line-height: 1.6; }
 
   @layer base {

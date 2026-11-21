@@ -12,21 +12,21 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
   return (
     <section id="sec-notes" className="section">
       <SectionHeader num="05" title="Notes & Stories" meta={`${entries.length} entries · index`} />
-      <p className="faint max-w-[720px] mb-6 max-wide:mb-[16px] max-wide:leading-[1.6]">
+      <p className="faint max-w-[720px] mb-6.5 max-wide:mb-[16px] max-wide:leading-[1.6]">
         A working journal for bug stories, personal projects, opinions, and things I figured out
         the hard way.
       </p>
 
       <div className="relative">
-        <div className="bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden max-wide:pt-[14px] max-wide:pr-[14px] max-wide:pb-[12px] max-wide:pl-[42px] max-xs:pr-[12px] max-xs:pl-[34px]">
+        <div className="bg-paper border-2 border-ink rounded-md pt-7.5 pr-6.5 pb-[18px] pl-17 relative overflow-hidden max-wide:pt-[14px] max-wide:pr-[14px] max-wide:pb-[12px] max-wide:pl-[42px] max-xs:pr-[12px] max-xs:pl-[34px]">
           <span
             aria-hidden="true"
-            className="absolute left-12 max-wide:left-[30px] max-xs:left-[24px] top-0 bottom-0 w-[1.2px] opacity-60"
+            className="absolute left-[51px] max-wide:left-[30px] max-xs:left-[24px] top-0 bottom-0 w-[1.2px] opacity-60"
             style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
           />
           <Label
             kind="stamp"
-            className="max-wide:hidden absolute left-2 top-7 whitespace-nowrap"
+            className="max-wide:hidden absolute left-2 top-7.5 whitespace-nowrap"
             style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
           >
             ✎ index — pp. {pad(Math.min(...pages))}–{pad(Math.max(...pages))}
@@ -34,7 +34,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
 
           <Label
             kind="stamp"
-            className="max-wide:hidden grid grid-cols-[44px_1fr_90px_64px] gap-3.5 pt-0 pr-[90px] pb-3 pl-1.5 mb-1.5"
+            className="max-wide:hidden grid grid-cols-[44px_1fr_90px_64px] gap-[15px] pt-0 pr-[90px] pb-[13px] pl-1.5 mb-1.5"
             style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
           >
             <span className="text-right">pg.</span>
@@ -48,7 +48,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
               <li key={e.slug}>
                 <Link
                   href={`/journal/${e.slug}`}
-                  className="grid grid-cols-[44px_1fr_90px_64px] gap-3.5 items-baseline py-3 pr-[90px] pl-1.5 relative max-wide:grid-cols-[40px_auto_auto_1fr] max-wide:gap-x-[8px] max-wide:gap-y-[3px] max-wide:py-[11px] max-wide:px-[2px] max-wide:[border-bottom:1px_dashed_color-mix(in_oklab,var(--color-ink)_12%,transparent)] max-xs:grid-cols-[36px_auto_1fr] max-xs:gap-x-[7px] no-underline transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
+                  className="grid grid-cols-[44px_1fr_90px_64px] gap-[15px] items-baseline py-[13px] pr-[90px] pl-1.5 relative max-wide:grid-cols-[40px_auto_auto_1fr] max-wide:gap-x-[8px] max-wide:gap-y-[3px] max-wide:py-[11px] max-wide:px-[2px] max-wide:[border-bottom:1px_dashed_color-mix(in_oklab,var(--color-ink)_12%,transparent)] max-xs:grid-cols-[36px_auto_1fr] max-xs:gap-x-[7px] no-underline transition-colors duration-150 hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
                   /* No aria-label: on a link it replaces the whole subtree, so it
                      was hiding the page number, read time and date. */
                   onClick={(ev) => {
@@ -74,7 +74,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                     </span>
                     <span
                       aria-hidden="true"
-                      className="max-wide:hidden flex-1 h-0 min-w-6 -translate-y-1"
+                      className="max-wide:hidden flex-1 h-0 min-w-6.5 -translate-y-1"
                       style={{ borderBottom: "1.5px dotted var(--color-ink-faint)" }}
                     />
                   </span>
@@ -88,7 +88,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                   </Label>
 
                   <span
-                    className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-2.5 pr-2 max-wide:static max-wide:[grid-area:2/4/3/5] max-wide:justify-self-end max-wide:self-center max-wide:min-w-0 max-wide:py-[1px] max-wide:px-[7px] max-wide:text-[9px] max-xs:[grid-area:2/3/3/4]"
+                    className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-[11px] pr-2 max-wide:static max-wide:[grid-area:2/4/3/5] max-wide:justify-self-end max-wide:self-center max-wide:min-w-0 max-wide:py-[1px] max-wide:px-[7px] max-wide:text-[9px] max-xs:[grid-area:2/3/3/4]"
                     // only the tab colour is dynamic — border/radius live in CSS
                     // so the mobile pass can turn the edge tab into a pill
                     style={tabColors(e.kind)}
@@ -101,7 +101,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
           </ul>
 
           <div
-            className="flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3 max-wide:mt-[10px] max-wide:pt-[10px]"
+            className="flex justify-between items-center gap-[13px] flex-wrap mt-[15px] pt-[13px] max-wide:mt-[10px] max-wide:pt-[10px]"
             style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
           >
             <Label kind="meta" as="span">

@@ -28,7 +28,7 @@ export default function Now() {
     <section id="sec-now" className="section">
       <SectionHeader num="01" title="Now" meta="what has my attention lately" />
       <div
-        className="p-10 rounded-lg max-wide:p-[18px] max-wide:rounded-[8px]"
+        className="p-10.5 rounded-lg max-wide:p-[18px] max-wide:rounded-[8px]"
         style={{ background: "color-mix(in oklab, var(--color-coral) 8%, var(--color-paper-2))" }}
       >
         <div className="flex items-stretch gap-[18px] max-wide:flex-col max-wide:gap-[14px]">

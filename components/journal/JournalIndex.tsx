@@ -156,7 +156,7 @@ export default function JournalIndex({
       inert={inert}
     >
       <div
-        className="flex items-center justify-between flex-wrap gap-3 mb-7 pb-3.5"
+        className="flex items-center justify-between flex-wrap gap-[13px] mb-7.5 pb-[15px]"
         style={{ borderBottom: "1.5px dashed var(--color-ink-faint)" }}
       >
         <JournalBackLink href="/" peel>
@@ -168,20 +168,20 @@ export default function JournalIndex({
       </div>
 
       <div className="journal-cover">
-        <Label kind="eyebrow" className="mb-3.5">
+        <Label kind="eyebrow" className="mb-[15px]">
           a working notebook · {ppRange}
         </Label>
         <h1 className="mb-2">
           The <span className="text-coral">Journal</span>
         </h1>
-        <p className="text-summary italic font-normal mt-2.5 mb-0 max-w-[720px] text-ink-soft">
+        <p className="text-summary italic font-normal mt-[11px] mb-0 max-w-[720px] text-ink-soft">
           A working notebook for bug stories, personal projects, opinions, and things I figured
           out the hard way.
         </p>
         <Label
           kind="tag"
           tone="inherit"
-          className="journal-cover-stamp absolute top-[22px] right-[26px] py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
+          className="journal-cover-stamp absolute top-[22px] right-[26px] py-1 px-[11px] rounded-[3px] border-[1.5px] border-coral"
           style={{
             transform: "rotate(3deg)",
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
@@ -193,7 +193,7 @@ export default function JournalIndex({
 
       {/* Kind uses the top filters; subject uses each row's edge tab. Below the
           breakpoint this whole row is replaced by the filter pill. */}
-      <div className="journal-filter-row flex items-center flex-wrap gap-2.5 mb-[22px]">
+      <div className="journal-filter-row flex items-center flex-wrap gap-[11px] mb-[22px]">
         <span className="mono journal-filter-lbl text-[11px] tracking-[1px] uppercase text-ink-soft">
           filter ↦
         </span>
@@ -313,15 +313,15 @@ export default function JournalIndex({
         onCloseAction={() => setSheetOpen(false)}
       />
 
-      <div className="journal-toc-panel bg-paper border-2 border-ink rounded-md pt-7 pr-6 pb-[18px] pl-16 relative overflow-hidden">
+      <div className="journal-toc-panel bg-paper border-2 border-ink rounded-md pt-7.5 pr-6.5 pb-[18px] pl-17 relative overflow-hidden">
         <span
           aria-hidden="true"
-          className="journal-toc-rule absolute left-12 top-0 bottom-0 w-[1.2px] opacity-60"
+          className="journal-toc-rule absolute left-[51px] top-0 bottom-0 w-[1.2px] opacity-60"
           style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
         />
         <Label
           kind="stamp"
-          className="journal-toc-stamp absolute left-2 top-7 whitespace-nowrap"
+          className="journal-toc-stamp absolute left-2 top-7.5 whitespace-nowrap"
           style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
         >
           ✎ index — {visible.length} of {entries.length}
@@ -346,7 +346,7 @@ export default function JournalIndex({
 
         {visible.length === 0 && (
           <div className="pt-[26px] pb-[22px] px-1.5">
-            <p className="text-summary italic text-ink-soft mt-0 mb-2.5">
+            <p className="text-summary italic text-ink-soft mt-0 mb-[11px]">
               Nothing filed under {tag ? <b className="font-semibold">{tag}</b> : "that"}
               {filter !== "all" && (
                 <>
@@ -364,7 +364,7 @@ export default function JournalIndex({
             </p>
             <button
               type="button"
-              className="mono text-[11px] tracking-[1px] py-[5px] px-3 border-[1.5px] border-ink rounded-full bg-paper text-ink cursor-pointer"
+              className="mono text-[11px] tracking-[1px] py-[5px] px-[13px] border-[1.5px] border-ink rounded-full bg-paper text-ink cursor-pointer"
               onClick={() => {
                 setFilter("all");
                 setTag(null);
@@ -404,7 +404,7 @@ export default function JournalIndex({
                   )}
                   <span
                     aria-hidden="true"
-                    className="journal-toc-leader flex-1 h-0 min-w-6 -translate-y-1"
+                    className="journal-toc-leader flex-1 h-0 min-w-6.5 -translate-y-1"
                     style={{ borderBottom: "1.5px dotted var(--color-ink-faint)" }}
                   />
                 </span>
@@ -449,7 +449,7 @@ export default function JournalIndex({
         </ul>
 
         <div
-          className="journal-toc-foot flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
+          className="journal-toc-foot flex justify-between items-center gap-[13px] flex-wrap mt-[15px] pt-[13px]"
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
           <Label kind="meta" as="span">

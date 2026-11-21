@@ -8,7 +8,7 @@ export default function Contact() {
     <section id="sec-contact" className="section">
       <SectionHeaderStamp num="06" title="Say Hi" meta="postcard from the workshop" />
 
-      <div className="relative pt-5 pb-10">
+      <div className="relative pt-[21px] pb-10.5">
         <span
           aria-hidden="true"
           className="absolute top-0 left-[12%] w-[90px] h-[22px] opacity-70 z-[2]"
@@ -31,7 +31,7 @@ export default function Contact() {
         />
 
         <article
-          className="postcard relative border-2 border-ink rounded grid min-h-[380px] overflow-hidden grid-cols-[1.05fr_1fr] max-wide:grid-cols-1 max-wide:min-h-0"
+          className="postcard relative border-2 border-ink rounded-sm grid min-h-[380px] overflow-hidden grid-cols-[1.05fr_1fr] max-wide:grid-cols-1 max-wide:min-h-0"
           style={{
             background: "color-mix(in oklab, var(--color-coral) 6%, var(--color-paper))",
             boxShadow: "6px 6px 0 color-mix(in oklab, var(--color-ink) 12%, transparent)",
@@ -43,11 +43,11 @@ export default function Contact() {
             style={{ border: "1px solid color-mix(in oklab, var(--color-ink) 50%, transparent)" }}
           />
 
-          <div className="pt-11 px-9 pb-9 relative z-[2] max-wide:pt-[26px] max-wide:px-[20px] max-wide:pb-[20px]">
+          <div className="pt-[47px] px-9.5 pb-9.5 relative z-[2] max-wide:pt-[26px] max-wide:px-[20px] max-wide:pb-[20px]">
             <Label kind="tag">
               ✎ message side
             </Label>
-            <h2 className="text-[46px] mt-2 mb-3.5 leading-[1.08] tracking-[-0.016em] max-wide:text-[34px] max-wide:leading-[1.03] max-wide:tracking-[-0.018em]">
+            <h2 className="text-[46px] mt-2 mb-[15px] leading-[1.08] tracking-[-0.016em] max-wide:text-[34px] max-wide:leading-[1.03] max-wide:tracking-[-0.018em]">
               Let&apos;s
               <br />
               talk.
@@ -57,7 +57,7 @@ export default function Contact() {
               <span className="marker-highlight purple">interesting full-stack + AI roles</span>,
               freelance gigs, and PC build advice over coffee.
             </p>
-            <div className="mt-[22px] flex gap-2.5 flex-wrap">
+            <div className="mt-[22px] flex gap-[11px] flex-wrap">
               <a href="mailto:anoopchandraparampalli@gmail.com" className="no-underline">
                 <Chip kind="electric">email →</Chip>
               </a>
@@ -87,7 +87,7 @@ export default function Contact() {
               </a>
             </div>
             <div
-              className="accent mt-7 text-2xl text-ink-soft inline-block"
+              className="accent mt-7.5 text-[25.5px] leading-[calc(2/1.5)] text-ink-soft inline-block"
               style={{ transform: "rotate(-1.5deg)" }}
             >
               — Anoop ✎
@@ -96,11 +96,11 @@ export default function Contact() {
 
           <span
             aria-hidden="true"
-            className="max-wide:hidden absolute top-4 bottom-4 left-[51.2%] w-[1.5px] bg-ink opacity-85 z-[2]"
+            className="max-wide:hidden absolute top-[17px] bottom-[17px] left-[51.2%] w-[1.5px] bg-ink opacity-85 z-[2]"
           />
 
-          <div className="pt-[30px] px-9 pb-9 relative z-[2] flex flex-col max-wide:border-t-2 max-wide:border-dashed max-wide:border-ink max-wide:p-[20px]">
-            <div className="flex justify-between items-start mb-7 gap-5 max-wide:mb-[16px] max-wide:gap-[12px]">
+          <div className="pt-[30px] px-9.5 pb-9.5 relative z-[2] flex flex-col max-wide:border-t-2 max-wide:border-dashed max-wide:border-ink max-wide:p-[20px]">
+            <div className="flex justify-between items-start mb-7.5 gap-[21px] max-wide:mb-[16px] max-wide:gap-[12px]">
               <Postmark />
 
               <div
@@ -125,20 +125,20 @@ export default function Contact() {
               </div>
             </div>
 
-            <Label kind="tag" className="mb-2.5">to —</Label>
-            <div className="flex flex-col gap-2.5 mb-[18px] max-wide:*:text-[20px]">
+            <Label kind="tag" className="mb-[11px]">to —</Label>
+            <div className="flex flex-col gap-[11px] mb-[18px] max-wide:*:text-[20px]">
               <div className="accent text-[22px] text-ink pb-1 border-b-[1.2px] border-ink-faint">
                 whoever&apos;s reading this
               </div>
-              <div className="accent text-xl text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
+              <div className="accent text-[21.25px] leading-[calc(1.75/1.25)] text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
                 ⌂ a hiring manager · a friend · a stranger
               </div>
-              <div className="accent text-xl text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
+              <div className="accent text-[21.25px] leading-[calc(1.75/1.25)] text-ink-soft pb-1 border-b-[1.2px] border-ink-faint">
                 the internet, somewhere
               </div>
             </div>
 
-            <div className="mt-auto pt-3" style={{ borderTop: "1px dashed var(--color-ink-faint)" }}>
+            <div className="mt-auto pt-[13px]" style={{ borderTop: "1px dashed var(--color-ink-faint)" }}>
               <Label kind="tag" className="mb-1.5">from —</Label>
               <Label kind="meta" tone="soft" className="leading-[1.7]">
                 Anoopchandra Parampalli

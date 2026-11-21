@@ -54,6 +54,25 @@
   --text-small: 15px;
   --text-small--line-height: 1.6;
 
+  /* Tailwind's scales in px. html is 17px (the reading-size basis), so the
+     rem defaults landed on fractions: p-4 was 17px, mb-6 25.5px. In px,
+     p-4 is 16px and every step is a whole pixel. */
+  --spacing: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+
   /* In px: the rem basis is 17px. lib/breakpoints.ts mirrors these for JS.
      Tailwind's defaults are rem-based, so they're cleared. */
   --breakpoint-*: initial;

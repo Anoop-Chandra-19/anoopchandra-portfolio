@@ -36,11 +36,11 @@ export default function Lab() {
   return (
     <section id="sec-lab" className="section">
       <SectionHeader num="03" title="The Lab" meta="3 experiments · run in your browser" />
-      <p className="faint max-w-[720px] mb-7 max-wide:mb-[16px] max-wide:leading-[1.6]">
+      <p className="faint max-w-[720px] mb-7.5 max-wide:mb-[16px] max-wide:leading-[1.6]">
         Real ML runs entirely in your browser with TensorFlow.js. There is no server and no cold
         start. Everything below is live, so open an experiment and try it.
       </p>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-[21px]">
         {LAB_EXPS.map((e) => {
           const short = SHORT_DESCRIPTIONS[e.slug];
           return (

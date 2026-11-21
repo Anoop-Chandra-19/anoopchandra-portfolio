@@ -12,7 +12,7 @@ function TagPill({ t }: { t: string }) {
       kind="meta"
       tone="soft"
       as="span"
-      className="py-[3px] px-2.5 rounded-full"
+      className="py-[3px] px-[11px] rounded-full"
       style={{ border: "1.2px solid var(--color-ink-soft)" }}
     >
       {t}
@@ -52,7 +52,7 @@ function Bullets({ items, short, className }: { items: string[]; short?: string[
   );
 }
 
-function TagRow({ tags, short, className = "mt-4" }: { tags: string[]; short?: string[]; className?: string }) {
+function TagRow({ tags, short, className = "mt-[17px]" }: { tags: string[]; short?: string[]; className?: string }) {
   const row = (xs: string[], variant: string) => (
     <div className={`flex gap-1.5 flex-wrap ${className} ${variant}`.trim()}>
       {xs.map((t) => (
@@ -75,7 +75,7 @@ function RoleBlock() {
       className="sketch-box mb-[26px]"
       style={{ background: "color-mix(in oklab, var(--color-electric) 5%, var(--color-paper))" }}
     >
-      <div className="flex items-baseline gap-4 flex-wrap mb-3">
+      <div className="flex items-baseline gap-[17px] flex-wrap mb-[13px]">
         <span className="hand text-[34px] leading-none text-electric max-wide:text-[26px]">{ROLE.org}</span>
         <div>
           <Label kind="eyebrow">
@@ -299,9 +299,9 @@ function PlatformCard() {
 
 function AlsoList() {
   return (
-    <ul className="list-none p-0 m-0 grid gap-3">
+    <ul className="list-none p-0 m-0 grid gap-[13px]">
       {ALSO.map((a) => (
-        <li key={a.d} className="grid grid-cols-[20px_1fr] gap-3 items-start max-wide:grid-cols-[14px_1fr]">
+        <li key={a.d} className="grid grid-cols-[20px_1fr] gap-[13px] items-start max-wide:grid-cols-[14px_1fr]">
           <span className="mono text-[13px] leading-[1.6] text-ink-faint">•</span>
           <span className="text-small">
             <Copy long={a.d} short={a.shortD} />
@@ -315,7 +315,7 @@ function AlsoList() {
 function MinorRow({ m }: { m: Minor }) {
   return (
     <div
-      className="grid grid-cols-[minmax(150px,190px)_1fr] gap-6 items-baseline py-3.5 max-wide:grid-cols-1 max-wide:gap-[6px] max-wide:py-[12px]"
+      className="grid grid-cols-[minmax(150px,190px)_1fr] gap-6.5 items-baseline py-[15px] max-wide:grid-cols-1 max-wide:gap-[6px] max-wide:py-[12px]"
       style={{ borderTop: "1.5px dashed var(--color-ink-faint)" }}
     >
       <div className="max-wide:flex max-wide:items-baseline max-wide:justify-between max-wide:gap-[10px]">
@@ -351,12 +351,12 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
       }`}
     >
       {!flip && <ProjectMedia p={p} />}
-      <div className="p-8 max-mid:order-2 max-mid:p-[24px] max-wide:p-[18px]">
+      <div className="p-8.5 max-mid:order-2 max-mid:p-[24px] max-wide:p-[18px]">
         <Label kind="eyebrow">
           {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
         </Label>
-        <h3 className="mt-2 mb-3.5 text-[25px] leading-[1.18] tracking-[-0.012em] max-mid:text-[24px] max-wide:text-[20px] max-wide:leading-[1.2]">{p.t}</h3>
-        <p className="mt-0 text-intro max-w-[520px] mb-4">
+        <h3 className="mt-2 mb-[15px] text-[25px] leading-[1.18] tracking-[-0.012em] max-mid:text-[24px] max-wide:text-[20px] max-wide:leading-[1.2]">{p.t}</h3>
+        <p className="mt-0 text-intro max-w-[520px] mb-[17px]">
           <Copy long={p.d} short={p.shortD} />
         </p>
         <Bullets
@@ -403,14 +403,14 @@ export default function Work() {
         title="Work"
         meta={`${1 + PARTS.length + PROJECTS.length + MINOR.length} entries · 2025 to present`}
       />
-      <p className="faint max-w-[740px] mb-7 text-[16px] max-wide:mb-[16px] max-wide:leading-[1.6]">
+      <p className="faint max-w-[740px] mb-7.5 text-[16px] max-wide:mb-[16px] max-wide:leading-[1.6]">
         <span className="marker-highlight">Panacea Financial</span>: selected work from my current
         role, alongside projects I build on my own time.
       </p>
 
       <RoleBlock />
 
-      <div className="mb-5">
+      <div className="mb-[21px]">
         <GroupRule
           label="selected work"
           count={<Copy long={`1 platform · ${1 + PARTS.length} parts`} short="1 platform" />}
@@ -418,12 +418,12 @@ export default function Work() {
       </div>
       <PlatformCard />
 
-      <div className="mt-9 mb-5">
+      <div className="mt-9.5 mb-[21px]">
         <GroupRule label="across the platform" count={`${ALSO.length} areas`} />
       </div>
       <AlsoList />
 
-      <div className="mt-12 mb-6">
+      <div className="mt-[51px] mb-6.5">
         <GroupRule label="on my own time" count={`${PROJECTS.length} projects`} />
       </div>
       <div className="flex flex-col gap-[18px] max-wide:gap-[14px]">
@@ -432,7 +432,7 @@ export default function Work() {
         ))}
       </div>
 
-      <div className="mt-9 mb-1">
+      <div className="mt-9.5 mb-1">
         <GroupRule label="earlier" count={`${MINOR.length} more`} />
       </div>
       <div>

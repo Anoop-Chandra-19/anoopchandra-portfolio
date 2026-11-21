@@ -14,9 +14,9 @@ export default function SideNav({
   const jumpTo = useSectionJump();
 
   return (
-    /* Whole pixels only, never rem: at a 17px basis the usual Tailwind steps
-       land on fractions and the row pitch drifts, which puts each 2px dash on
-       a different sub-pixel phase and antialiases them to different weights. */
+    /* Whole pixels only: if the row pitch lands on a fraction it drifts, which
+       puts each 2px dash on a different sub-pixel phase and antialiases them
+       to different weights. */
     <nav
       className="max-nav:hidden fixed left-[30px] top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-[2px] py-[14px] pr-[10px] pl-[14px]"
       aria-label="Section navigation"
@@ -31,7 +31,7 @@ export default function SideNav({
             key={id}
             href={`#sec-${id}`}
             aria-current={isActive ? "true" : undefined}
-            className={`anim-rail d-rail-${idx} flex h-[30px] items-center gap-[10px] no-underline text-ink px-[6px] rounded`}
+            className={`anim-rail d-rail-${idx} flex h-[30px] items-center gap-[10px] no-underline text-ink px-[6px] rounded-sm`}
             onClick={(e) => {
               e.preventDefault();
               jumpTo(id);
