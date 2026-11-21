@@ -30,12 +30,6 @@
   --color-teal: #1ea896;
   --color-navy: #25283d;
 
-  /* Text-safe accents (4.5:1 on paper) from the Work redesign, for small
-     labels the brand accents above are too light to carry. */
-  --color-coral-ink: #b8402c;
-  --color-teal-ink: #137a6d;
-  --color-electric-ink: #a800be;
-
   /* Mono label roles. No line-height: labels inherit it, as they always have.
      Case is set at the call site (`uppercase`), as Mosaic does. */
   --text-eyebrow: 11px;
@@ -48,6 +42,16 @@
   --text-caption: 10.5px;
   --text-caption--letter-spacing: 1px;
 
+  /* Body roles, for copy that sits between the 18px body and the labels.
+     Work's lead ladder (19/17.5/17/16.5) is the design, so it stays as
+     bracket values. Phone sizes are set on :root below. */
+  --text-summary: 19px;
+  --text-summary--line-height: 1.5;
+  --text-intro: 17px;
+  --text-intro--line-height: 1.6;
+  --text-small: 15px;
+  --text-small--line-height: 1.6;
+
   /* In px: the rem basis is 17px. lib/breakpoints.ts mirrors these for JS.
      Tailwind's defaults are rem-based, so they're cleared. */
   --breakpoint-*: initial;
@@ -55,4 +59,24 @@
   --breakpoint-wide: 721px;
   --breakpoint-mid: 1001px;  /* Work slabs stack */
   --breakpoint-nav: 901px;
+}
+
+/* Text-safe accents (4.5:1 on paper) from the Work redesign, for small
+   labels the brand accents above are too light to carry. `static` because
+   they're read as var(--color-${tone}-ink) in inline styles, which Tailwind
+   can't see; without it the variables are never emitted. */
+@theme static {
+  --color-coral-ink: #b8402c;
+  --color-teal-ink: #137a6d;
+  --color-electric-ink: #a800be;
+}
+
+/* A role resizes itself on phones, so elements don't carry a max-wide: size. */
+@media (max-width: 720px) {
+  :root {
+    --text-summary: 17px;
+    --text-summary--line-height: 1.55;
+    --text-intro: 16px;
+    --text-intro--line-height: 1.62;
+  }
 }

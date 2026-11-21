@@ -21,7 +21,7 @@ export default function Hero() {
           </h1>
           {/* A line of text, not a second headline. Deks are regular italic —
               never bold. Size is not a licence to go bold. */}
-          <div className="anim-rise d-subtle mt-[18px] text-[19px] leading-[1.65] italic font-normal text-ink-soft max-wide:order-4 max-wide:mt-[12px] max-wide:text-[17px] max-wide:leading-[1.55] max-xs:mt-[10px]">
+          <div className="anim-rise d-subtle mt-[18px] text-summary italic font-normal text-ink-soft max-wide:order-4 max-wide:mt-[12px] max-xs:mt-[10px]">
             full-stack dev <span className="faint">×</span> AI engineer{" "}
             <span className="faint">×</span> linux daily-driver
           </div>

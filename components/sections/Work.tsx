@@ -148,7 +148,7 @@ function DiagramImg({
   );
 }
 
-const DETAIL_LIST = "mt-[12px] pl-[18px] text-[15px] leading-[1.66] grid gap-[8px]";
+const DETAIL_LIST = "mt-[12px] pl-[18px] text-small grid gap-[8px]";
 
 function FlagshipPart() {
   const f = FLAGSHIP;
@@ -196,12 +196,12 @@ function FlagshipPart() {
           <p className="mt-0 mb-[10px] text-[19px] leading-[1.55] max-w-[640px] max-wide:text-[16.5px]">
             <Copy long={f.lead} short={f.shortLead} />
           </p>
-          <p className="mt-0 mb-[12px] text-[15.5px] text-ink-soft max-w-[640px] max-wide:text-[14.5px]">
+          <p className="mt-0 mb-[12px] text-small text-ink-soft max-w-[640px]">
             <Copy long={f.role} short={f.shortRole} />
           </p>
           <Details label={<Copy long={f.detailsLabel} short="details" />}>
             <Bullets items={f.bullets} short={f.shortBullets} className={DETAIL_LIST} />
-            <p className="max-wide:hidden mt-[14px] mb-0 text-[15px]">
+            <p className="max-wide:hidden mt-[14px] mb-0 text-small">
               <Label
                 kind="tag"
                 tone="inherit"
@@ -249,7 +249,7 @@ function CompactPart({ p }: { p: Part }) {
           <Copy long={p.lead} short={p.shortLead} />
         </p>
         {p.xref && (
-          <p className="mt-[-4px] mb-0 text-[14.5px] text-ink-soft">
+          <p className="mt-[-4px] mb-0 text-small text-ink-soft">
             <Label
               kind="tag"
               tone="inherit"
@@ -281,7 +281,7 @@ function PlatformCard() {
           <Copy long={PLATFORM.kicker} short={PLATFORM.shortKicker} />
         </Label>
         <h3 className="mt-[6px] mb-[10px] text-[30px] leading-[1.12] max-wide:text-[22px]">{PLATFORM.title}</h3>
-        <p className="mt-0 mb-[12px] text-[17.5px] leading-[1.58] max-w-[720px] max-wide:text-[15.5px]">
+        <p className="mt-0 mb-[12px] text-intro max-w-[720px]">
           <Copy long={PLATFORM.lead} short={PLATFORM.shortLead} />
         </p>
         <div className="max-w-[680px] mx-auto mt-[8px]">
@@ -303,7 +303,7 @@ function AlsoList() {
       {ALSO.map((a) => (
         <li key={a.d} className="grid grid-cols-[20px_1fr] gap-3 items-start max-wide:grid-cols-[14px_1fr]">
           <span className="mono text-[13px] leading-[1.6] text-ink-faint">•</span>
-          <span className="text-[15px] leading-[1.6]">
+          <span className="text-small">
             <Copy long={a.d} short={a.shortD} />
           </span>
         </li>
@@ -322,7 +322,7 @@ function MinorRow({ m }: { m: Minor }) {
         <div className="text-[16px] font-semibold leading-[1.3]">{m.t}</div>
         <Label kind="meta" className="mt-[3px] max-wide:shrink-0 max-wide:mt-0">{m.y}</Label>
       </div>
-      <p className="m-0 text-[14.5px] leading-[1.6]">{m.d}</p>
+      <p className="m-0 text-small">{m.d}</p>
     </div>
   );
 }
@@ -356,7 +356,7 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
           {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
         </Label>
         <h3 className="mt-2 mb-3.5 text-[25px] leading-[1.18] tracking-[-0.012em] max-mid:text-[24px] max-wide:text-[20px] max-wide:leading-[1.2]">{p.t}</h3>
-        <p className="mt-0 text-[17px] max-w-[520px] mb-4 max-wide:text-[16px] max-wide:leading-[1.62]">
+        <p className="mt-0 text-intro max-w-[520px] mb-4">
           <Copy long={p.d} short={p.shortD} />
         </p>
         <Bullets

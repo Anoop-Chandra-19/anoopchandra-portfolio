@@ -174,7 +174,7 @@ export default function JournalIndex({
         <h1 className="mb-2">
           The <span className="text-coral">Journal</span>
         </h1>
-        <p className="text-[19px] leading-[1.5] italic font-normal mt-2.5 mb-0 max-w-[720px] text-ink-soft">
+        <p className="text-summary italic font-normal mt-2.5 mb-0 max-w-[720px] text-ink-soft">
           A working notebook for bug stories, personal projects, opinions, and things I figured
           out the hard way.
         </p>
@@ -346,7 +346,7 @@ export default function JournalIndex({
 
         {visible.length === 0 && (
           <div className="pt-[26px] pb-[22px] px-1.5">
-            <p className="text-[19px] italic leading-[1.4] text-ink-soft mt-0 mb-2.5">
+            <p className="text-summary italic text-ink-soft mt-0 mb-2.5">
               Nothing filed under {tag ? <b className="font-semibold">{tag}</b> : "that"}
               {filter !== "all" && (
                 <>

@@ -128,6 +128,7 @@ Use these naming conventions:
   - `--color-navy`: `#25283d`
 - Preserve the editorial notebook aesthetic: paper backgrounds, ink borders, measured typography, and restrained accents.
 - Small mono labels use `<Label kind="eyebrow|tag|stamp|meta|caption">` from `components/ui/Label.tsx`, which applies the `@theme` type role, the case and the colour (`tone`, default faint), rather than a typed `text-[11px] tracking-[2px]`. Set colour with `tone`, not a colour utility in `className`.
+- Body copy between the 18px body and the labels uses `text-summary` (italic summary line), `text-intro` (intro paragraph) or `text-small` (small card and list copy). These resize themselves on phones, so they need no `max-wide:` size. Work's lead ladder (19/17.5/17/16.5px) is deliberate and stays as bracket values.
 - Phone changes go on the element as `max-wide:` variants (`max-xs:` for 360px, `max-mid:` for 1000px), not as a named class picked up by an `@media` block. Breakpoint tokens are in px because the rem basis is 17px; check `--breakpoint-nav` (900px) before adding a nearby breakpoint.
 - Named CSS in `app/styles/` sits in `@layer components`, so a utility beats it; keep it for what utilities can't express (pseudo-elements, `details`, descendant selectors, the lightbox).
 - Avoid inline styles unless values are computed dynamically or CSS custom properties are the cleanest bridge.

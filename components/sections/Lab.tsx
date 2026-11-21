@@ -96,7 +96,7 @@ export default function Lab() {
                 </div>
                 <div className="px-[18px] pt-[16px] pb-[18px]">
                   <h3 className="card-title">{e.title}</h3>
-                  <p className="text-[15.5px] leading-[1.55] mt-1.5">
+                  <p className="text-small mt-1.5">
                     {short ? (
                       <>
                         <span className="max-wide:hidden">{DESCRIPTIONS[e.slug]}</span>
