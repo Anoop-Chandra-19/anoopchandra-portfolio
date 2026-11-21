@@ -1,20 +1,17 @@
 @import "tailwindcss";
 
 /* Imported here rather than from layout.tsx so Tailwind inlines them into this
-   one stylesheet, in this order. Most rules are unlayered and source order
-   breaks their ties: generic before specific, and visibility.css last so
-   .wide-only / .narrow-only beat section display rules. */
+   one stylesheet. Section CSS sits in the components layer, so a utility on an
+   element beats its named class. base.css holds global element rules and
+   layers its own defaults. */
 @import "./styles/base.css";
-@import "./styles/primitives.css";
-@import "./styles/media.css";
-@import "./styles/hero.css";
-@import "./styles/now.css";
-@import "./styles/work.css";
-@import "./styles/stack.css";
-@import "./styles/notes.css";
-@import "./styles/contact.css";
-@import "./styles/nav.css";
-@import "./styles/visibility.css";
+@import "./styles/primitives.css" layer(components);
+@import "./styles/media.css" layer(components);
+@import "./styles/now.css" layer(components);
+@import "./styles/work.css" layer(components);
+@import "./styles/notes.css" layer(components);
+@import "./styles/contact.css" layer(components);
+@import "./styles/nav.css" layer(components);
 
 /* Theme tokens exposed to Tailwind utilities. */
 @theme {
@@ -38,4 +35,24 @@
   --color-coral-ink: #b8402c;
   --color-teal-ink: #137a6d;
   --color-electric-ink: #a800be;
+
+  /* Mono label roles. No line-height: labels inherit it, as they always have.
+     Case is set at the call site (`uppercase`), as Mosaic does. */
+  --text-eyebrow: 11px;
+  --text-eyebrow--letter-spacing: 3px;
+  --text-tag: 10.5px;
+  --text-tag--letter-spacing: 2px;
+  --text-stamp: 9px;
+  --text-stamp--letter-spacing: 2px;
+  --text-meta: 11px;
+  --text-caption: 10.5px;
+  --text-caption--letter-spacing: 1px;
+
+  /* In px: the rem basis is 17px. lib/breakpoints.ts mirrors these for JS.
+     Tailwind's defaults are rem-based, so they're cleared. */
+  --breakpoint-*: initial;
+  --breakpoint-xs: 361px;
+  --breakpoint-wide: 721px;
+  --breakpoint-mid: 1001px;  /* Work slabs stack */
+  --breakpoint-nav: 901px;
 }

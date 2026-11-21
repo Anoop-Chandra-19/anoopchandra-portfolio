@@ -139,21 +139,21 @@ export default function Stack() {
   return (
     <section id="sec-stack" className="section">
       <SectionHeader num="04" title="Stack" meta="grouped by where I use it" />
-      <div className="mono faint stack-legend text-[11px] mb-[18px] flex gap-[18px] flex-wrap">
+      <div className="mono faint text-meta mb-[18px] flex gap-[18px] flex-wrap max-wide:flex-col max-wide:gap-[3px] max-wide:text-[10.5px] max-wide:tracking-[0.5px]">
         <span>tally marks = rough years of use</span>
-        <span className="stack-legend-sep">·</span>
+        <span className="max-wide:hidden">·</span>
         <span>circled = current obsession</span>
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
         {COLS.map((col) => (
           <div
             key={col.h}
-            className="sketch-box pr-[22px]"
+            className="sketch-box"
             style={{ borderTop: "5px solid", borderTopColor: col.c }}
           >
             <h3 className="card-title" style={{ color: col.c }}>{col.h}</h3>
-            <div className="mono faint text-[11px] mt-0.5">{col.note}</div>
-            <ul className="mono stack-list list-none p-0 mt-4 text-[13px] tracking-[-0.01em] leading-[1.4]">
+            <div className="mono faint text-meta mt-0.5">{col.note}</div>
+            <ul className="mono list-none p-0 mt-4 text-[13px] tracking-[-0.01em] leading-[1.4] max-wide:text-[12.5px]">
               {col.items.map(([name, years, obsession]) => (
                 <li
                   key={name}

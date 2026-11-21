@@ -186,19 +186,4 @@
     letter-spacing: 0.5px;
   }
   .section-header h2 { order: 3; flex: 1 0 100%; margin: 6px 0 0; }
-
-  .sh-arrow { margin-bottom: 20px; padding-bottom: 8px; }
-  .sh-arrow-svg { display: none; }
-  .sh-arrow-row { flex-wrap: wrap; gap: 6px 14px; padding-left: 0; }
-  .sh-num { font-size: 11px; letter-spacing: 1px; }
-  .sh-meta { font-size: 10.5px; letter-spacing: 0.5px; }
-  .sh-arrow-row .sh-num { order: 1; }
-  .sh-arrow-row .sh-meta { order: 2; margin-left: auto; }
-  .sh-arrow-row h2 { order: 3; flex: 1 0 100%; margin: 6px 0 0; }
-
-  .sh-stamp { gap: 12px; margin-bottom: 20px; }
-  .sh-stamp-rule { display: none; }
-  .sh-stamp-box { padding: 6px 16px 8px; }
-
-  .sh-stamp-box h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.014em; }
 }

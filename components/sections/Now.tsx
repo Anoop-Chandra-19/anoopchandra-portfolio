@@ -27,10 +27,10 @@ export default function Now() {
     <section id="sec-now" className="section">
       <SectionHeader num="01" title="Now" meta="what has my attention lately" />
       <div
-        className="now-well p-10 rounded-lg"
+        className="p-10 rounded-lg max-wide:p-[18px] max-wide:rounded-[8px]"
         style={{ background: "color-mix(in oklab, var(--color-coral) 8%, var(--color-paper-2))" }}
       >
-        <div className="row items-stretch gap-6">
+        <div className="row items-stretch">
           {CARDS.map((c) => (
             <div
               key={c.h}
@@ -39,7 +39,7 @@ export default function Now() {
               // it in CSS — an inline transform would need !important to undo
               style={{ "--rot": `${c.rot}deg` } as CSSProperties}
             >
-              <div className="mono faint text-[11px] mb-1.5">{c.tag}</div>
+              <div className="mono faint text-meta mb-1.5">{c.tag}</div>
               <h3 className="card-title">{c.h}</h3>
               <ul className="pl-[18px] mt-2 text-[16px] leading-[1.6]">
                 {c.items.map((i) => (

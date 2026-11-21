@@ -49,7 +49,7 @@ export default function SideNav({
               }`}
             />
             <span
-              className={`mono text-[11.5px] tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
+              className={`mono text-meta tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
                 isActive ? "text-electric translate-x-0" : "text-ink -translate-x-[1px]"
               }`}
             >

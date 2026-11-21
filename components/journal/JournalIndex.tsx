@@ -161,13 +161,13 @@ export default function JournalIndex({
         <JournalBackLink href="/" peel>
           ← back to portfolio
         </JournalBackLink>
-        <div className="mono faint text-[11px] tracking-[2px] uppercase">
+        <div className="mono faint text-eyebrow uppercase">
           anoop parampalli · journal · vol. 02
         </div>
       </div>
 
       <div className="journal-cover">
-        <div className="mono faint text-[11px] tracking-[3px] uppercase mb-3.5">
+        <div className="mono faint text-eyebrow uppercase mb-3.5">
           a working notebook · {ppRange}
         </div>
         <h1 className="mb-2">
@@ -178,7 +178,7 @@ export default function JournalIndex({
           out the hard way.
         </p>
         <div
-          className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-[10px] tracking-[2px] uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
+          className="mono journal-cover-stamp absolute top-[22px] right-[26px] text-tag uppercase py-1 px-2.5 rounded-[3px] border-[1.5px] border-coral"
           style={{
             transform: "rotate(3deg)",
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
@@ -202,7 +202,7 @@ export default function JournalIndex({
             onClick={() => setFilter(k)}
           >
             {label}
-            <span className="mono text-[11px] opacity-70 ml-1">({counts[k]})</span>
+            <span className="mono text-meta opacity-70 ml-1">({counts[k]})</span>
           </button>
         ))}
         {years.length > 1 && (
@@ -317,14 +317,14 @@ export default function JournalIndex({
           style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
         />
         <div
-          className="mono faint journal-toc-stamp absolute left-2 top-7 text-[9px] tracking-[3px] uppercase whitespace-nowrap"
+          className="mono faint journal-toc-stamp absolute left-2 top-7 text-stamp uppercase whitespace-nowrap"
           style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
         >
           ✎ index — {visible.length} of {entries.length}
         </div>
 
         <div
-          className="mono faint journal-toc-header text-[9px] tracking-[2px] uppercase mb-1.5"
+          className="mono faint journal-toc-header text-stamp uppercase mb-1.5"
           style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
         >
           <span className="text-right">pg.</span>
@@ -383,7 +383,7 @@ export default function JournalIndex({
                    was hiding the page number, kind, read time and date from
                    screen readers. The row's own text is the better name. */
               >
-                <span className="mono faint journal-toc-page text-[11px] text-right text-ink-soft">
+                <span className="mono faint journal-toc-page text-meta text-right text-ink-soft">
                   p.{pad(e.page)}
                 </span>
 
@@ -393,7 +393,7 @@ export default function JournalIndex({
                   </span>
                   {/* The case badge provides a non-colour kind signal; mobile uses the tab. */}
                   {e.kind === "case" && (
-                    <span className="mono journal-toc-case text-[9px] tracking-[2px] uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
+                    <span className="mono journal-toc-case text-stamp uppercase text-ink bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
                       <span aria-hidden="true">★ </span>case study
                     </span>
                   )}
@@ -420,10 +420,10 @@ export default function JournalIndex({
                     )}
                   </span>
                   <span className="journal-toc-tag">{e.tag}</span>
-                  <span className="mono faint journal-toc-meta journal-toc-read text-[11px] text-right text-ink-soft">
+                  <span className="mono faint journal-toc-meta journal-toc-read text-meta text-right text-ink-soft">
                     {e.read}
                   </span>
-                  <span className="mono journal-toc-meta journal-toc-date text-[11px] text-right text-ink-soft">
+                  <span className="mono journal-toc-meta journal-toc-date text-meta text-right text-ink-soft">
                     {e.dateDisplay}
                   </span>
                 </span>
@@ -447,7 +447,7 @@ export default function JournalIndex({
           className="journal-toc-foot flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3"
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
-          <span className="mono faint text-[11px]">
+          <span className="mono faint text-meta">
             {visible.length} shown
             {tag && (
               <>

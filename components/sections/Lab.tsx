@@ -35,7 +35,7 @@ export default function Lab() {
   return (
     <section id="sec-lab" className="section">
       <SectionHeader num="03" title="The Lab" meta="3 experiments · run in your browser" />
-      <p className="faint max-w-[720px] mb-7">
+      <p className="faint max-w-[720px] mb-7 max-wide:mb-[16px]">
         Real ML runs entirely in your browser with TensorFlow.js. There is no server and no cold
         start. Everything below is live, so open an experiment and try it.
       </p>
@@ -66,17 +66,17 @@ export default function Lab() {
               {/* No tilt, unlike the design: a sub-degree rotation blurs the 15.5px
                   body copy at 1x, the same reason the Work cards dropped theirs. */}
               <div
-                className="sketch-box lab-card overflow-hidden"
+                className="sketch-box lab-card p-0 overflow-hidden"
                 style={{ borderTop: `4px solid var(--color-${e.accent})` }}
               >
                 <div className="flex justify-between items-center px-[18px] pt-[12px]">
                   <span
-                    className="mono text-[11.5px] tracking-[1px]"
+                    className="mono text-caption"
                     style={{ color: `var(--color-${e.accent}-ink)` }}
                   >
                     {e.num}
                   </span>
-                  <span className="mono faint text-[10.5px] tracking-[1px]">in your browser</span>
+                  <span className="mono faint text-caption">in your browser</span>
                 </div>
                 <div
                   className="mx-[18px] mt-[8px] pb-[8px]"
@@ -96,8 +96,8 @@ export default function Lab() {
                   <p className="text-[15.5px] leading-[1.55] mt-1.5">
                     {short ? (
                       <>
-                        <span className="wide-only">{DESCRIPTIONS[e.slug]}</span>
-                        <span className="narrow-only">{short}</span>
+                        <span className="max-wide:hidden">{DESCRIPTIONS[e.slug]}</span>
+                        <span className="wide:hidden">{short}</span>
                       </>
                     ) : (
                       DESCRIPTIONS[e.slug]

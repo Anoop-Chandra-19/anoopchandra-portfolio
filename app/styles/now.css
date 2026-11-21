@@ -1,6 +1,5 @@
 .now-card { transform: rotate(var(--rot, 0deg)); }
 
 @media (max-width: 720px) {
-  .now-well { padding: 18px; border-radius: 8px; }
   .now-card { transform: none; }
 }
