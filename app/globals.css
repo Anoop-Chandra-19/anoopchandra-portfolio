@@ -12,6 +12,8 @@
 @import "./styles/notes.css" layer(components);
 @import "./styles/contact.css" layer(components);
 @import "./styles/nav.css" layer(components);
+@import "./styles/journal.css" layer(components);
+@import "./styles/lab.css" layer(components);
 
 /* Theme tokens exposed to Tailwind utilities. */
 @theme {

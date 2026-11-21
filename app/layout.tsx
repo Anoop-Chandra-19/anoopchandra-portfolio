@@ -3,8 +3,6 @@ import { Caveat, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 import "./animations.css";
-import "./journal.css";
-import "./lab.css";
 import "./ink-transition.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";

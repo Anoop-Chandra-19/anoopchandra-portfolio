@@ -1,5 +1,5 @@
 // Section IDs come from lib/journal.ts and match rehype-slug's rendered IDs.
-// The rail is hidden below 820px and for entries with fewer than three sections.
+// The rail is hidden below 900px and for entries with fewer than three sections.
 "use client";
 import { useEffect, useState } from "react";
 import type { Section } from "@/lib/journal-meta";

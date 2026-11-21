@@ -167,21 +167,21 @@ export default function JournalIndex({
         </Label>
       </div>
 
-      <div className="journal-cover">
+      <div className="journal-cover relative bg-paper border-2 border-ink rounded-[7px] py-7 px-8 mb-9 max-wide:py-5 max-wide:px-[18px]">
         <Label kind="eyebrow" className="mb-[15px]">
           a working notebook · {ppRange}
         </Label>
-        <h1 className="mb-2">
+        <h1 className="mb-2 leading-[0.95] max-wide:text-[40px] max-wide:leading-[1.02] max-wide:tracking-[-0.02em]">
           The <span className="text-coral">Journal</span>
         </h1>
-        <p className="text-summary italic font-normal mt-[11px] mb-0 max-w-[720px] text-ink-soft">
+        <p className="text-summary italic font-normal mt-[11px] mb-0 max-w-[720px] text-ink-soft max-wide:leading-[1.5]">
           A working notebook for bug stories, personal projects, opinions, and things I figured
           out the hard way.
         </p>
         <Label
           kind="tag"
           tone="inherit"
-          className="journal-cover-stamp absolute top-[22px] right-[26px] py-1 px-[11px] rounded-[3px] border-[1.5px] border-coral"
+          className="absolute top-[22px] right-[26px] py-1 px-[11px] rounded-[3px] border-[1.5px] border-coral max-wide:static max-wide:inline-block max-wide:mt-3.5"
           style={{
             transform: "rotate(3deg)",
             color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
@@ -193,8 +193,8 @@ export default function JournalIndex({
 
       {/* Kind uses the top filters; subject uses each row's edge tab. Below the
           breakpoint this whole row is replaced by the filter pill. */}
-      <div className="journal-filter-row flex items-center flex-wrap gap-[11px] mb-[22px]">
-        <span className="mono journal-filter-lbl text-[11px] tracking-[1px] uppercase text-ink-soft">
+      <div className="flex items-center flex-wrap gap-[11px] mb-[22px] max-wide:hidden">
+        <span className="mono text-[11px] tracking-[1px] uppercase text-ink-soft">
           filter ↦
         </span>
         {FILTERS.map(([k, label]) => (
@@ -313,15 +313,16 @@ export default function JournalIndex({
         onCloseAction={() => setSheetOpen(false)}
       />
 
-      <div className="journal-toc-panel bg-paper border-2 border-ink rounded-md pt-7.5 pr-6.5 pb-[18px] pl-17 relative overflow-hidden">
+      {/* The notebook stays on phones: it is the page's only paper cue. */}
+      <div className="bg-paper border-2 border-ink rounded-md pt-7.5 pr-6.5 pb-[18px] pl-17 relative overflow-hidden max-wide:pt-2 max-wide:pr-3.5 max-wide:pb-3 max-wide:pl-10">
         <span
           aria-hidden="true"
-          className="journal-toc-rule absolute left-[51px] top-0 bottom-0 w-[1.2px] opacity-60"
+          className="absolute left-[51px] top-0 bottom-0 w-[1.2px] opacity-60 max-wide:left-7"
           style={{ background: "color-mix(in oklab, var(--color-coral) 70%, transparent)" }}
         />
         <Label
           kind="stamp"
-          className="journal-toc-stamp absolute left-2 top-7.5 whitespace-nowrap"
+          className="absolute left-2 top-7.5 whitespace-nowrap max-wide:hidden"
           style={{ transform: "rotate(-90deg)", transformOrigin: "left top" }}
         >
           ✎ index — {visible.length} of {entries.length}
@@ -329,7 +330,7 @@ export default function JournalIndex({
 
         <Label
           kind="stamp"
-          className="journal-toc-header mb-1.5"
+          className="journal-toc-header mb-1.5 max-wide:hidden"
           style={{ borderBottom: "1px dashed var(--color-ink-faint)" }}
         >
           <span className="text-right">pg.</span>
@@ -376,46 +377,50 @@ export default function JournalIndex({
           </div>
         )}
 
-        <ul className="journal-toc-list list-none p-0 m-0">
+        <ul className="list-none p-0 m-0">
           {visible.map((e) => (
             /* On the row, not the tab: the phone kind label needs the same
                hue and sits inside the link. */
             <li key={e.slug} className="journal-toc-item" style={tabAccent(e.kind)}>
               <Link
                 href={`/journal/${e.slug}`}
-                className="journal-toc-row items-baseline no-underline"
+                className="journal-toc-row items-baseline no-underline max-wide:grid-cols-[1fr_auto] max-wide:[grid-template-areas:'title_page'_'meta_meta'] max-wide:gap-y-[7px] max-wide:gap-x-[10px] max-wide:pt-[13px] max-wide:px-0 max-wide:pb-3"
+                /* Areas, not reordering: the `page → title → metas` source order stays. */
                 /* No aria-label: on a link it replaces the whole subtree, so it
                    was hiding the page number, kind, read time and date from
                    screen readers. The row's own text is the better name. */
               >
-                <Label kind="meta" tone="soft" as="span" className="journal-toc-page text-right">
+                <Label kind="meta" tone="soft" as="span" className="text-right max-wide:[grid-area:page] max-wide:self-baseline max-wide:pt-0 max-wide:text-[10.5px] max-wide:text-ink-faint">
                   p.{pad(e.page)}
                 </Label>
 
-                <span className="journal-toc-title flex items-baseline min-w-0 gap-2 overflow-hidden">
-                  <span className="text-[18px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink">
+                <span className="flex items-baseline min-w-0 gap-2 overflow-hidden max-wide:[grid-area:title] max-wide:flex-wrap">
+                  <span className="text-[18px] font-semibold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis flex-[0_1_auto] text-ink max-wide:whitespace-normal max-wide:text-[17.5px] max-wide:leading-[1.28] max-wide:tracking-[-0.012em] max-wide:flex-[0_1_100%]">
                     {e.title}
                   </span>
                   {/* The case badge provides a non-colour kind signal; mobile uses the tab. */}
                   {e.kind === "case" && (
-                    <Label kind="stamp" tone="ink" as="span" className="journal-toc-case bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
+                    <Label kind="stamp" tone="ink" as="span" className="max-wide:hidden bg-paper-2 border border-ink px-[6px] py-[2px] rounded-[3px] shrink-0">
                       <span aria-hidden="true">★ </span>case study
                     </Label>
                   )}
                   <span
                     aria-hidden="true"
-                    className="journal-toc-leader flex-1 h-0 min-w-6.5 -translate-y-1"
+                    className="flex-1 h-0 min-w-6.5 -translate-y-1 max-wide:hidden"
                     style={{ borderBottom: "1.5px dotted var(--color-ink-faint)" }}
                   />
                 </span>
 
                 {/* `display: contents` above the phone breakpoint, so the ledger
                     grid still owns read and date as its own cells; below it, these
-                    collapse into the one meta line under the title. */}
-                <span className="journal-toc-metas">
+                    collapse into the one meta line under the title. Source order is
+                    the desktop column order (read, date); `order` puts the date first
+                    on phones. Each item is nowrap: a date breaking after its comma
+                    reads as two values. */}
+                <span className="contents max-wide:flex max-wide:[grid-area:meta] max-wide:items-center max-wide:flex-wrap max-wide:gap-[7px] max-wide:min-w-0">
                   {/* The ★ badge above is desktop-only; this is its phone
                       equivalent, and it has to read for notes too. */}
-                  <span className="journal-toc-kind">
+                  <span className="journal-toc-kind hidden max-wide:inline max-wide:order-1 font-mono text-[9px] tracking-[1.6px] uppercase whitespace-nowrap text-[color:var(--tab-ink)]">
                     {e.kind === "case" ? (
                       <>
                         <span aria-hidden="true">★ </span>case
@@ -424,11 +429,11 @@ export default function JournalIndex({
                       "note"
                     )}
                   </span>
-                  <span className="journal-toc-tag">{e.tag}</span>
-                  <Label kind="meta" tone="soft" as="span" className="journal-toc-meta journal-toc-read text-right">
+                  <span className="journal-toc-tag hidden max-wide:inline max-wide:order-2 font-mono text-[10.5px] text-ink-soft">{e.tag}</span>
+                  <Label kind="meta" tone="soft" as="span" className="text-right max-wide:order-4 max-wide:text-left max-wide:whitespace-nowrap">
                     {e.read}
                   </Label>
-                  <Label kind="meta" tone="soft" as="span" className="journal-toc-meta journal-toc-date text-right">
+                  <Label kind="meta" tone="soft" as="span" className="journal-toc-date text-right max-wide:order-3 max-wide:text-left max-wide:whitespace-nowrap">
                     {e.dateDisplay}
                   </Label>
                 </span>
@@ -438,7 +443,7 @@ export default function JournalIndex({
                   elements are invalid; absolute positioning preserves one row target. */}
               <button
                 type="button"
-                className={`journal-edge-tab ${tag === e.tag ? "is-on" : ""}`}
+                className={`journal-edge-tab max-wide:hidden ${tag === e.tag ? "is-on" : ""}`}
                 title={tag === e.tag ? `showing ${e.tag}; click to clear` : `filter to ${e.tag}`}
                 onClick={() => setTag(tag === e.tag ? null : e.tag)}
               >
@@ -449,7 +454,7 @@ export default function JournalIndex({
         </ul>
 
         <div
-          className="journal-toc-foot flex justify-between items-center gap-[13px] flex-wrap mt-[15px] pt-[13px]"
+          className="flex justify-between items-center gap-[13px] flex-wrap mt-[15px] pt-[13px] max-wide:justify-center max-wide:text-center"
           style={{ borderTop: "1px dashed var(--color-ink-faint)" }}
         >
           <Label kind="meta" as="span">
@@ -469,7 +474,7 @@ export default function JournalIndex({
             {" · "}
             {counts.case} case studies + {counts.note} notes · pp. {pad(first)}–{pad(last)}
           </Label>
-          <span className="journal-toc-hint text-[15px] italic text-ink-faint">
+          <span className="text-[15px] italic text-ink-faint max-wide:hidden">
             tap a line to open it · tap a tab to filter ↦
           </span>
         </div>

@@ -33,6 +33,12 @@ body {
   body { padding-left: 0; }
 }
 
+/* Journal and Lab pages have no side nav. Unlayered, like the body rule. */
+body:has([data-journal-root]),
+body:has([data-lab-root]) {
+  padding-left: 0;
+}
+
 /* Fine-pointer gating avoids forcing permanent WebKit scrollbars on touch devices. */
 @media (pointer: fine) {
   ::-webkit-scrollbar {

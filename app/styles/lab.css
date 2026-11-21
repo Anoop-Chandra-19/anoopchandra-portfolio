@@ -2,10 +2,6 @@
 
 @keyframes lxPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
-body:has([data-lab-root]) {
-  padding-left: 0;
-}
-
 .lx-page-inner {
   max-width: 920px;
   margin: 0 auto;
@@ -696,7 +692,7 @@ body:has([data-lab-root]) {
 }
 
 /* Responsive lab layout */
-@media (max-width: 760px) {
+@media (max-width: 720px) {
   .lx-page-inner {
     padding: 26px 20px 70px;
   }

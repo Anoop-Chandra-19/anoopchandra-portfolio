@@ -1,18 +1,5 @@
 /* Journal index */
 
-body:has([data-journal-root]) {
-  padding-left: 0;
-}
-
-.journal-cover {
-  position: relative;
-  background: var(--color-paper);
-  border: 2px solid var(--color-ink);
-  border-radius: 7px;
-  padding: 28px 32px;
-  margin-bottom: 36px;
-}
-
 .journal-cover::before {
   content: "";
   position: absolute;
@@ -20,9 +7,6 @@ body:has([data-journal-root]) {
   border: 1px solid color-mix(in oklab, var(--color-ink) 50%, transparent);
   border-radius: 4px;
   pointer-events: none;
-}
-.journal-cover h1 {
-  line-height: 0.95;
 }
 
 .journal-filter-btn {
@@ -196,11 +180,6 @@ body:has([data-journal-root]) {
 
 .journal-index.has-subject .journal-edge-tab:not(.is-on) { opacity: 0.45; }
 
-.journal-toc-metas {
-  display: contents;
-}
-.journal-toc-kind,
-.journal-toc-tag,
 .journal-pill-row,
 .journal-applied {
   display: none;
@@ -208,90 +187,6 @@ body:has([data-journal-root]) {
 
 @media (max-width: 720px) {
 
-  /* The notebook stays on phones: it is the page's only paper cue. */
-  .journal-toc-panel {
-    padding: 8px 14px 12px 40px;
-  }
-  .journal-toc-rule {
-    left: 28px;
-  }
-  .journal-toc-stamp,
-  .journal-toc-header,
-  .journal-toc-case,
-  .journal-toc-leader {
-    display: none;
-  }
-  .journal-toc-list {
-    border-top: 0;
-  }
-
-  /* Areas, not reordering: the `page → title → metas` source order stays. */
-  .journal-toc-row {
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "title page"
-      "meta meta";
-    row-gap: 7px;
-    column-gap: 10px;
-    padding: 13px 0 12px;
-  }
-  .journal-toc-page {
-    grid-area: page;
-    align-self: baseline;
-    padding-top: 0;
-    font-size: 10.5px;
-    color: var(--color-ink-faint);
-  }
-  .journal-toc-title {
-    grid-area: title;
-    flex-wrap: wrap;
-  }
-  /* The title span has no role class; target it structurally. */
-  .journal-toc-title > :first-child {
-    white-space: normal;
-    font-size: 17.5px;
-    line-height: 1.28;
-    letter-spacing: -0.012em;
-    flex: 0 1 100%;
-  }
-
-  .journal-toc-metas {
-    display: flex;
-    grid-area: meta;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 7px;
-    min-width: 0;
-  }
-  /* The line wraps at 320px; a date breaking after its comma reads as two values. */
-  .journal-toc-row .journal-toc-meta {
-    text-align: left;
-    white-space: nowrap;
-  }
-  .journal-toc-kind,
-  .journal-toc-tag {
-    display: inline;
-  }
-  .journal-toc-kind {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: var(--tab-ink);
-  }
-  .journal-toc-tag {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    color: var(--color-ink-soft);
-  }
-
-  /* Source order is the desktop column order, read then date; the phone line
-     reads date first. */
-  .journal-toc-kind { order: 1; }
-  .journal-toc-tag { order: 2; }
-  .journal-toc-date { order: 3; }
-  .journal-toc-read { order: 4; }
   /* On the items so they follow `order`, and trailing so a wrapped line never
      opens with a stray dot. Read time is last in `order`, so it gets none. */
   .journal-toc-kind::after,
@@ -302,17 +197,9 @@ body:has([data-journal-root]) {
     color: var(--color-ink-faint);
   }
 
-  /* The sheet owns subject filtering below this width. `display:none` rather
-     than a visual hide: it is a button and would otherwise stay tabbable. */
-  .journal-edge-tab {
-    display: none;
-  }
-
   /* One pill replaces the kind buttons, the year select, and the sort controls
-     that lived in the display:none ledger header. */
-  .journal-filter-row {
-    display: none;
-  }
+     that lived in the hidden ledger header. The edge tabs hide too (a button,
+     so `hidden`, not a visual hide): the sheet owns subject filtering. */
   .journal-pill-row {
     display: flex;
     align-items: center;
@@ -407,25 +294,6 @@ body:has([data-journal-root]) {
     border-bottom: 1px dotted var(--color-ink-faint);
     cursor: pointer;
   }
-
-  /* The edge tabs it points at are gone; the sheet is the filter now. */
-  .journal-toc-hint {
-    display: none;
-  }
-  .journal-toc-foot {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .journal-cover .journal-cover-stamp {
-    position: static;
-    display: inline-block;
-    margin-top: 14px;
-  }
-
-  .journal-cover { padding: 20px 18px; }
-  .journal-cover h1 { font-size: 40px; line-height: 1.02; letter-spacing: -0.02em; }
-  .journal-cover > p { font-size: 17px; line-height: 1.5; }
 }
 
 /* Journal entry */
@@ -664,12 +532,13 @@ body:has([data-journal-root]) {
   .je-callout{max-width:100%}
   .je-body p,.je-ul,.je-ol,.je-h2,.je-body h3,.je-code,.je-quote,.je-end{max-width:100%}
 }
-@media (max-width:820px){
+/* 900px, with the home page's side nav (was 820). */
+@media (max-width:900px){
   .je-secnav{display:none}
   .je{--rail:26px;--colgap:14px}
 }
 
-@media (max-width:640px){
+@media (max-width:720px){
   .je-inner{padding:24px 18px 72px}
   .je-ledger{font-size:9px;letter-spacing:2px;gap:9px}
   .je-chip{font-size:11px}
@@ -699,12 +568,10 @@ body:has([data-journal-root]) {
   .je-code .cap{font-size:9.5px}
   .je-nav{grid-template-columns:1fr}
   .je-navcard.older{text-align:left}
-}
 
-/* Separate from the 640px block: this is the site's phone breakpoint, not an
-   article column-width step. Moves with `PHONE_QUERY` in lib/breakpoints.ts —
-   split them and the ref becomes a plain anchor that opens a sheet. */
-@media (max-width:720px){
+  /* At 720px, the site's phone breakpoint (the type and spacing here were a
+     640px step until 2026-11-21). Moves with `PHONE_QUERY` in lib/breakpoints.ts —
+     split them and the ref becomes a plain anchor that opens a sheet. */
   /* Keep the hidden list in the DOM because the mobile sheet clones its bodies. */
   .je-fnlist{display:none}
   /* The pseudo-element enlarges the footnote tap target without changing line height. */
