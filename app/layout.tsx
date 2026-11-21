@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     template: "%s | Anoopchandra Parampalli",
   },
   description:
-    "Portfolio of Anoopchandra Parampalli, a full-stack engineer at Panacea Financial with AI/ML projects from Northeastern and a Linux daily driver. React, NestJS, PyTorch, FastAPI.",
+    "Portfolio of Anoopchandra Parampalli, an applied AI engineer at Panacea Financial with AI/ML projects from Northeastern and a Linux daily driver. React, NestJS, PyTorch, FastAPI.",
   keywords: [
     "AI Engineer",
     "ML Engineer",

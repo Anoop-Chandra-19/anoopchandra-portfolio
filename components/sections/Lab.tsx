@@ -1,37 +1,47 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
 import { LAB_EXPS } from "@/lib/lab-meta";
+import type { LabSlug } from "@/lib/lab-meta";
 
-const ACTIONS: Record<string, string> = {
-  doodle: "draw something →",
-  sentiment: "type to start →",
-  kmeans: "drop points →",
+const DESCRIPTIONS: Record<LabSlug, string> = {
+  doodle: "Draw something and a CNN guesses what it is. 50 classes, trained on Google QuickDraw.",
+  sentiment: "Type a sentence and an LSTM rates how positive it is. Trained on IMDB reviews.",
+  kmeans: "Place points and watch k-means cluster them step by step.",
 };
 
-const DESCRIPTIONS: Record<string, string> = {
-  doodle: "Draw → CNN guesses what it is. 50 classes, trained on Google QuickDraw.",
-  sentiment: "Type text → LSTM rates emotion. Trained on IMDB reviews.",
-  kmeans: "Place points → watch clustering animate step-by-step.",
+// Real captures of each experiment mid-run, cropped from the desktop Lab
+// pages; phones show the same crop scaled down. Previews only, not zoomable:
+// the live experiment is one click away, and a lightbox button can't sit inside
+// the card's link. alt is empty because the link's visible text already names
+// the experiment, and a description would only lengthen its accessible name.
+const SHOTS: Record<LabSlug, string> = {
+  doodle: "/lab/doodle.png",
+  sentiment: "/lab/sentiment.png",
+  kmeans: "/lab/kmeans.png",
 };
 
-const STRIPE_BG =
-  "repeating-linear-gradient(45deg, transparent 0 8px, rgba(0,0,0,0.05) 8px 9px)";
+// The phone design shortens only the doodle card.
+const SHORT_DESCRIPTIONS: Partial<Record<LabSlug, string>> = {
+  doodle: "Draw something and a CNN guesses what it is.",
+};
 
 export default function Lab() {
   const { navigate } = useInkTransition();
 
   return (
     <section id="sec-lab" className="section">
-      <SectionHeader num="03" title="The Lab" meta="3 live experiments · all in-browser" />
+      <SectionHeader num="03" title="The Lab" meta="3 experiments · run in your browser" />
       <p className="faint max-w-[720px] mb-7">
         Real ML runs entirely in your browser with TensorFlow.js. There is no server and no cold
         start. Everything below is live, so open an experiment and try it.
       </p>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5">
-        {LAB_EXPS.map((e, i) => {
+        {LAB_EXPS.map((e) => {
+          const short = SHORT_DESCRIPTIONS[e.slug];
           return (
             <Link
               key={e.slug}
@@ -53,28 +63,46 @@ export default function Lab() {
                 navigate(`/lab/${e.slug}`, { effect: "bleed", originRect });
               }}
             >
-              <div className={`sketch-box ${i % 2 ? "tilt-r" : "tilt-l"} p-0 overflow-hidden`}>
-                <div
-                  className="mono py-2.5 px-4 flex justify-between text-xs text-white"
-                  style={{ background: `var(--color-${e.accent})` }}
-                >
-                  <span>{e.num}</span>
-                  <span>
-                    <span
-                      className="pulse-dot inline-block w-2 h-2 rounded-full bg-white mr-1.5"
-                    />
-                    live
+              {/* No tilt, unlike the design: a sub-degree rotation blurs the 15.5px
+                  body copy at 1x, the same reason the Work cards dropped theirs. */}
+              <div
+                className="sketch-box lab-card overflow-hidden"
+                style={{ borderTop: `4px solid var(--color-${e.accent})` }}
+              >
+                <div className="flex justify-between items-center px-[18px] pt-[12px]">
+                  <span
+                    className="mono text-[11.5px] tracking-[1px]"
+                    style={{ color: `var(--color-${e.accent}-ink)` }}
+                  >
+                    {e.num}
                   </span>
+                  <span className="mono faint text-[10.5px] tracking-[1px]">in your browser</span>
                 </div>
                 <div
-                  className="lab-card-canvas h-40 flex items-center justify-center border-b-2 border-ink"
-                  style={{ background: STRIPE_BG }}
+                  className="mx-[18px] mt-[8px] pb-[8px]"
+                  style={{ borderBottom: "1.5px dashed rgba(0, 0, 0, 0.25)" }}
                 >
-                  <span className="text-[17px] text-ink-soft">{ACTIONS[e.slug]}</span>
+                  <Image
+                    src={SHOTS[e.slug]}
+                    alt=""
+                    width={640}
+                    height={300}
+                    sizes="(max-width: 720px) 90vw, 320px"
+                    className="block w-full h-auto"
+                  />
                 </div>
-                <div className="p-[18px]">
+                <div className="px-[18px] pt-[16px] pb-[18px]">
                   <h3 className="card-title">{e.title}</h3>
-                  <p className="text-[16px] leading-[1.55] mt-1.5">{DESCRIPTIONS[e.slug]}</p>
+                  <p className="text-[15.5px] leading-[1.55] mt-1.5">
+                    {short ? (
+                      <>
+                        <span className="wide-only">{DESCRIPTIONS[e.slug]}</span>
+                        <span className="narrow-only">{short}</span>
+                      </>
+                    ) : (
+                      DESCRIPTIONS[e.slug]
+                    )}
+                  </p>
                   <Chip>▸ open experiment</Chip>
                 </div>
               </div>
