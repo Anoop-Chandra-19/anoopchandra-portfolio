@@ -13,7 +13,7 @@ import JournalBackLink from "@/components/journal/JournalBackLink";
 import ZoomableImage from "@/components/ui/ZoomableImage";
 import { imageDims } from "@/lib/image-dims";
 
-const AUTHOR = "Anoop Parampalli";
+const AUTHOR = "Anoopchandra Parampalli";
 
 export default function ArticleEntry({
   entry,

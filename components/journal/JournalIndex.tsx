@@ -471,7 +471,7 @@ export default function JournalIndex({
       </div>
 
       <div style={{ marginTop: 40, textAlign: "center" }} className="mono faint">
-        — © 2026 Anoop Parampalli · journal —
+        — © 2026 Anoopchandra Parampalli · journal —
       </div>
     </main>
   );
