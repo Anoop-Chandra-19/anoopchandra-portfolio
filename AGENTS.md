@@ -35,6 +35,7 @@ Do not run a persistent development server unless the task requires interactive 
 
 ```text
 app/                       App Router pages, metadata, sitemap, and global CSS
+  styles/                  Home-page CSS split by concern; imported in order by globals.css
   journal/                 Journal index and statically generated article routes
   lab/                     Interactive lab index and individual lab routes
 components/

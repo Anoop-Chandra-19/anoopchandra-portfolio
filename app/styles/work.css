@@ -1,0 +1,172 @@
+.project-slab { grid-template-columns: var(--slab-cols, 1.4fr 1fr); }
+
+.minor-row { grid-template-columns: minmax(150px, 190px) 1fr; }
+
+.also-list > li { grid-template-columns: 20px 1fr; }
+
+/* Tailwind preflight removes list markers; restore them for semantic work lists. */
+details.more ul,
+.project-content ul { list-style: disc; }
+
+/* §02 platform card. Padding lives here, not in utilities: .sketch-box is
+   unlayered, so its padding would beat a layered p-0. */
+.sketch-box.platform-card,
+.sketch-box.lab-card { padding: 0; }
+.plat-head { padding: 26px 30px 18px; border-bottom: 2px solid var(--color-ink); }
+.part + .part { border-top: 2px dashed rgba(0, 0, 0, 0.35); }
+.flagship-band { padding: 18px 22px 12px; border-bottom: 2px solid var(--color-ink); }
+.flagship-body {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 28px;
+  padding: 28px 30px 26px;
+}
+.compact-part { display: flex; align-items: stretch; }
+.part-pic {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px 18px;
+  border-right: 2px solid var(--color-ink);
+}
+.part-pic .zoom-wrap + .pic-cap { margin-top: 10px; }
+.diagram img { display: block; width: 100%; height: auto; }
+/* The enlarge pill gets its own row above each diagram so it never covers the
+   drawing. A caption, where there is one, shares that row on the left. */
+.diagram { padding-top: 34px; }
+.diagram .zoom-btn { top: 0; right: 0; }
+.diagram-cap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  margin-bottom: -34px;
+  padding-right: 104px;
+  pointer-events: none;
+}
+.part-inner { flex: 1; min-width: 0; padding: 22px 26px 20px; }
+
+details.more {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1.5px dashed rgba(0, 0, 0, 0.25);
+  interpolate-size: allow-keywords;
+}
+details.more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before {
+  content: "+";
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-ink-soft);
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+}
+details.more[open] > summary::before { content: "−"; }
+details.more > summary:hover { color: var(--color-ink); }
+details.more > summary:focus-visible {
+  outline: 2px solid var(--color-electric);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Open/close motion. Durations are placeholders pending a value from the
+   design; browsers without ::details-content open instantly. */
+details.more::details-content {
+  height: 0;
+  opacity: 0;
+  overflow: clip;
+  transition: height 0.25s ease, opacity 0.2s ease, content-visibility 0.25s allow-discrete;
+}
+details.more[open]::details-content { height: auto; opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  details.more::details-content { transition: none; }
+}
+
+.project-media {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 200px;
+  background: var(--color-paper-2);
+  border-left: 2px solid var(--color-ink);
+  border-right: 2px solid var(--color-ink);
+  overflow: hidden;
+}
+
+.project-media[data-fit="contain"] { padding: 20px; }
+.project-media img { display: block; width: 100%; height: 100%; }
+.project-media[data-fit="contain"] img { object-fit: contain; }
+.project-media[data-fit="cover"] img { object-fit: cover; }
+
+@media (max-width: 1000px) {
+  .project-slab { grid-template-columns: 1fr; }
+
+  .project-media {
+    order: 1;
+    border: none;
+    border-bottom: 2px solid var(--color-ink);
+    min-height: 200px;
+  }
+
+  .project-media img { height: auto; }
+  .project-content { order: 2; padding: 24px; }
+  .project-content h3 { font-size: 24px; }
+}
+
+@media (max-width: 720px) {
+  .project-slab { padding: 0; }
+
+  .project-content h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.012em; }
+  .project-content p { font-size: 16px; line-height: 1.62; }
+
+  .plat-head { padding: 16px 14px 12px; }
+  .plat-title { font-size: 22px; }
+  .plat-lead { font-size: 15.5px; }
+  .flagship-band { padding: 12px 14px 8px; }
+  .flagship-body { display: block; padding: 18px 16px; }
+  .flagship-title { font-size: 23px; }
+  .flagship-lead { font-size: 16.5px; }
+  .flagship-role { font-size: 14.5px; }
+  .compact-part { display: block; }
+  .part-inner { padding: 16px; }
+  .part-title { font-size: 19px; }
+  .part-lead { font-size: 15.5px; }
+
+  .role-org { font-size: 26px; }
+
+  .minor-row { grid-template-columns: 1fr; gap: 6px; padding: 12px 0; }
+  .minor-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .minor-year { flex-shrink: 0; margin-top: 0; }
+
+  .also-list > li { grid-template-columns: 14px 1fr; }
+
+  .group-rule { gap: 10px; }
+  .group-rule-line { flex-shrink: 0; min-width: 20px; }
+
+  .project-media { min-height: 0; padding: 16px; }
+  .project-media img { max-height: 190px; }
+  .project-content { padding: 18px; }
+}

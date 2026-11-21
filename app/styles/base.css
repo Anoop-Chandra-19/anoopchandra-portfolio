@@ -1,0 +1,132 @@
+* { box-sizing: border-box; }
+
+/* Keep html at 17px: it is Tailwind's rem basis; body owns the reading size. */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* next/font variables live on body; keep the role alias here. */
+body {
+  --font-body: var(--font-display);
+  font-family: var(--font-body);
+
+  font-size: 18px;
+  line-height: 1.65;
+  letter-spacing: 0;
+  font-optical-sizing: auto;
+  padding-bottom: 40px;
+  padding-left: 140px;
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(255,113,91,0.05), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(30,168,150,0.04), transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0,0,0,0.018) 28px, rgba(0,0,0,0.018) 29px);
+}
+
+@media (max-width: 900px) {
+
+  body { padding-left: 0; }
+}
+
+/* Fine-pointer gating avoids forcing permanent WebKit scrollbars on touch devices. */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-paper);
+    border-left: 1px dashed var(--color-ink-faint);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-paper-2);
+    border: 1.5px solid var(--color-ink);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--color-electric) 14%, var(--color-paper));
+    border-color: var(--color-electric);
+  }
+  ::-webkit-scrollbar-corner {
+    background: var(--color-paper);
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-ink) var(--color-paper-2);
+    }
+  }
+}
+
+/* Keep classic scrollbar width stable while Lenis locks scrolling. */
+@media (pointer: fine) {
+  html {
+    scrollbar-gutter: stable;
+  }
+}
+html.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow-y: scroll;
+}
+
+/* Keep element defaults layered so Tailwind utilities can override them. */
+@layer base {
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-optical-sizing: auto;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  h1 { font-size: 72px; line-height: 1.02; letter-spacing: -0.022em; }
+  h2 { font-size: 42px; line-height: 1.08; letter-spacing: -0.016em; }
+  h3 { font-size: 28px; line-height: 1.18; letter-spacing: -0.012em; }
+  /* .card-title is an h3 by document outline, h4 by type scale: card headings
+     sit directly under a section's h2, so the tag can't skip a level. */
+  h4, .card-title { font-size: 21px; line-height: 1.25; letter-spacing: -0.008em; margin-bottom: 8px; }
+
+  p, li, blockquote { font-weight: 400; }
+  strong, b { font-weight: 600; }
+
+  p { margin: 0 0 12px; text-wrap: pretty; }
+  a { color: var(--color-ink); }
+}
+
+.section > p { max-width: 66ch; }
+
+/* Keep role defaults layered so local Tailwind sizes can override them. */
+@layer components {
+  .mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.2px; }
+
+  .hand { font-family: var(--font-display); }
+  .accent { font-family: var(--font-accent); font-weight: 600; }
+  .tiny { font-size: 13px; color: var(--color-ink-soft); }
+  .faint { color: var(--color-ink-faint); }
+}
+
+@media (max-width: 1100px) {
+  @layer base {
+    h1 { font-size: 60px; }
+    h2 { font-size: 36px; }
+    h3 { font-size: 25px; }
+  }
+}
+
+@media (max-width: 720px) {
+  /* Keep body unlayered and preserve html's 17px Tailwind rem basis. */
+  body { font-size: 16px; line-height: 1.6; }
+
+  @layer base {
+    h1 { font-size: 42px; line-height: 1.03; letter-spacing: -0.022em; }
+    h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.014em; }
+    h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.012em; }
+    h4, .card-title { font-size: 17px; line-height: 1.25; letter-spacing: -0.008em; }
+    p { font-size: 16px; line-height: 1.62; }
+  }
+}

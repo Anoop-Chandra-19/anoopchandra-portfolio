@@ -1,0 +1,6 @@
+@media (max-width: 720px) {
+  .stack-legend { flex-direction: column; gap: 3px; font-size: 10.5px; letter-spacing: 0.5px; }
+  .stack-legend-sep { display: none; }
+
+  .stack-list { font-size: 12.5px; }
+}
