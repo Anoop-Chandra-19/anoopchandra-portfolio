@@ -58,7 +58,7 @@ export function SectionHeaderArrow({
           fontSize="20"
           transform="rotate(-6 14 10)"
         >
-          the work ↘
+          the work
         </text>
       </svg>
       <div className="flex items-baseline gap-[18px] pl-[170px] max-wide:flex-wrap max-wide:gap-x-[14px] max-wide:gap-y-[6px] max-wide:pl-0">
