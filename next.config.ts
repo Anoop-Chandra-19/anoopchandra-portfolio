@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Stops `next dev` appending its managed rules block to AGENTS.md when an AI
+  // agent starts the dev server.
+  agentRules: false,
   experimental: {
     agentUpgrade: "security",
   },
