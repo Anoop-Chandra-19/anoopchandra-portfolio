@@ -3,7 +3,6 @@
 import type { ReactNode } from "react";
 import type { LenisOptions } from "lenis";
 import { ReactLenis } from "lenis/react";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export { useLenis as useLenisInstance } from "lenis/react";
 
@@ -12,11 +11,13 @@ type Props = {
 };
 
 export function LenisProvider({ children }: Props) {
-  const shouldReduceMotion = useReducedMotion();
+  // Wheel scrolling stays native: smoothing it eased each tick over ~870ms
+  // (90% at ~370ms), which read as lag. Lenis stays for animated section
+  // jumps and stop() under overlays.
   const options: LenisOptions = {
     autoRaf: true,
     gestureOrientation: "vertical",
-    smoothWheel: !shouldReduceMotion,
+    smoothWheel: false,
     stopInertiaOnNavigate: true,
     touchMultiplier: 1.2,
   };
