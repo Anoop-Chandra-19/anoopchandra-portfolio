@@ -19,7 +19,6 @@
 .je-fnlist h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .je-fnlist ol{margin:0;padding-left:0}
 .je-fnlist li{font-size:var(--text-small);line-height:var(--text-small--line-height)}
-.je-fnlist p{font-size:inherit;line-height:inherit;color:inherit;margin:0;max-width:none}
 .je-fnlist li:target{background:color-mix(in oklab,var(--accent) 12%,transparent);border-radius:3px}
 .je-fnlist li:target::before{color:var(--color-ink)}
 .je-fnlist li,.je-fnref{scroll-margin-top:120px}

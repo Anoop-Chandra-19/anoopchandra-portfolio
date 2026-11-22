@@ -240,7 +240,7 @@ export const mdxComponents: MDXComponents = {
   // first and merge — otherwise it overwrites ours.
   section: ({ children, className, ...rest }: ComponentPropsWithoutRef<"section">) =>
     "data-footnotes" in rest ? (
-      <section {...rest} className={`je-fnlist ${className ?? ""}`.trim()}>
+      <section {...rest} className={`je-fnlist ${INHERIT_P} ${className ?? ""}`.trim()}>
         <div className="mb-2.5 font-mono text-stamp uppercase text-ink-faint">footnotes</div>
         {children}
       </section>
