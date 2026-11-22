@@ -66,13 +66,17 @@ export default function Hero() {
           <div className="relative w-full aspect-square">
             <div className="anim-portrait-shadow absolute inset-0 top-2 left-2 rounded-full bg-electric z-0" />
             <div className="absolute inset-0 rounded-full overflow-hidden z-[1]">
+              {/* On high-density phones `sizes` under-reports the width on purpose:
+                  at 213px every 2-3x screen picks the 640w file (44KB) instead of
+                  1080w (96KB) on 3x. That is still ~2x density in a ≤300px circle,
+                  and on a slow connection the LCP photo arrives sooner. */}
               <Image
                 className="anim-portrait-img w-full h-full object-cover block"
                 src="/anoopchandra.webp"
                 alt="Anoopchandra Parampalli"
                 width={460}
                 height={460}
-                sizes="(max-width: 720px) min(300px, 74vw), 460px"
+                sizes="(max-width: 720px) and (min-resolution: 2dppx) 213px, (max-width: 720px) min(300px, 74vw), 460px"
                 preload
                 fetchPriority="high"
               />
