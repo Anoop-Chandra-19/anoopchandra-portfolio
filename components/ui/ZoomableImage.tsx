@@ -37,7 +37,8 @@ export default function ZoomableImage({
         width={width}
         height={height}
         sizes={sizes}
-        priority={priority}
+        preload={priority}
+        fetchPriority={priority ? "high" : undefined}
         className="zoomable"
         onClick={() => setOpen(true)}
       />

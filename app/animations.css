@@ -14,8 +14,8 @@
   100% { opacity: 1; transform: scale(1) rotate(0); }
 }
 @keyframes markerPaint {
-  from { background-size: 0% 100%; }
-  to   { background-size: 100% 100%; }
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 @keyframes railRowIn {
   from { opacity: 0; transform: translateX(-6px); }
@@ -54,10 +54,11 @@
 .anim-rise  { animation: fadeRise 0.4s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
 .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
 .anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
-.marker-highlight {
-  background-repeat: no-repeat;
-  animation: markerPaint 0.35s cubic-bezier(.4,0,.6,1) both;
-  animation-delay: var(--d, 0s);
+/* Each word's stripe takes its share of the 0.35s sweep (--ws start, --wl
+   length, both fractions of the phrase), so the words chain at one speed. */
+.marker-word::after {
+  animation: markerPaint calc(0.35s * var(--wl)) linear both;
+  animation-delay: calc(var(--d, 0s) + 0.35s * var(--ws));
 }
 /* Each window clips to one half of the portrait; inside it, the sweep shows the
    opposite half of the ring, so it starts hidden and rotates into view. The
@@ -117,7 +118,7 @@ body.ink-no-anim .ring-sweep,
 body.ink-no-anim .ring-done,
 body.ink-no-anim .anim-portrait-img,
 body.ink-no-anim .anim-portrait-shadow,
-body.ink-no-anim .marker-highlight {
+body.ink-no-anim .marker-word::after {
   animation: none;
 }
 
@@ -131,7 +132,7 @@ body.ink-no-anim .marker-highlight {
   .ring-done,
   .anim-portrait-img,
   .anim-portrait-shadow,
-  .marker-highlight {
+  .marker-word::after {
     animation: none;
   }
 }

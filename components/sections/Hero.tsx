@@ -3,6 +3,7 @@ import Chip from "@/components/ui/Chip";
 import Label from "@/components/ui/Label";
 import Annotation from "@/components/ui/Annotation";
 import ScrollLink from "@/components/ui/ScrollLink";
+import Marker from "@/components/ui/Marker";
 
 function PortraitRing() {
   return (
@@ -34,9 +35,9 @@ export default function Hero() {
             <span className="faint">×</span> linux daily-driver
           </div>
           <div className="anim-rise d-body mt-[22px] max-w-[520px] text-[18px] max-wide:order-5 max-wide:mt-[16px] max-wide:text-[16px] max-wide:leading-[1.62] max-xs:mt-[12px]">
-            I build <span className="marker-highlight purple d-marker1">AI tools</span>,{" "}
-            <span className="marker-highlight d-marker2">custom PCs</span>, and{" "}
-            <span className="marker-highlight teal d-marker3">scalable backends</span> around the people
+            I build <Marker tone="purple" className="d-marker1">AI tools</Marker>,{" "}
+            <Marker className="d-marker2">custom PCs</Marker>, and{" "}
+            <Marker tone="teal" className="d-marker3">scalable backends</Marker> around the people
             who use them.
           </div>
           <div className="mt-[26px] flex gap-[11px] flex-wrap max-wide:order-6 max-wide:mt-[18px] max-wide:gap-[8px] max-xs:mt-[14px]">
@@ -72,7 +73,8 @@ export default function Hero() {
                 width={460}
                 height={460}
                 sizes="(max-width: 720px) min(300px, 74vw), 460px"
-                priority
+                preload
+                fetchPriority="high"
               />
             </div>
             {/* The outline draws itself with two half-rings rotating into place,

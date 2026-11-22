@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   experimental: {
     agentUpgrade: "security",
   },
+  // AVIF first: for the photo and the Work diagrams it is typically 30-50%
+  // smaller than WebP at the same quality. Browsers without it get WebP.
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   async headers() {
     return [
       {
