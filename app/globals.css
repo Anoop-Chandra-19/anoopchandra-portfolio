@@ -174,3 +174,15 @@
     --text-code--line-height: 1.7;
   }
 }
+
+/* MDX wraps block content in <p>, and the mapped <p> carries the body's type
+   and measure. Inside a caption, callout or footnote it should take the
+   container's type instead. A utility, so it outranks the <p>'s own. */
+@utility inherit-p {
+  & p {
+    font: inherit;
+    color: inherit;
+    margin: 0;
+    max-width: none;
+  }
+}

@@ -222,7 +222,9 @@ export default function Lightbox({
       </div>
       <div className="lightbox-bar">
         {/* A div, not a span: a plate's caption comes from MDX and can be a <p>. */}
-        <div className="lightbox-cap">{caption}</div>
+        <div className="lightbox-cap inherit-p">
+          {caption}
+        </div>
         <span className="lightbox-hint">
           {/* Both wordings ship and CSS hides one, the same trick §02 uses for
               the phone copy — the gesture that works here is a property of the

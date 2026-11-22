@@ -39,9 +39,9 @@
   inset: 0;
   z-index: 9000;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(16px, 4vw, 56px);
+  flex-direction: column;
+  /* No bottom padding: the bar below the stage carries its own. */
+  padding: clamp(16px, 4vw, 56px) clamp(16px, 4vw, 56px) 0;
   background: var(--lb-scrim);
   animation: lb-in 160ms ease-out;
 }
@@ -62,8 +62,9 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  /* Takes whatever the caption bar leaves, so the two can never overlap. */
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   touch-action: none;
 }
@@ -72,7 +73,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: calc(100vh - 140px);
+  max-height: 100%;
 
   border: 2px solid var(--color-ink);
   box-shadow: 8px 8px 0 rgb(0 0 0 / 0.35);
@@ -84,15 +85,11 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 .lightbox-stage.is-zoomed img { cursor: zoom-out; }
 .lightbox-stage.is-zoomed.is-gesturing img { cursor: grabbing; }
 .lightbox-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px clamp(16px, 4vw, 56px);
+  padding: 16px 0;
   color: var(--color-paper);
   font-size: 12px;
   letter-spacing: 1px;
@@ -112,15 +109,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 .lightbox-bar button:hover { background: var(--color-paper); color: var(--color-ink); }
 .lightbox-btns { display: flex; flex-shrink: 0; gap: 8px; margin-left: auto; }
 
-.lightbox-cap {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  min-width: 0;
-  overflow: hidden;
-}
-.lightbox-cap p { margin: 0; font: inherit; letter-spacing: inherit; color: inherit; }
+.lightbox-cap { min-width: 0; }
 
 .lightbox-hint { opacity: 0.65; font-size: 10px; }
 .hint-touch { display: none; }
