@@ -3,6 +3,15 @@ import Chip from "@/components/ui/Chip";
 import Label from "@/components/ui/Label";
 import Annotation from "@/components/ui/Annotation";
 import ScrollLink from "@/components/ui/ScrollLink";
+import Marker from "@/components/ui/Marker";
+
+function PortraitRing() {
+  return (
+    <svg viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet" className="block w-full h-full">
+      <circle cx="180" cy="180" r="178" fill="none" stroke="var(--color-ink)" strokeWidth="4" />
+    </svg>
+  );
+}
 
 export default function Hero() {
   return (
@@ -26,9 +35,9 @@ export default function Hero() {
             <span className="faint">×</span> linux daily-driver
           </div>
           <div className="anim-rise d-body mt-[22px] max-w-[520px] text-[18px] max-wide:order-5 max-wide:mt-[16px] max-wide:text-[16px] max-wide:leading-[1.62] max-xs:mt-[12px]">
-            I build <span className="marker-highlight purple d-marker1">AI tools</span>,{" "}
-            <span className="marker-highlight d-marker2">custom PCs</span>, and{" "}
-            <span className="marker-highlight teal d-marker3">scalable backends</span> around the people
+            I build <Marker tone="purple" className="d-marker1">AI tools</Marker>,{" "}
+            <Marker className="d-marker2">custom PCs</Marker>, and{" "}
+            <Marker tone="teal" className="d-marker3">scalable backends</Marker> around the people
             who use them.
           </div>
           <div className="mt-[26px] flex gap-[11px] flex-wrap max-wide:order-6 max-wide:mt-[18px] max-wide:gap-[8px] max-xs:mt-[14px]">
@@ -57,32 +66,39 @@ export default function Hero() {
           <div className="relative w-full aspect-square">
             <div className="anim-portrait-shadow absolute inset-0 top-2 left-2 rounded-full bg-electric z-0" />
             <div className="absolute inset-0 rounded-full overflow-hidden z-[1]">
+              {/* On high-density phones `sizes` under-reports the width on purpose:
+                  at 213px every 2-3x screen picks the 640w file (44KB) instead of
+                  1080w (96KB) on 3x. That is still ~2x density in a ≤300px circle,
+                  and on a slow connection the LCP photo arrives sooner. */}
               <Image
                 className="anim-portrait-img w-full h-full object-cover block"
                 src="/anoopchandra.webp"
                 alt="Anoopchandra Parampalli"
                 width={460}
                 height={460}
-                sizes="(max-width: 720px) min(300px, 74vw), 460px"
-                priority
+                sizes="(max-width: 720px) and (min-resolution: 2dppx) 213px, (max-width: 720px) min(300px, 74vw), 460px"
+                preload
+                fetchPriority="high"
               />
             </div>
-            <svg
-              viewBox="0 0 360 360"
-              preserveAspectRatio="xMidYMid meet"
-              className="absolute inset-0 w-full h-full z-[2] pointer-events-none"
-            >
-              <circle
-                cx="180"
-                cy="180"
-                r="178"
-                fill="none"
-                stroke="var(--color-ink)"
-                strokeWidth="4"
-                strokeDasharray="1131"
-                className="anim-portrait-outline"
-              />
-            </svg>
+            {/* The outline draws itself with two half-rings rotating into place,
+                not an animated stroke-dashoffset: a rotation runs on the
+                compositor, so hydration can't make the draw drop frames. */}
+            <div className="portrait-ring absolute inset-0 z-[2] pointer-events-none" aria-hidden="true">
+              <div className="ring-window ring-window-r">
+                <div className="ring-sweep">
+                  <PortraitRing />
+                </div>
+              </div>
+              <div className="ring-window ring-window-l">
+                <div className="ring-sweep">
+                  <PortraitRing />
+                </div>
+              </div>
+              <div className="ring-done">
+                <PortraitRing />
+              </div>
+            </div>
           </div>
           <div className="anim-stamp d-annot1 absolute -top-[11px] right-[11px] max-wide:-top-[10px] max-wide:-left-[10px] max-wide:right-auto">
             <Annotation color="coral">👋 hi!</Annotation>

@@ -14,16 +14,27 @@
   100% { opacity: 1; transform: scale(1) rotate(0); }
 }
 @keyframes markerPaint {
-  from { background-size: 0% 100%; }
-  to   { background-size: 100% 100%; }
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 @keyframes railRowIn {
   from { opacity: 0; transform: translateX(-6px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-@keyframes portraitDraw {
-  from { stroke-dashoffset: 1131; }
-  to   { stroke-dashoffset: 0; }
+/* The ring sweep is split across two halves: the right window fills in the
+   first half of the run, the left in the second. The two curves are mirror
+   images whose slopes meet at the halfway point, so the sweep never jolts. */
+@keyframes ringSweepFirst {
+  0%        { rotate: 0deg; animation-timing-function: cubic-bezier(.4,0,.7,.5); }
+  50%, 100% { rotate: 180deg; }
+}
+@keyframes ringSweepSecond {
+  0%, 50% { rotate: 0deg; animation-timing-function: cubic-bezier(.3,.5,.6,1); }
+  100%    { rotate: 180deg; }
+}
+@keyframes ringDone {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes portraitImgIn {
   from { opacity: 0; transform: scale(1.04); }
@@ -34,36 +45,44 @@
   to   { opacity: 1; transform: translate(0, 0); }
 }
 
-body:not(.hydrated) .anim-swipe   { clip-path: inset(0 100% 0 0); }
-body:not(.hydrated) .anim-rise    { opacity: 0; transform: translateY(14px); }
-body:not(.hydrated) .anim-stamp   { opacity: 0; transform: scale(0.7); }
-body:not(.hydrated) .anim-rail    { opacity: 0; transform: translateX(-6px); }
-body:not(.hydrated) .anim-portrait-outline { stroke-dashoffset: 1131; }
-body:not(.hydrated) .anim-portrait-img { opacity: 0; }
-body:not(.hydrated) .anim-portrait-shadow { opacity: 0; }
-body:not(.hydrated) .marker-highlight { background-size: 0% 100%; background-repeat: no-repeat; }
-
-/* The animation shorthand resets delay; use --d to avoid specificity conflicts. */
-body.hydrated .anim-swipe { animation: swipeIn 0.45s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
-body.hydrated .anim-rise  { animation: fadeRise 0.4s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
-body.hydrated .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
-body.hydrated .anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
-body.hydrated .marker-highlight {
-  background-repeat: no-repeat;
-  animation: markerPaint 0.35s cubic-bezier(.4,0,.6,1) both;
-  animation-delay: var(--d, 0s);
+/* Pure CSS, so these start on first paint rather than waiting for React to
+   hydrate. `both` holds the first keyframe through each delay, so nothing
+   needs a separate hidden state. Opacity/transform ones run on the compositor
+   even while hydration keeps the main thread busy. Unlayered, so these win over
+   the marker colour variants' `background` shorthand. */
+.anim-swipe { animation: swipeIn 0.45s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
+.anim-rise  { animation: fadeRise 0.4s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
+.anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
+.anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
+/* Each word's stripe takes its share of the 0.35s sweep (--ws start, --wl
+   length, both fractions of the phrase), so the words chain at one speed. */
+.marker-word::after {
+  animation: markerPaint calc(0.35s * var(--wl)) linear both;
+  animation-delay: calc(var(--d, 0s) + 0.35s * var(--ws));
 }
-body.hydrated .anim-portrait-outline {
-  animation: portraitDraw 0.7s cubic-bezier(.4,0,.2,1) both;
-  animation-delay: 0.20s;
-}
-body.hydrated .anim-portrait-img {
+/* Each window clips to one half of the portrait; inside it, the sweep shows the
+   opposite half of the ring, so it starts hidden and rotates into view. The
+   whole ring is turned a quarter so the draw starts at 3 o'clock, as the SVG
+   stroke did. The full ring lands on top at the end to cover the seam. */
+.portrait-ring { rotate: 90deg; }
+.ring-window,
+.ring-sweep,
+.ring-done { position: absolute; inset: 0; }
+.ring-window-r { clip-path: inset(0 0 0 50%); }
+.ring-window-l { clip-path: inset(0 50% 0 0); }
+.ring-window-r .ring-sweep { clip-path: inset(0 50% 0 0); }
+.ring-window-l .ring-sweep { clip-path: inset(0 0 0 50%); }
+.ring-window-r .ring-sweep { animation: ringSweepFirst 0.7s 0.20s both; }
+.ring-window-l .ring-sweep { animation: ringSweepSecond 0.7s 0.20s both; }
+/* The photo waits for this same 0.90s mark, so it appears once the ring is closed. */
+.ring-done { animation: ringDone 0s 0.90s both; }
+.anim-portrait-img {
   animation: portraitImgIn 0.4s cubic-bezier(.2,.7,.2,1) both;
-  animation-delay: 0.85s;
+  animation-delay: 0.90s;
 }
-body.hydrated .anim-portrait-shadow {
+.anim-portrait-shadow {
   animation: shadowIn 0.4s cubic-bezier(.2,.7,.2,1) both;
-  animation-delay: 1.00s;
+  animation-delay: 1.05s;
 }
 
 .d-hello   { --d: 0.00s; }
@@ -95,31 +114,25 @@ body.ink-no-anim .anim-swipe,
 body.ink-no-anim .anim-rise,
 body.ink-no-anim .anim-stamp,
 body.ink-no-anim .anim-rail,
-body.ink-no-anim .anim-portrait-outline,
+body.ink-no-anim .ring-sweep,
+body.ink-no-anim .ring-done,
 body.ink-no-anim .anim-portrait-img,
 body.ink-no-anim .anim-portrait-shadow,
-body.ink-no-anim .marker-highlight {
+body.ink-no-anim .marker-word::after {
   animation: none;
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  body.hydrated .anim-swipe,
-  body.hydrated .anim-rise,
-  body.hydrated .anim-stamp,
-  body.hydrated .anim-rail,
-  body.hydrated .anim-portrait-outline,
-  body.hydrated .anim-portrait-img,
-  body.hydrated .anim-portrait-shadow,
-  body.hydrated .marker-highlight {
+  .anim-swipe,
+  .anim-rise,
+  .anim-stamp,
+  .anim-rail,
+  .ring-window .ring-sweep,
+  .ring-done,
+  .anim-portrait-img,
+  .anim-portrait-shadow,
+  .marker-word::after {
     animation: none;
   }
-  body:not(.hydrated) .anim-swipe { clip-path: none; }
-  body:not(.hydrated) .anim-rise,
-  body:not(.hydrated) .anim-stamp,
-  body:not(.hydrated) .anim-rail { opacity: 1; transform: none; }
-  body:not(.hydrated) .anim-portrait-img,
-  body:not(.hydrated) .anim-portrait-shadow { opacity: 1; transform: none; }
-  body:not(.hydrated) .anim-portrait-outline { stroke-dashoffset: 0; }
-  body:not(.hydrated) .marker-highlight { background-size: 100% 100%; }
 }

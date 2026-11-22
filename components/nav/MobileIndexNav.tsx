@@ -1,32 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useLenisInstance } from "@/components/LenisProvider";
 import { NAV_ITEMS, useActiveSection, useSectionJump } from "@/hooks/useActiveSection";
 
 /** Mobile chrome (≤900px): a floating "index" chip that opens a full-screen
     notebook index. Replaces the old bottom dock — the dock crowded seven
     labels into a scroller nobody scrolled, and ate a strip of every page. */
-export default function MobileIndexNav({
-  frozenAt,
-}: {
-  /** Render as a static snapshot inside a transition page copy: the chip only,
-      no scroll tracking and no way to open the overlay. */
-  frozenAt?: number;
-}) {
-  const frozen = frozenAt !== undefined;
-  const active = useActiveSection(frozenAt);
+export default function MobileIndexNav() {
+  const active = useActiveSection();
   const jumpTo = useSectionJump();
-  const lenis = useLenisInstance();
   const [open, setOpen] = useState(false);
-  // A bleed copy mounts while the live chip is still in the DOM — inherit its
-  // state, or the copy pops a chip back in that the user had just scrolled
-  // away. A peel copy has no live chip to read (we're on an article) and lands
-  // home at the top, where the chip is always out.
-  const [tucked, setTucked] = useState(() => {
-    if (!frozen) return false;
-    const live = document.querySelector(".m-nav-tab");
-    return live ? live.classList.contains("tucked") : false;
-  });
+  const [tucked, setTucked] = useState(false);
   const chipRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +17,6 @@ export default function MobileIndexNav({
   // under it — section headers put their meta line exactly there. Tuck it away
   // while reading downward; a flick back up brings it straight back.
   useEffect(() => {
-    if (frozen) return;
     let last = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
@@ -45,21 +27,18 @@ export default function MobileIndexNav({
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [frozen]);
+  }, []);
 
-  // Freeze the page underneath while the index is up: Lenis owns the smooth
-  // scroll, the root overflow catches the raw touch scroll it doesn't.
+  // Freeze the page underneath while the index is up.
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
     const prev = root.style.overflow;
     root.style.overflow = "hidden";
-    lenis?.stop();
     return () => {
       root.style.overflow = prev;
-      lenis?.start();
     };
-  }, [open, lenis]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -101,8 +80,7 @@ export default function MobileIndexNav({
   const go = (id: string) => {
     setOpen(false);
     // The scroll lock above is torn down on the closing commit; jumping before
-    // that lands on a stopped Lenis and an overflow:hidden root, and goes
-    // nowhere. A frame later the page can scroll again.
+    // that lands on an overflow:hidden root, and goes nowhere. A frame later the page can scroll again.
     requestAnimationFrame(() => jumpTo(id));
   };
 
@@ -115,7 +93,7 @@ export default function MobileIndexNav({
         aria-label="Open section index"
         aria-expanded={open}
         hidden={open}
-        onClick={frozen ? undefined : () => setOpen(true)}
+        onClick={() => setOpen(true)}
       >
         <span className="inline-flex flex-col gap-[3px] w-[16px]" aria-hidden="true">
           <i className="h-[2px] bg-ink rounded-[2px]" />

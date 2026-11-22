@@ -3,6 +3,7 @@ import ZoomableImage from "@/components/ui/ZoomableImage";
 import { SectionHeaderArrow } from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
 import Label from "@/components/ui/Label";
+import Marker from "@/components/ui/Marker";
 import { ROLE, PLATFORM, FLAGSHIP, PARTS, ALSO, PROJECTS, MINOR } from "@/lib/work-data";
 import type { Diagram, Minor, Part, Project, WorkStatus } from "@/lib/work-data";
 
@@ -144,6 +145,7 @@ function DiagramImg({
       height={d.h}
       sizes={sizes}
       className={`diagram ${className}`.trim()}
+      defer
     />
   );
 }
@@ -404,7 +406,7 @@ export default function Work() {
         meta={`${1 + PARTS.length + PROJECTS.length + MINOR.length} entries · 2025 to present`}
       />
       <p className="faint max-w-[740px] mb-7.5 text-[16px] max-wide:mb-[16px] max-wide:leading-[1.6]">
-        <span className="marker-highlight">Panacea Financial</span>: selected work from my current
+        <Marker>Panacea Financial</Marker>: selected work from my current
         role, alongside projects I build on my own time.
       </p>
 

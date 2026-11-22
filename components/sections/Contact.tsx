@@ -1,6 +1,7 @@
 import { SectionHeaderStamp } from "@/components/ui/SectionHeader";
 import Chip from "@/components/ui/Chip";
 import Label from "@/components/ui/Label";
+import Marker from "@/components/ui/Marker";
 import Postmark from "./Postmark";
 
 export default function Contact() {
@@ -54,7 +55,7 @@ export default function Contact() {
             </h2>
             <p className="mt-0 max-w-[360px] text-intro text-ink">
               Open to{" "}
-              <span className="marker-highlight purple">interesting full-stack + AI roles</span>,
+              <Marker tone="purple">interesting full-stack + AI roles</Marker>,
               freelance gigs, and PC build advice over coffee.
             </p>
             <div className="mt-[22px] flex gap-[11px] flex-wrap">

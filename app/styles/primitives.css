@@ -39,13 +39,29 @@
   pointer-events: none;
   transform: rotate(0.4deg);
 }
+/* The ghost sits outside the box, so a clipping box hides it, leaving only the
+   sliver the tilt swings back inside. On the 1000-2000px Work cards that tilted
+   layer cost Firefox on Android visible frame drops while scrolling. */
+.sketch-box.overflow-hidden::after { content: none; }
 
-.marker-highlight {
-  background: linear-gradient(180deg, transparent 84%, var(--color-coral) 84%, var(--color-coral) 96%, transparent 96%);
-  padding: 0 1px;
+/* The stroke sits on 84–96% of each word's line box, behind the text. The
+   word is its own stacking context so the stripe's z-index: -1 stays inside
+   it instead of dropping behind a card's background. */
+.marker-highlight { --marker: var(--color-coral); padding: 0 1px; }
+.marker-highlight.purple { --marker: var(--color-electric); }
+.marker-highlight.teal { --marker: var(--color-teal); }
+.marker-word { position: relative; z-index: 0; }
+.marker-word::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: 84%;
+  height: 12%;
+  background: var(--marker);
+  transform-origin: left center;
 }
-.marker-highlight.purple { background: linear-gradient(180deg, transparent 84%, var(--color-electric) 84%, var(--color-electric) 96%, transparent 96%); }
-.marker-highlight.teal    { background: linear-gradient(180deg, transparent 84%, var(--color-teal) 84%, var(--color-teal) 96%, transparent 96%); }
 
 .chip {
   display: inline-flex;

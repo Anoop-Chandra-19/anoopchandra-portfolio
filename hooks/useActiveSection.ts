@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useLenisInstance } from "@/components/LenisProvider";
 import { useReducedMotion } from "./useReducedMotion";
 
 /** The home page's sections, in reading order: [id, page number, label]. */
@@ -29,21 +28,12 @@ function activeSectionAt(scrollY: number): string {
   return cur;
 }
 
-/** Scroll-spy shared by the desktop rail and the mobile index overlay.
-    frozenAt: render as a static snapshot inside a transition page copy —
-    compute the marker once as if scrolled to that offset, never track scroll. */
-export function useActiveSection(frozenAt?: number): string {
+/** Scroll-spy shared by the desktop rail and the mobile index overlay. */
+export function useActiveSection(): string {
   const pathname = usePathname();
-  const frozen = frozenAt !== undefined;
-  // A peel transition always returns to the top. Resolve that snapshot without
-  // reading the journal/lab document, whose height and missing home sections
-  // cannot describe the destination nav state.
-  const [active, setActive] = useState(() =>
-    frozen && frozenAt > 0 ? activeSectionAt(frozenAt) : "home"
-  );
+  const [active, setActive] = useState("home");
 
   useEffect(() => {
-    if (frozen) return;
     const syncActiveSection = () => setActive(activeSectionAt(window.scrollY));
     syncActiveSection();
     // App Router may restore a cached home tree before applying its final scroll
@@ -56,30 +46,21 @@ export function useActiveSection(frozenAt?: number): string {
       window.removeEventListener("scroll", syncActiveSection);
       window.removeEventListener("pageshow", syncActiveSection);
     };
-  }, [frozen, pathname]);
+  }, [pathname]);
 
   return active;
 }
 
-/** Smooth-scroll to a home section by id, through Lenis when it's running. */
+/** Smooth-scroll to a home section by id. */
 export function useSectionJump() {
-  const lenis = useLenisInstance();
   const shouldReduceMotion = useReducedMotion();
 
   return (id: string) => {
     const target = document.getElementById(`sec-${id}`);
     if (!target) return;
-    if (lenis) {
-      lenis.scrollTo(target, {
-        immediate: shouldReduceMotion,
-        lerp: shouldReduceMotion ? undefined : 0.1,
-        offset: 0,
-      });
-    } else {
-      target.scrollIntoView({
-        behavior: shouldReduceMotion ? "auto" : "smooth",
-        block: "start",
-      });
-    }
+    target.scrollIntoView({
+      behavior: shouldReduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
   };
 }

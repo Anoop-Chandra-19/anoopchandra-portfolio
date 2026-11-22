@@ -8,7 +8,7 @@ Guidance for coding agents working on this portfolio. Keep changes focused, pres
 - **UI:** React 19.2.8
 - **Language:** TypeScript 6.0.3 with strict checking
 - **Styling:** Tailwind CSS 4.1.11 plus global CSS
-- **Animation:** Framer Motion, GSAP, and Lenis
+- **Animation:** Framer Motion and GSAP
 - **Content:** Local MDX journal entries rendered with `next-mdx-remote`
 - **ML:** TensorFlow.js models loaded and run in the browser
 - **Package manager:** npm; keep `package-lock.json` in sync
@@ -35,6 +35,7 @@ Do not run a persistent development server unless the task requires interactive 
 
 ```text
 app/                       App Router pages, metadata, sitemap, and global CSS
+  fonts/                   Trimmed Source Serif (Notebook Serif, OFL); regenerate with scripts/trim-serif-font.py
   styles/                  Home-page CSS split by concern; imported in order by globals.css
   journal/                 Journal index and statically generated article routes
   lab/                     Interactive lab index and individual lab routes

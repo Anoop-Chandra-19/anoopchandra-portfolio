@@ -7,9 +7,7 @@ import Notes from "@/components/sections/Notes";
 import Contact from "@/components/sections/Contact";
 import type { JournalEntryMeta } from "@/lib/journal-meta";
 
-// The home page's section stack, shared between app/page.tsx and the ink
-// transition overlay. Excludes SideNav — fixed-position elements don't anchor
-// correctly inside the overlay's clip-path'd layers.
+// The home page's section stack.
 export default function HomeContent({
   journalEntries,
 }: {
