@@ -7,7 +7,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import StructuredData from "@/components/StructuredData";
 import InkTransitionProvider from "@/components/transition/InkTransitionProvider";
-import { getEntryMetas } from "@/lib/journal";
 
 /* Keep Source Serif's optical sizing automatic; pinning opsz also freezes weight. */
 const sourceSerif = Source_Serif_4({
@@ -109,7 +108,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>
-        <InkTransitionProvider entries={getEntryMetas()}>{children}</InkTransitionProvider>
+        <InkTransitionProvider>{children}</InkTransitionProvider>
         <Analytics />
         <SpeedInsights />
       </body>

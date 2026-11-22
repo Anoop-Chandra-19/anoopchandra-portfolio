@@ -64,9 +64,9 @@ export function makeBleedSeeds(seed = 0xdeadbeef, n = 64): number[] {
 
 export const BLEED_SEEDS = makeBleedSeeds();
 
-/** Shared blob outline as SVG path data. The bleed layers are cut as holes in
-    an origin-page copy via one SVG mask (white rect + black blob paths), so
-    overlapping blobs union naturally — something polygon() clip-paths can't do. */
+/** Shared blob outline as path data. Every blob has the same 64-point
+    structure whatever its radius, so path() keyframes can interpolate between
+    them, and overlapping blobs in one path union under the nonzero fill rule. */
 function noisyBlobPath(cx: number, cy: number, r: number, eff: number, seedOffset: number): string {
   const n = BLEED_SEEDS.length;
   const cmds: string[] = [];
@@ -81,10 +81,11 @@ function noisyBlobPath(cx: number, cy: number, r: number, eff: number, seedOffse
 }
 
 /** Main-bleed blob. Jitter scales with radius — a fresh drop is round,
-    irregularity grows as the ink soaks into more paper. */
-export function blobPath(cx: number, cy: number, r: number, jitter = JITTER): string {
+    irregularity grows as the ink soaks into more paper. drawScale redraws the
+    same shape smaller or larger, for a layer that is itself scaled. */
+export function blobPath(cx: number, cy: number, r: number, drawScale = 1, jitter = JITTER): string {
   const eff = jitter * Math.min(1, Math.max(0, (r - 20) / 180));
-  return noisyBlobPath(cx, cy, r, eff, 0);
+  return noisyBlobPath(cx, cy, r * drawScale, eff, 0);
 }
 
 export function spatterPath(
@@ -101,55 +102,7 @@ export function spatterPath(
 export const maxRadius = (cx: number, cy: number, vw: number, vh: number) =>
   Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy)) + 80;
 
-const EMPTY = "polygon(0px 0px, 0px 0px, 0px 0px)";
-
-/** Clip a viewport rect against a half-plane along the diagonal x + y = k.
-    keep = "gte" keeps x+y ≥ k (the un-peeled region, bottom-right);
-    keep = "lte" keeps x+y ≤ k (the revealed region growing from top-left). */
-function halfPlaneClip(k: number, vw: number, vh: number, keep: "gte" | "lte"): string {
-  const corners: Array<[number, number]> = [
-    [0, 0],
-    [vw, 0],
-    [vw, vh],
-    [0, vh],
-  ];
-  const inside = (p: [number, number]) => (keep === "gte" ? p[0] + p[1] >= k : p[0] + p[1] <= k);
-  const pts: Array<[number, number]> = [];
-  for (let i = 0; i < 4; i++) {
-    const A = corners[i];
-    const B = corners[(i + 1) % 4];
-    const aIn = inside(A);
-    const bIn = inside(B);
-    if (aIn) pts.push(A);
-    if (aIn !== bIn) {
-      const t = (k - A[0] - A[1]) / (B[0] + B[1] - A[0] - A[1]);
-      pts.push([A[0] + t * (B[0] - A[0]), A[1] + t * (B[1] - A[1])]);
-    }
-  }
-  if (pts.length < 3) return EMPTY;
-  return `polygon(${pts.map((p) => `${p[0].toFixed(1)}px ${p[1].toFixed(1)}px`).join(", ")})`;
-}
-
-export const peelClip = (k: number, vw: number, vh: number) => halfPlaneClip(k, vw, vh, "gte");
-
-export const peelClipComplement = (k: number, vw: number, vh: number) =>
-  halfPlaneClip(k, vw, vh, "lte");
-
 export const peelMaxK = (vw: number, vh: number) => vw + vh + 20;
-
-/** Geometry of the soft shadow band running along the diagonal cut x + y = k */
-export function peelShadowGeom(
-  k: number,
-  vw: number,
-  vh: number
-): { left: number; top: number; width: number; height: number } | null {
-  const lo = Math.max(0, k - vw);
-  const hi = Math.min(vh, k);
-  const len = (hi - lo) * Math.SQRT2;
-  if (len < 4) return null;
-  const midY = (lo + hi) / 2;
-  return { left: k - midY - len / 2, top: midY - 12, width: len, height: 24 };
-}
 
 export function hexA(hex: string, a: number): string {
   const h = hex.replace("#", "");

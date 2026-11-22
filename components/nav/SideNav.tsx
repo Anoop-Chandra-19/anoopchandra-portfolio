@@ -4,13 +4,8 @@ import { NAV_ITEMS, useActiveSection, useSectionJump } from "@/hooks/useActiveSe
 
 /** Desktop-only vertical left rail (>900px). Below that the index chip +
     full-screen overlay in MobileIndexNav takes over. */
-export default function SideNav({
-  frozenAt,
-}: {
-  /** Render as a static snapshot inside a transition page copy. */
-  frozenAt?: number;
-}) {
-  const active = useActiveSection(frozenAt);
+export default function SideNav() {
+  const active = useActiveSection();
   const jumpTo = useSectionJump();
 
   return (

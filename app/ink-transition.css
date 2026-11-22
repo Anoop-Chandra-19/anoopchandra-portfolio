@@ -1,95 +1,38 @@
-/* Ink transition overlay */
+/* Ink transition on React's <ViewTransition> (components/transition/InkMarks.tsx).
+   The keyframes are computed per navigation in JS; this file only clears the
+   browser's default cross-fade for the ink types and sets up the mark layers. */
 
-.ink-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
+html:active-view-transition-type(ink-bleed, ink-peel)::view-transition-old(root),
+html:active-view-transition-type(ink-bleed, ink-peel)::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
-.ink-layer {
+::view-transition-group(.ink-mark) {
+  animation: none;
+  transform-origin: 0 0;
+}
+::view-transition-new(.ink-mark) {
+  animation: none;
+}
+::view-transition-group(ink-halo),
+::view-transition-group(ink-shadow) {
+  mix-blend-mode: multiply;
+}
+/* The band straddles the cut; only its half on the home side shows. */
+::view-transition-new(ink-shadow) {
+  clip-path: inset(50% 0 0 0);
+}
+
+/* The marks exist only to be captured as transition layers.
+   :active-view-transition flips off in the same frame the layers go away, so
+   the live elements never show; where it's unsupported they stay hidden and
+   the transition runs without them. */
+.ink-mark {
   position: fixed;
-  inset: 0;
-  overflow: hidden;
-  will-change: clip-path;
-  contain: paint;
+  pointer-events: none;
   visibility: hidden;
 }
-
-/* Keep this paper texture synchronized with body in globals.css. */
-.ink-layer-paper {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  background-color: var(--color-paper);
-  background-image:
-    radial-gradient(ellipse at 20% 10%, rgba(255, 113, 91, 0.05), transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(30, 168, 150, 0.04), transparent 50%),
-    repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0, 0, 0, 0.018) 28px, rgba(0, 0, 0, 0.018) 29px);
-}
-
-/* Keep this gutter and breakpoint synchronized with globals.css. */
-.ink-layer-home {
-  padding-left: 140px;
-}
-@media (max-width: 900px) {
-  .ink-layer-home {
-    padding-left: 0;
-  }
-}
-
-/* Document-bound texture keeps ruled lines aligned while scrolling; sync with globals.css. */
-.ink-doc {
-  min-height: 100vh;
-  background-color: var(--color-paper);
-  background-image:
-    radial-gradient(ellipse at 20% 10%, rgba(255, 113, 91, 0.05), transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(30, 168, 150, 0.04), transparent 50%),
-    repeating-linear-gradient(0deg, transparent 0, transparent 28px, rgba(0, 0, 0, 0.018) 28px, rgba(0, 0, 0, 0.018) 29px);
-}
-
-/* The SVG mask cuts reveal holes through the origin-page copy. */
-.ink-origin {
+:active-view-transition .ink-mark {
   visibility: visible;
-  will-change: mask;
-  -webkit-mask: url(#ink-hole-mask);
-  mask: url(#ink-hole-mask);
-}
-
-.ink-drop {
-  position: fixed;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-/* The pre-rendered halo scales on the compositor during each frame. */
-.ink-halo {
-  position: fixed;
-  transform: scale(0);
-  will-change: transform, opacity;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  visibility: hidden;
-}
-
-.ink-peel-shadow {
-  position: absolute;
-  transform: rotate(135deg);
-  transform-origin: center center;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.32) 50%, rgba(0, 0, 0, 0) 100%);
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  visibility: hidden;
-}
-
-.ink-dim {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  visibility: hidden;
-  opacity: 0;
 }
