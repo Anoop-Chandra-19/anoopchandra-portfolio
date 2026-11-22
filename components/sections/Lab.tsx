@@ -47,7 +47,7 @@ export default function Lab() {
             <Link
               key={e.slug}
               href={`/lab/${e.slug}`}
-              className="lab-card-btn"
+              className="block text-[color:inherit] no-underline cursor-pointer [transition:transform_0.14s,box-shadow_0.14s] hover:[transform:translateY(-3px)] motion-reduce:transition-none"
               /* No aria-label: it replaced the card's whole subtree, hiding the
                  number, status and description, and left the accessible name
                  without the visible "open experiment" text. */

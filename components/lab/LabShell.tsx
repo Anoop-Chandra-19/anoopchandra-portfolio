@@ -14,6 +14,8 @@ const DEMOS = {
   kmeans: ClusterClassifyLab,
 } as const;
 
+const TAB = "py-[5px] px-3 border-[1.5px] rounded-[3px] font-mono text-caption no-underline [transition:all_0.14s]";
+
 const MODIFIER_KEYS = new Set(["Alt", "Control", "Meta", "Shift", "CapsLock", "NumLock"]);
 
 
@@ -42,13 +44,13 @@ export default function LabShell({ exp }: { exp: LabExp }) {
   return (
     <main
       id="main-content"
-      className="lx-page-inner"
+      className="max-w-[920px] mx-auto pt-9.5 px-10 pb-20 max-wide:pt-6.5 max-wide:px-5 max-wide:pb-[70px]"
       style={{ "--lxa": `var(--color-${exp.accent})` } as React.CSSProperties}
     >
-      <div className="lx-page-head">
+      <div className="flex justify-between items-center gap-3.5 mb-6.5">
         <Link
           href="/"
-          className="lx-back"
+          className="inline-flex items-center py-[7px] px-3.5 bg-paper border-[1.5px] border-ink rounded-[3px] cursor-pointer font-mono text-[13px] tracking-[0.5px] text-ink no-underline [transition:transform_0.12s] hover:[transform:translate(-2px,-1px)] hover:shadow-[2px_2px_0_color-mix(in_oklab,var(--color-ink)_14%,transparent)]"
           onClick={(event) => {
             if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             event.preventDefault();
@@ -57,15 +59,19 @@ export default function LabShell({ exp }: { exp: LabExp }) {
         >
           ← back to portfolio
         </Link>
-        <nav className="lx-tabs" aria-label="Experiments">
+        <nav className="flex gap-2" aria-label="Experiments">
           {LAB_EXPS.map((x) =>
             x.slug === exp.slug ? (
-              <span key={x.slug} className="lx-tab on" aria-current="page">
+              <span key={x.slug} className={`${TAB} text-white bg-(--lxa) border-(--lxa)`} aria-current="page">
                 {x.num}
               </span>
             ) : (
               // static links — ink is a home-only ceremony
-              <Link key={x.slug} href={`/lab/${x.slug}`} className="lx-tab">
+              <Link
+                key={x.slug}
+                href={`/lab/${x.slug}`}
+                className={`${TAB} bg-transparent text-ink-faint border-[color:color-mix(in_oklab,var(--color-ink)_26%,transparent)] hover:text-ink-soft hover:border-ink-soft`}
+              >
                 {x.num}
               </Link>
             )
@@ -73,22 +79,22 @@ export default function LabShell({ exp }: { exp: LabExp }) {
         </nav>
       </div>
 
-      <header className="lx-head">
-        <span className="lx-tag">
+      <header className="pb-4 mb-[22px] [border-bottom:2px_dashed_color-mix(in_oklab,var(--color-ink)_30%,transparent)]">
+        <span className="inline-flex items-center gap-[7px] py-1 px-[11px] border-[1.5px] border-(--lxa) rounded-[3px] bg-[color-mix(in_oklab,var(--lxa)_14%,var(--color-paper))] font-mono text-caption uppercase text-ink-soft">
           {exp.tag}
-          <span className="lx-livedot" aria-hidden="true" />
+          <span className="size-[7px] rounded-full bg-(--lxa) animate-[lxPulse_1.4s_infinite] motion-reduce:animate-none" aria-hidden="true" />
           live
         </span>
-        <h1 className="lx-title">{exp.title}</h1>
-        <p className="lx-blurb">{exp.blurb}</p>
+        <h1 className="mt-3.5 mx-0 mb-1.5 text-[44px] leading-none max-wide:text-[34px] max-wide:leading-[1.04] max-wide:tracking-[-0.018em]">{exp.title}</h1>
+        <p className="m-0 max-w-[640px] text-[19px] leading-[1.5] font-normal text-ink-soft max-wide:text-[17px]">{exp.blurb}</p>
       </header>
 
       <Demo accent={exp.accent} />
       <KeyboardLegend isVisible={isKeyboardMode} hasPointField={exp.slug === "kmeans"} />
 
-      <div className="lx-aside">
-        <span className="lx-aside-mark">✎ how it actually works</span>
-        <span className="lx-aside-body">{exp.foot}</span>
+      <div className="flex flex-col gap-[5px] mt-6.5 py-3.5 px-[18px] border-[1.5px] border-dashed border-(--lxa) rounded-[4px] bg-[color-mix(in_oklab,var(--lxa)_8%,var(--color-paper))]">
+        <span className="font-mono text-caption uppercase text-(--lxa)">✎ how it actually works</span>
+        <span className="text-[17.5px] leading-[1.55] text-ink max-wide:text-[17px]">{exp.foot}</span>
       </div>
     </main>
   );

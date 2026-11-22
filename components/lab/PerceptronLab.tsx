@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { LabAccent } from "@/lib/lab-meta";
 import Button from "@/components/ui/Button";
+import Label from "@/components/ui/Label";
+import { CONTROL_ROW, FIELD, FIELD_HINT, LEGEND, LEGEND_DOT, LEGEND_ROW, LabBody, LabPanel, MARK, NOTE, POINT_BUTTON, STATUS } from "./lab-ui";
 
 /* A single-layer perceptron trained on normalized user points. One waypoint is
    recorded per epoch, then replayed at constant visual speed along the smoothed
@@ -356,11 +358,11 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
   const shownW = cur ? cur.w : w;
 
   return (
-    <div className="lx-body lx-kbody">
-      <div className="lx-panel">
+    <LabBody field>
+      <LabPanel>
         <div
           ref={fieldRef}
-          className="lx-kfield"
+          className={FIELD}
           role="application"
           tabIndex={0}
           aria-label={`Perceptron point field. Current class ${cls ? "B" : "A"}. Press A or B to select a point class. Use arrow keys to move the cursor, hold two arrow keys to move diagonally, and hold Shift for larger steps. Press Enter or Space to place a point.`}
@@ -371,7 +373,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           onPointerDown={add}
         >
           {reg && (
-            <svg className="lx-cbnd" viewBox="0 0 1 1" preserveAspectRatio="none">
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1 1" preserveAspectRatio="none">
               {reg.poly.length > 2 && (
                 <polygon
                   points={reg.poly.map((p) => p.join(",")).join(" ")}
@@ -396,7 +398,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
             <button
               key={i}
               type="button"
-              className="lx-kpt lx-cpt"
+              className={POINT_BUTTON}
               aria-label={`Point ${i + 1}, class ${p.l ? "B" : "A"}. Activate to flip its class.`}
               disabled={training}
               onPointerDown={(event) => {
@@ -413,7 +415,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           ))}
           {isKeyboardCursorActive && !training && (
             <span
-              className="lx-kcent"
+              className={MARK}
               aria-hidden="true"
               style={{
                 left: `${cursor.x * 100}%`,
@@ -425,7 +427,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
             </span>
           )}
           {!pts.length && (
-            <span className="lx-kfield-hint">
+            <span className={FIELD_HINT}>
               click to place points · tab into the field for keyboard controls · activate a point to flip
             </span>
           )}
@@ -433,11 +435,11 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {`${pts.length} points placed. Cursor at ${Math.round(cursor.x * 100)}, ${Math.round(cursor.y * 100)} percent. Current class ${cls ? "B" : "A"}.`}
         </div>
-        <div className="lx-krow">
+        <div className={CONTROL_ROW}>
           <span className="font-mono text-[13px] tracking-[-0.2px] faint">class</span>
           <button
             type="button"
-            className="lx-cswatch"
+            className="size-[34px] p-0 rounded-full border-[1.5px] border-ink cursor-pointer font-mono text-[12px] tracking-[-0.2px] text-white disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={`Current point class ${cls ? "B" : "A"}. Activate to switch class.`}
             aria-pressed={cls === 1}
             disabled={training}
@@ -446,8 +448,8 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           >
             {cls ? "B" : "A"}
           </button>
-          <span className="faint lx-chint">click to switch</span>
-          <span className="lx-krow-sp" />
+          <span className="faint font-mono text-[11px] tracking-[-0.2px]">click to switch</span>
+          <span className="flex-1" />
           <Button kind="box" size="sm" onClick={scatter} disabled={training}>
             scatter
           </Button>
@@ -458,7 +460,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
             clear
           </Button>
         </div>
-        <div className="lx-krow">
+        <div className={CONTROL_ROW}>
           <span className="font-mono text-[13px] tracking-[-0.2px] faint">epochs</span>
           <Button
             kind="key"
@@ -476,7 +478,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           >
             −
           </Button>
-          <output className="lx-epn" aria-label="Epoch count">
+          <output className="min-w-6 text-center font-mono text-[13px] tracking-[-0.2px] text-ink" aria-label="Epoch count">
             {epochs}
           </output>
           <Button
@@ -495,14 +497,14 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           >
             +
           </Button>
-          <span className="faint lx-chint">max passes before it gives up</span>
+          <span className="faint font-mono text-[11px] tracking-[-0.2px]">max passes before it gives up</span>
         </div>
-      </div>
-      <div className="lx-panel lx-out">
-        <div className="faint lx-cap">
+      </LabPanel>
+      <LabPanel out>
+        <Label kind="caption" className="mb-2">
           $ perceptron --lr {LR} --epochs {epochs}
-        </div>
-        <div className="lx-kstat">
+        </Label>
+        <div className={STATUS}>
           {training
             ? `training… epoch ${cur ? cur.epoch : 1}`
             : w
@@ -517,20 +519,20 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
                   : "needs points in both colours"
                 : "place a few points of each colour"}
         </div>
-        <div className="lx-klegend">
+        <div className={LEGEND}>
           {CLASS_COLORS.map((c, i) => (
-            <span key={i} className="lx-kleg-row">
-              <span className="lx-kdot" style={{ background: `var(--color-${c})` }} />
+            <span key={i} className={LEGEND_ROW}>
+              <span className={LEGEND_DOT} style={{ background: `var(--color-${c})` }} />
               class {i ? "B" : "A"}
               <span className="faint">· {pts.filter((p) => p.l === i).length} pts</span>
             </span>
           ))}
         </div>
         {shownW && (
-          <div className="lx-cw">w = [{shownW.map((v) => v.toFixed(2)).join(", ")}]</div>
+          <div className="mt-4 font-mono text-[12px] tracking-[0.5px] text-ink-soft">w = [{shownW.map((v) => v.toFixed(2)).join(", ")}]</div>
         )}
         {w && !training && acc < 1 && (
-          <div className="lx-cnote">
+          <div className={NOTE}>
             {epochs >= EPOCHS
               ? "a straight line can't split these. that's the ceiling of a linear model."
               : `didn't converge in ${epochs} pass${epochs === 1 ? "" : "es"}. give it more epochs to keep going.`}
@@ -543,7 +545,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
               }`
             : ""}
         </div>
-      </div>
-    </div>
+      </LabPanel>
+    </LabBody>
   );
 }
