@@ -75,8 +75,6 @@ export default function LabShell({ exp }: { exp: LabExp }) {
       <header className="pb-4 mb-[22px] [border-bottom:2px_dashed_color-mix(in_oklab,var(--color-ink)_30%,transparent)]">
         <span className="inline-flex items-center gap-[7px] py-1 px-[11px] border-[1.5px] border-(--lxa) rounded-[3px] bg-[color-mix(in_oklab,var(--lxa)_14%,var(--color-paper))] font-mono text-caption uppercase text-ink-soft">
           {exp.tag}
-          <span className="size-[7px] rounded-full bg-(--lxa) animate-[lxPulse_1.4s_infinite] motion-reduce:animate-none" aria-hidden="true" />
-          live
         </span>
         <h1 className="mt-3.5 mx-0 mb-1.5 text-[44px] leading-none max-wide:text-[34px] max-wide:leading-[1.04] max-wide:tracking-[-0.018em]">{exp.title}</h1>
         <p className="m-0 max-w-[640px] text-[19px] leading-[1.5] font-normal text-ink-soft max-wide:text-[17px]">{exp.blurb}</p>
