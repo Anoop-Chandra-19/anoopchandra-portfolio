@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Caveat, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
+import { Caveat, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import "./animations.css";
 import "./ink-transition.css";
@@ -8,13 +9,18 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import StructuredData from "@/components/StructuredData";
 import InkTransitionProvider from "@/components/transition/InkTransitionProvider";
 
-/* Keep Source Serif's optical sizing automatic; pinning opsz also freezes weight. */
-const sourceSerif = Source_Serif_4({
+/* Source Serif 4, trimmed to the weights the site sets (scripts/trim-serif-font.py)
+   and renamed Notebook Serif as its licence requires (app/fonts/OFL.txt).
+   Italic exists only at 400; nothing sets bold italic.
+   Keep the optical sizing automatic; pinning opsz also freezes weight. */
+const notebookSerif = localFont({
   variable: "--font-display",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["opsz"],
+  src: [
+    { path: "./fonts/NotebookSerif-Roman.woff2", weight: "400 700", style: "normal" },
+    { path: "./fonts/NotebookSerif-Italic.woff2", weight: "400", style: "italic" },
+  ],
   display: "swap",
+  adjustFontFallback: "Times New Roman",
 });
 
 /* Interface chrome uses mono. */
@@ -103,7 +109,7 @@ export default function RootLayout({
       {/* Extensions can mutate body attributes before hydration; suppression stays scoped here. */}
       <body
         suppressHydrationWarning
-        className={`${sourceSerif.variable} ${jetbrainsMono.variable} ${caveat.variable} antialiased`}
+        className={`${notebookSerif.variable} ${jetbrainsMono.variable} ${caveat.variable} antialiased`}
       >
         <a className="skip-link" href="#main-content">
           Skip to main content
