@@ -39,6 +39,10 @@
   pointer-events: none;
   transform: rotate(0.4deg);
 }
+/* The ghost sits outside the box, so a clipping box hides it, leaving only the
+   sliver the tilt swings back inside. On the 1000-2000px Work cards that tilted
+   layer cost Firefox on Android visible frame drops while scrolling. */
+.sketch-box.overflow-hidden::after { content: none; }
 
 .marker-highlight {
   background: linear-gradient(180deg, transparent 84%, var(--color-coral) 84%, var(--color-coral) 96%, transparent 96%);

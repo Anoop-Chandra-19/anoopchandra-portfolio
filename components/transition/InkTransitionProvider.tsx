@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useLenisInstance } from "@/components/LenisProvider";
 import type { JournalEntryMeta } from "@/lib/journal-meta";
 import InkBleedOverlay from "@/components/transition/InkBleedOverlay";
 import HomeLayer from "@/components/transition/layers";
@@ -50,7 +49,6 @@ export default function InkTransitionProvider({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const lenis = useLenisInstance();
   const [transition, setTransition] = useState<Transition | null>(null);
   const committingRef = useRef(false);
 
@@ -65,7 +63,6 @@ export default function InkTransitionProvider({
       const vh = window.innerHeight;
       const cx = opts.originRect ? opts.originRect.left + opts.originRect.width / 2 : vw / 2;
       const cy = opts.originRect ? opts.originRect.top + opts.originRect.height / 2 : vh / 2;
-      lenis?.stop();
       // Entrance animations are a first-load ceremony: once we start doing client
       // navigations, every freshly pushed page should render settled. The class
       // stays on for the rest of the session (removing it would restart the
@@ -80,7 +77,7 @@ export default function InkTransitionProvider({
         router.push(href);
       }
     },
-    [transition, pathname, router, lenis]
+    [transition, pathname, router]
   );
 
   const handleComplete = useCallback(() => {
@@ -90,14 +87,27 @@ export default function InkTransitionProvider({
       // viewport, so the fully-rendered destination is already what's visible.
       committingRef.current = false;
       setTransition(null);
-      lenis?.start();
       return;
     }
     // Peel: the home copy covers everything — commit the route now.
     if (committingRef.current) return;
     committingRef.current = true;
     router.push(transition.href);
-  }, [transition, router, lenis]);
+  }, [transition, router]);
+
+  // Freeze the page under the overlay for the whole transition. The overlay
+  // also blocks wheel and touch; this catches keyboard scrolling. Script
+  // scrolls still work, so the route change can reset the offset.
+  const isActive = transition !== null;
+  useEffect(() => {
+    if (!isActive) return;
+    const root = document.documentElement;
+    const prev = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = prev;
+    };
+  }, [isActive]);
 
   // Peel teardown: once home has actually rendered underneath the overlay,
   // wait two frames (paint settled) and unmount it — no handoff flash.
@@ -109,14 +119,13 @@ export default function InkTransitionProvider({
       raf2 = requestAnimationFrame(() => {
         committingRef.current = false;
         setTransition(null);
-        lenis?.start();
       });
     });
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  }, [pathname, transition, lenis]);
+  }, [pathname, transition]);
 
   // Browser back/forward mid-flight: drop the overlay immediately.
   useEffect(() => {
@@ -124,11 +133,10 @@ export default function InkTransitionProvider({
     const abort = () => {
       committingRef.current = false;
       setTransition(null);
-      lenis?.start();
     };
     window.addEventListener("popstate", abort);
     return () => window.removeEventListener("popstate", abort);
-  }, [transition, lenis]);
+  }, [transition]);
 
   return (
     <InkTransitionContext.Provider value={{ navigate, active: transition !== null }}>

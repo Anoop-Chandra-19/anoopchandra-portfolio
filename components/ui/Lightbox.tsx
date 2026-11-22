@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { useLenisInstance } from "@/components/LenisProvider";
 import { useModalLifecycle } from "@/hooks/useModalLifecycle";
 
 /** Pinch ceiling. The plates are ~1700px wide against a ~360px phone stage, so
@@ -70,14 +69,12 @@ export default function Lightbox({
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const lenis = useLenisInstance();
 
   useModalLifecycle({
     isOpen: true,
     containerRef: dialogRef,
     initialFocusRef: closeRef,
     onCloseAction: onClose,
-    lenis,
   });
 
   const [z, setZ] = useState<Zoom>(RESET);

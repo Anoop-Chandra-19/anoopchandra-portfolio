@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useLenisInstance } from "@/components/LenisProvider";
 import { NAV_ITEMS, useActiveSection, useSectionJump } from "@/hooks/useActiveSection";
 
 /** Mobile chrome (≤900px): a floating "index" chip that opens a full-screen
@@ -16,7 +15,6 @@ export default function MobileIndexNav({
   const frozen = frozenAt !== undefined;
   const active = useActiveSection(frozenAt);
   const jumpTo = useSectionJump();
-  const lenis = useLenisInstance();
   const [open, setOpen] = useState(false);
   // A bleed copy mounts while the live chip is still in the DOM — inherit its
   // state, or the copy pops a chip back in that the user had just scrolled
@@ -47,19 +45,16 @@ export default function MobileIndexNav({
     return () => window.removeEventListener("scroll", onScroll);
   }, [frozen]);
 
-  // Freeze the page underneath while the index is up: Lenis owns the smooth
-  // scroll, the root overflow catches the raw touch scroll it doesn't.
+  // Freeze the page underneath while the index is up.
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
     const prev = root.style.overflow;
     root.style.overflow = "hidden";
-    lenis?.stop();
     return () => {
       root.style.overflow = prev;
-      lenis?.start();
     };
-  }, [open, lenis]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -101,8 +96,7 @@ export default function MobileIndexNav({
   const go = (id: string) => {
     setOpen(false);
     // The scroll lock above is torn down on the closing commit; jumping before
-    // that lands on a stopped Lenis and an overflow:hidden root, and goes
-    // nowhere. A frame later the page can scroll again.
+    // that lands on an overflow:hidden root, and goes nowhere. A frame later the page can scroll again.
     requestAnimationFrame(() => jumpTo(id));
   };
 

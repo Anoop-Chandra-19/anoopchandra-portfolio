@@ -8,7 +8,7 @@ Guidance for coding agents working on this portfolio. Keep changes focused, pres
 - **UI:** React 19.2.8
 - **Language:** TypeScript 6.0.3 with strict checking
 - **Styling:** Tailwind CSS 4.1.11 plus global CSS
-- **Animation:** Framer Motion, GSAP, and Lenis
+- **Animation:** Framer Motion and GSAP
 - **Content:** Local MDX journal entries rendered with `next-mdx-remote`
 - **ML:** TensorFlow.js models loaded and run in the browser
 - **Package manager:** npm; keep `package-lock.json` in sync

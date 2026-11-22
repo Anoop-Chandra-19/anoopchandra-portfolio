@@ -71,8 +71,8 @@ export default function InkBleedOverlay({
     onCompleteActionRef.current = onCompleteAction;
   }, [onCompleteAction]);
 
-  // Block scrolling underneath the overlay for the duration (Lenis is stopped
-  // separately, but native wheel/touch would still move the page beneath).
+  // Block scrolling underneath the overlay for the duration (the provider
+  // hides the root's overflow, but wheel/touch would still move the page).
   useEffect(() => {
     const prevent = (e: Event) => e.preventDefault();
     window.addEventListener("wheel", prevent, { passive: false });

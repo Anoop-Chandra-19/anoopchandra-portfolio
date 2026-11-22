@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import type { RefObject } from "react";
-import type Lenis from "lenis";
 
 const FOCUSABLE_SELECTOR = [
   "a[href]",
@@ -41,8 +40,6 @@ type ScrollLockState = {
   rootStyles: StyleSnapshot;
   rootScrollBehavior: StyleSnapshot;
   bodyStyles: StyleSnapshot;
-  lenis: Lenis | null;
-  shouldRestartLenis: boolean;
 };
 
 type ModalEntry = { token: symbol; container: HTMLElement };
@@ -71,7 +68,7 @@ function restoreStyles(element: HTMLElement, snapshot: StyleSnapshot): void {
   }
 }
 
-function lockPageScroll(lenis: Lenis | null | undefined): () => void {
+function lockPageScroll(): () => void {
   if (scrollLock) {
     scrollLock.count += 1;
     return releasePageScroll;
@@ -86,7 +83,6 @@ function lockPageScroll(lenis: Lenis | null | undefined): () => void {
     ? 0
     : Math.max(0, window.innerWidth - root.clientWidth);
   const bodyPaddingRight = Number.parseFloat(getComputedStyle(body).paddingRight) || 0;
-  const shouldRestartLenis = Boolean(lenis && !lenis.isStopped);
 
   scrollLock = {
     count: 1,
@@ -97,11 +93,7 @@ function lockPageScroll(lenis: Lenis | null | undefined): () => void {
     rootStyles: captureStyles(root, ROOT_LOCK_PROPERTIES),
     rootScrollBehavior: captureStyles(root, ["scroll-behavior"]),
     bodyStyles: captureStyles(body, BODY_LOCK_PROPERTIES),
-    lenis: lenis ?? null,
-    shouldRestartLenis,
   };
-
-  if (shouldRestartLenis) lenis?.stop();
 
   root.style.setProperty("overflow", "hidden");
   root.style.setProperty("overscroll-behavior", "none");
@@ -132,8 +124,6 @@ function releasePageScroll(): void {
   restoreStyles(state.root, state.rootStyles);
   window.scrollTo(state.scrollX, state.scrollY);
   restoreStyles(state.root, state.rootScrollBehavior);
-
-  if (state.shouldRestartLenis) state.lenis?.start();
 }
 
 function refreshBackgroundInertness(): void {
@@ -198,7 +188,6 @@ type UseModalLifecycleOptions = {
   containerRef: RefObject<HTMLElement | null>;
   initialFocusRef: RefObject<HTMLElement | null>;
   onCloseAction: () => void;
-  lenis: Lenis | null | undefined;
   opener?: HTMLElement | null;
 };
 
@@ -209,7 +198,6 @@ export function useModalLifecycle({
   containerRef,
   initialFocusRef,
   onCloseAction,
-  lenis,
   opener,
 }: UseModalLifecycleOptions): void {
   const onCloseRef = useRef(onCloseAction);
@@ -228,7 +216,7 @@ export function useModalLifecycle({
     const capturedOpener =
       opener ?? (activeElement instanceof HTMLElement && activeElement !== document.body ? activeElement : null);
     const token = registerModal(container);
-    const unlockPageScroll = lockPageScroll(lenis);
+    const unlockPageScroll = lockPageScroll();
 
     const focusInitial = () => {
       const initial = initialFocusRef.current;
@@ -293,5 +281,5 @@ export function useModalLifecycle({
         focusWithoutScrolling(capturedOpener);
       }
     };
-  }, [containerRef, initialFocusRef, isOpen, lenis, opener]);
+  }, [containerRef, initialFocusRef, isOpen, opener]);
 }

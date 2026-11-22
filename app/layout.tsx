@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import { Caveat, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
-import "lenis/dist/lenis.css";
 import "./globals.css";
 import "./animations.css";
 import "./ink-transition.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import StructuredData from "@/components/StructuredData";
-import HydrationTrigger from "@/components/HydrationTrigger";
-import { LenisProvider } from "@/components/LenisProvider";
 import InkTransitionProvider from "@/components/transition/InkTransitionProvider";
 import { getEntryMetas } from "@/lib/journal";
 
@@ -112,10 +109,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>
-        <HydrationTrigger />
-        <LenisProvider>
-          <InkTransitionProvider entries={getEntryMetas()}>{children}</InkTransitionProvider>
-        </LenisProvider>
+        <InkTransitionProvider entries={getEntryMetas()}>{children}</InkTransitionProvider>
         <Analytics />
         <SpeedInsights />
       </body>

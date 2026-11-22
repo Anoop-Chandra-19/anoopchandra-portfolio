@@ -4,6 +4,14 @@ import Label from "@/components/ui/Label";
 import Annotation from "@/components/ui/Annotation";
 import ScrollLink from "@/components/ui/ScrollLink";
 
+function PortraitRing() {
+  return (
+    <svg viewBox="0 0 360 360" preserveAspectRatio="xMidYMid meet" className="block w-full h-full">
+      <circle cx="180" cy="180" r="178" fill="none" stroke="var(--color-ink)" strokeWidth="4" />
+    </svg>
+  );
+}
+
 export default function Hero() {
   return (
     <section id="sec-home" className="section min-h-[560px] pt-10.5 max-wide:min-h-[calc(100svh-26px)] max-wide:mt-0 max-wide:pt-0 max-wide:flex max-wide:flex-col max-wide:justify-center">
@@ -67,22 +75,24 @@ export default function Hero() {
                 priority
               />
             </div>
-            <svg
-              viewBox="0 0 360 360"
-              preserveAspectRatio="xMidYMid meet"
-              className="absolute inset-0 w-full h-full z-[2] pointer-events-none"
-            >
-              <circle
-                cx="180"
-                cy="180"
-                r="178"
-                fill="none"
-                stroke="var(--color-ink)"
-                strokeWidth="4"
-                strokeDasharray="1131"
-                className="anim-portrait-outline"
-              />
-            </svg>
+            {/* The outline draws itself with two half-rings rotating into place,
+                not an animated stroke-dashoffset: a rotation runs on the
+                compositor, so hydration can't make the draw drop frames. */}
+            <div className="portrait-ring absolute inset-0 z-[2] pointer-events-none" aria-hidden="true">
+              <div className="ring-window ring-window-r">
+                <div className="ring-sweep">
+                  <PortraitRing />
+                </div>
+              </div>
+              <div className="ring-window ring-window-l">
+                <div className="ring-sweep">
+                  <PortraitRing />
+                </div>
+              </div>
+              <div className="ring-done">
+                <PortraitRing />
+              </div>
+            </div>
           </div>
           <div className="anim-stamp d-annot1 absolute -top-[11px] right-[11px] max-wide:-top-[10px] max-wide:-left-[10px] max-wide:right-auto">
             <Annotation color="coral">👋 hi!</Annotation>

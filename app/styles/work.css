@@ -38,18 +38,25 @@ details.more > summary {
   color: var(--color-ink-soft);
 }
 details.more > summary::-webkit-details-marker { display: none; }
+/* The +/− is drawn as two bars rather than glyphs: a font's "+" sits on its
+   baseline, off the circle's centre, and a glyph swap can't animate. Opening
+   collapses the vertical bar during a half turn, in step with the panel. */
 details.more > summary::before {
-  content: "+";
-  display: inline-grid;
-  place-items: center;
+  content: "";
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
   border: 1.5px solid var(--color-ink-soft);
   border-radius: 50%;
-  font-size: 12px;
-  line-height: 1;
+  background:
+    linear-gradient(currentColor 0 0) center / 8px 1.5px no-repeat,
+    linear-gradient(currentColor 0 0) center / 1.5px 8px no-repeat;
+  transition: background-size 0.25s ease, transform 0.25s ease;
 }
-details.more[open] > summary::before { content: "−"; }
+details.more[open] > summary::before {
+  background-size: 8px 1.5px, 1.5px 0;
+  transform: rotate(180deg);
+}
 details.more > summary:hover { color: var(--color-ink); }
 details.more > summary:focus-visible { border-radius: 4px; }
 /* Open/close motion. Durations are placeholders pending a value from the
@@ -66,7 +73,8 @@ details.more::details-content {
 }
 details.more[open]::details-content { height: auto; opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  details.more::details-content { transition: none; }
+  details.more::details-content,
+  details.more > summary::before { transition: none; }
 }
 
 .project-media {

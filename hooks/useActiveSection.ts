@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useLenisInstance } from "@/components/LenisProvider";
 import { useReducedMotion } from "./useReducedMotion";
 
 /** The home page's sections, in reading order: [id, page number, label]. */
@@ -61,25 +60,16 @@ export function useActiveSection(frozenAt?: number): string {
   return active;
 }
 
-/** Smooth-scroll to a home section by id, through Lenis when it's running. */
+/** Smooth-scroll to a home section by id. */
 export function useSectionJump() {
-  const lenis = useLenisInstance();
   const shouldReduceMotion = useReducedMotion();
 
   return (id: string) => {
     const target = document.getElementById(`sec-${id}`);
     if (!target) return;
-    if (lenis) {
-      lenis.scrollTo(target, {
-        immediate: shouldReduceMotion,
-        lerp: shouldReduceMotion ? undefined : 0.1,
-        offset: 0,
-      });
-    } else {
-      target.scrollIntoView({
-        behavior: shouldReduceMotion ? "auto" : "smooth",
-        block: "start",
-      });
-    }
+    target.scrollIntoView({
+      behavior: shouldReduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
   };
 }

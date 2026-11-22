@@ -8,7 +8,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { useLenisInstance } from "@/components/LenisProvider";
 import { useModalLifecycle } from "@/hooks/useModalLifecycle";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -71,7 +70,6 @@ export default function BottomSheet({
   const drag = useRef<Drag | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const lenis = useLenisInstance();
   const shouldReduceMotion = useReducedMotion();
 
   // Callers pass inline arrows, and `close` is a dependency of the resize
@@ -138,7 +136,6 @@ export default function BottomSheet({
     containerRef: dialogRef,
     initialFocusRef: closeRef,
     onCloseAction: close,
-    lenis,
     opener,
   });
 
@@ -255,7 +252,6 @@ export default function BottomSheet({
         </div>
         <div
           className={`min-h-0 overflow-y-auto overscroll-contain touch-pan-y text-small text-ink-soft ${bodyClassName ?? ""}`}
-          data-lenis-prevent
         >
           {children}
         </div>
