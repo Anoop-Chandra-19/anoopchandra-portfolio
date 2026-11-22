@@ -27,6 +27,11 @@
   --color-ink-faint: #6b6b6b;
   --color-rule: #2a2a2a;
 
+  /* Fallbacks only: next/font sets these on <body>, which wins below it.
+     Gives `font-display` and `font-accent` (Caveat) utilities beside `font-mono`. */
+  --font-display: "Source Serif 4", Georgia, serif;
+  --font-accent: Caveat, cursive;
+
   --color-electric: #cc00e6;
   --color-coral: #ff715b;
   --color-teal: #1ea896;

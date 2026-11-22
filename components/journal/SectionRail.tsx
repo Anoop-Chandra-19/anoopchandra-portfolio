@@ -55,21 +55,36 @@ export default function SectionRail({ sections }: { sections: Section[] }) {
   if (sections.length < 3) return null;
 
   return (
-    <nav className="je-secnav" aria-label="sections in this entry">
-      <div className="je-secnav-in">
-        <div className="hd">sections</div>
-        {sections.map((s, i) => (
-          <a
-            key={s.id}
-            href={`#${s.id}`}
-            className={i === active ? "on" : ""}
-            title={s.title}
-            aria-current={i === active ? "true" : undefined}
-          >
-            <span className="n">§{String(s.n).padStart(2, "0")}</span>
-            <span className="t">{s.title}</span>
-          </a>
-        ))}
+    <nav className="absolute left-0 top-0 bottom-0 w-(--rail) max-nav:hidden" aria-label="sections in this entry">
+      <div className="sticky top-6.5 flex flex-col gap-px">
+        <div className="pr-[13px] pb-[9px] font-mono text-stamp uppercase text-ink-faint text-right">sections</div>
+        {sections.map((s, i) => {
+          const isOn = i === active;
+          return (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              className={`group block pt-1.5 pr-[11px] pb-[7px] pl-1 text-right no-underline border-r-2 rounded-l-[3px] [transition:background_.15s,color_.15s,border-color_.15s] ${
+                isOn
+                  ? "bg-[color-mix(in_oklab,var(--accent)_11%,var(--color-paper))] border-r-(--accent)"
+                  : "border-r-transparent hover:bg-[color-mix(in_oklab,var(--color-paper-2)_70%,transparent)]"
+              }`}
+              title={s.title}
+              aria-current={isOn ? "true" : undefined}
+            >
+              <span className={`block font-mono text-stamp ${isOn ? "text-(--accent-ink)" : "text-ink-faint"}`}>
+                §{String(s.n).padStart(2, "0")}
+              </span>
+              <span
+                className={`line-clamp-4 pt-[3px] px-1 pb-[5px] -mt-[3px] -mx-1 -mb-[3px] font-accent font-semibold text-[20px] leading-[1.22] ${
+                  isOn ? "text-ink" : "text-[color:color-mix(in_oklab,var(--color-ink)_55%,var(--color-paper))] group-hover:text-ink"
+                }`}
+              >
+                {s.title}
+              </span>
+            </a>
+          );
+        })}
       </div>
     </nav>
   );

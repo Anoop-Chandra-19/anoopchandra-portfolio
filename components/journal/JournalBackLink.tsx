@@ -30,7 +30,7 @@ export default function JournalBackLink({ href, children, peel = false }: Journa
   }
 
   return (
-    <Link href={href} className="je-back" onClick={handleClick}>
+    <Link href={href} className="py-1.5 px-3.5 rounded-full border-[1.5px] border-ink bg-paper font-mono text-control text-ink no-underline hover:bg-ink hover:text-paper" onClick={handleClick}>
       {children}
     </Link>
   );
