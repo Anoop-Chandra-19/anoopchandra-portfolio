@@ -1,46 +1,11 @@
-/* Journal entry. The renderer (components/journal/mdx-components.tsx) styles
-   the article with utilities; what's here prints counters or styles markup
-   remark-gfm generates. */
+/* Section and plate numbers. The rest of the article is styled in
+   components/journal/mdx-components.tsx; these stay here because the padded
+   counter style has no utility, and the escaped glyphs read better as CSS.
+   Built-in decimal-leading-zero pads only to two digits. */
+@counter-style plate-pad { system: extends decimal; pad: 3 "0"; }
+.je-plate-tab::before { content: "plate " counter(plate, plate-pad); }
+.je-secn::before { content: "\270E \A7" counter(sec, decimal-leading-zero); }
 
-/* Plate, section, list and line numbers. Built-in decimal-leading-zero pads
-   only to two digits. */
-@counter-style plate-pad{system:extends decimal;pad:3 "0"}
-.je-plate-tab::before{content:"plate " counter(plate,plate-pad)}
-.je-secn::before{content:"\270E \A7" counter(sec,decimal-leading-zero)}
-.je-ln::before{content:counter(ln);position:absolute;left:0;width:30px;text-align:right;font-size:11px;color:color-mix(in oklab,var(--color-ink) 32%,var(--color-paper))}
-
-/* Tailwind preflight removes markers; ordered-list ordinals use a counter. */
-.je-ol{list-style:none;padding-left:2px;margin:6px 0 24px;max-width:var(--je-measure);font-family:var(--font-display);font-size:var(--text-prose-list);line-height:var(--text-prose-list--line-height);counter-reset:oli}
-.je-ol li{position:relative;padding-left:32px;margin-bottom:9px;counter-increment:oli}
-.je-ol li::before{content:counter(oli,decimal-leading-zero);position:absolute;left:0;top:5px;font-family:var(--font-mono);font-size:12px;color:var(--accent-ink)}
-
-/* remark-gfm emits one terminal footnote list; this is the in-column fallback. */
-.je-fnlist{clear:right;margin:38px 0 0;padding-top:14px;border-top:1px dashed var(--color-ink-faint);max-width:var(--je-measure);font-family:var(--font-display);font-size:var(--text-small);line-height:var(--text-small--line-height);color:var(--color-ink-soft)}
-.je-fnlist h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.je-fnlist ol{margin:0;padding-left:0}
-.je-fnlist li{font-size:var(--text-small);line-height:var(--text-small--line-height)}
-.je-fnlist li:target{background:color-mix(in oklab,var(--accent) 12%,transparent);border-radius:3px}
-.je-fnlist li:target::before{color:var(--color-ink)}
-.je-fnlist li,.je-fnref{scroll-margin-top:120px}
-.je-fnlist a[data-footnote-backref]{border-bottom:0;padding:0 4px;text-decoration:none}
-.je-fnlist a[data-footnote-backref]:hover{color:var(--color-ink)}
-.je-fnref{font-family:var(--font-mono);font-size:.58em;font-weight:500;color:var(--accent-ink);vertical-align:super;line-height:0;padding-left:2px;text-decoration:none}
-.je-fnref a{color:inherit;text-decoration:none;border-bottom:0}
-.je-fnref a:hover{color:var(--color-ink)}
-
-@media (max-width:1000px){
-  .je-ol{max-width:100%}
-}
-@media (max-width:720px){
-  .je-secn::before{content:"\A7" counter(sec,decimal-leading-zero)}
-
-  /* Moves with `PHONE_QUERY` in lib/breakpoints.ts: split them and the
-     footnote ref becomes a plain anchor that opens a sheet. */
-  /* Keep the hidden list in the DOM because the mobile sheet clones its bodies. */
-  .je-fnlist{display:none}
-  /* The pseudo-element enlarges the footnote tap target without changing line height. */
-  .je-fnref{position:relative;display:inline-block;vertical-align:.34em;margin:0 1px 0 2px;padding:1px 5px 1.5px;border-radius:20px;background:color-mix(in oklab,var(--accent) 20%,var(--color-paper));font-size:9.5px;line-height:1.3;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  .je-fnref::after{content:"";position:absolute;inset:-9px -7px}
-  .je-fnref:active{background:color-mix(in oklab,var(--accent) 34%,var(--color-paper))}
-  .je-fnref.is-on{background:color-mix(in oklab,var(--accent) 40%,var(--color-paper))}
+@media (max-width: 720px) {
+  .je-secn::before { content: "\A7" counter(sec, decimal-leading-zero); }
 }

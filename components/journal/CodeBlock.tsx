@@ -156,7 +156,9 @@ export default function CodeBlock({
           {lines.map((toks, i) => (
             <span
               key={i}
-              className={`je-ln relative block [counter-increment:ln] py-0 pr-[18px] pl-[58px] max-wide:pl-[50px] font-mono text-code whitespace-pre text-ink ${
+              // A counter in ::before, not a rendered number, so copying the code
+              // doesn't copy the line numbers.
+              className={`relative block [counter-increment:ln] before:content-[counter(ln)] before:absolute before:left-0 before:w-[30px] before:text-right before:text-[11px] before:text-[color-mix(in_oklab,var(--color-ink)_32%,var(--color-paper))] py-0 pr-[18px] pl-[58px] max-wide:pl-[50px] font-mono text-code whitespace-pre text-ink ${
                 hiSet.has(i + 1) ? "bg-[color-mix(in_oklab,var(--accent)_10%,transparent)]" : ""
               }`}
             >

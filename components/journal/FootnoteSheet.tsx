@@ -28,7 +28,7 @@ export default function FootnoteSheet() {
       if (!mq.matches || e.metaKey || e.ctrlKey || e.shiftKey) return;
       // The pill's tap target is a ::after on the <sup>, not on the anchor, so
       // a thumb landing in the padding resolves through the sup.
-      const ref = (e.target as Element | null)?.closest?.(".je-fnref");
+      const ref = (e.target as Element | null)?.closest?.("sup");
       const a = ref?.querySelector<HTMLAnchorElement>("a[data-footnote-ref]");
       const id = a?.getAttribute("href")?.slice(1);
       if (!ref || !a || !id || !document.getElementById(id)) return;
@@ -56,8 +56,8 @@ export default function FootnoteSheet() {
       (clone.firstElementChild ?? clone).prepend(num);
       el.replaceChildren(...clone.childNodes);
     }
-    open.marker.classList.add("is-on");
-    return () => open.marker.classList.remove("is-on");
+    open.marker.setAttribute("data-on", "");
+    return () => open.marker.removeAttribute("data-on");
   }, [open]);
 
   return (

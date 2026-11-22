@@ -1,8 +1,11 @@
 // Maps MDX → the "Annotated Manuscript" entry blocks. Every component here
 // renders on the server (next-mdx-remote/rsc); the interactive bits are
-// client leaves it mounts, never this module. Section numbers (✎ §NN) and
-// plate numbers auto-increment via CSS counters defined in journal.css —
-// authors never number by hand.
+// client leaves it mounts, never this module. Section, plate, list and code
+// line numbers are CSS counters — authors never number by hand.
+//
+// remark-gfm generates the footnote markup, so its elements are told apart
+// here by the attributes it puts on them (data-footnotes, user-content-fn-N,
+// data-footnote-backref).
 import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from "react";
 import type { MDXComponents } from "mdx/types";
 import CodeBlock from "@/components/journal/CodeBlock";
@@ -178,13 +181,47 @@ function Pre({ title, hi, cap, children }: ComponentPropsWithoutRef<"pre"> & {
   return <CodeBlock code={src} lang={lang} file={title} hi={hiLines} cap={cap} />;
 }
 
+// ## kicker and heading. On phones the number moves into the margin rail.
+const SECTION_NO =
+  "je-secn block mb-0.5 font-accent font-semibold text-[20px] leading-none text-(--accent-ink)";
+const SECTION_NO_RAIL =
+  "max-wide:absolute max-wide:left-[calc(-1*(var(--rail)+var(--colgap)))] max-wide:top-[3px] max-wide:w-7 max-wide:py-0.5 max-wide:px-0 max-wide:font-mono max-wide:text-[9.5px] max-wide:font-normal max-wide:tracking-[.5px] max-wide:text-center max-wide:bg-paper";
+const SECTION_H2 =
+  "m-0 font-display font-semibold text-prose-h2 text-ink underline decoration-wavy decoration-[color:color-mix(in_oklab,var(--accent)_55%,transparent)] decoration-[1.6px] underline-offset-9 max-wide:decoration-[1.4px] max-wide:underline-offset-6 max-wide:[text-decoration-skip-ink:none]";
+
+// Lists. Preflight removes the markers: bullets are a rotated square, numbers
+// a counter. The footnote list is an <ol> too, and reuses the counter.
+const LIST = `list-none mt-1.5 mx-0 mb-6 ${MEASURE}`;
+const UL_ITEM = "[&>li]:relative [&>li]:pl-7 [&>li]:mb-[11px] [&>li]:font-display [&>li]:text-prose-list";
+const UL_MARK =
+  "[&>li]:before:content-[''] [&>li]:before:absolute [&>li]:before:left-0.5 [&>li]:before:top-[11px] [&>li]:before:size-2 [&>li]:before:border-[1.6px] [&>li]:before:border-[color:var(--accent)] [&>li]:before:rounded-[2px] [&>li]:before:[transform:rotate(45deg)]";
+const OL_ITEM = "[&>li]:relative [&>li]:pl-8 [&>li]:mb-[9px] [&>li]:[counter-increment:oli]";
+const OL_NUMBER =
+  "[&>li]:before:content-[counter(oli,decimal-leading-zero)] [&>li]:before:absolute [&>li]:before:left-0 [&>li]:before:top-[5px] [&>li]:before:font-mono [&>li]:before:text-[12px] [&>li]:before:text-(--accent-ink)";
+
+// The footnote ref. On phones it's a tinted pill that opens FootnoteSheet,
+// which sets data-on while its note is showing.
+const FN_REF =
+  "pl-0.5 font-mono text-[.58em] font-medium leading-[0] align-super text-(--accent-ink) scroll-mt-[120px]";
+const FN_REF_PILL =
+  "max-wide:relative max-wide:inline-block max-wide:[vertical-align:.34em] max-wide:mr-px max-wide:ml-0.5 max-wide:pt-px max-wide:px-[5px] max-wide:pb-[1.5px] max-wide:rounded-full max-wide:text-[9.5px] max-wide:leading-[1.3] max-wide:cursor-pointer max-wide:[-webkit-tap-highlight-color:transparent]";
+const FN_REF_TINT =
+  "max-wide:bg-[color-mix(in_oklab,var(--accent)_20%,var(--color-paper))] max-wide:active:bg-[color-mix(in_oklab,var(--accent)_34%,var(--color-paper))] max-wide:data-on:bg-[color-mix(in_oklab,var(--accent)_40%,var(--color-paper))]";
+/** A bigger tap target that doesn't change the line height. */
+const FN_REF_TAP = "max-wide:after:content-[''] max-wide:after:absolute max-wide:after:-inset-y-[9px] max-wide:after:-inset-x-[7px]";
+
+// The footnote list. Hidden on phones, where FootnoteSheet shows one note at
+// a time; it stays in the DOM because the sheet clones from it.
+const FOOTNOTES = `clear-right mt-[38px] pt-3.5 border-t border-dashed border-ink-faint max-w-(--je-measure) font-display text-small text-ink-soft max-wide:hidden [&>ol]:m-0 [&>ol]:pl-0 ${INHERIT_P}`;
+const FOOTNOTE =
+  "text-small scroll-mt-[120px] target:bg-[color-mix(in_oklab,var(--accent)_12%,transparent)] target:rounded-[3px] target:before:text-ink";
+
 export const mdxComponents: MDXComponents = {
   // Explicit size and line-height: the base layer resizes a bare <p> on phones.
   p: (p) => (
     <p className={`mt-0 mx-0 mb-[22px] ${MEASURE} font-display text-prose text-ink text-pretty`} {...p} />
   ),
-  // ## → hand section-number + wavy-underlined serif heading. On phones the
-  // number moves into the margin rail.
+  // ## → hand section-number + wavy-underlined serif heading.
   // remark-gfm emits its own <h2 id="footnote-label"> as the (screen-reader
   // only) heading of the footnote list. That is not a section: giving it a
   // ✎ §NN kicker would both show a marker and bump the section counter, so it
@@ -194,14 +231,8 @@ export const mdxComponents: MDXComponents = {
       <h2 {...rest}>{children}</h2>
     ) : (
       <div className={`mt-11 mx-0 mb-4 ${MEASURE} [counter-increment:sec] max-wide:relative max-wide:mt-7.5 max-wide:mb-3`}>
-        <span
-          className="je-secn block mb-0.5 font-accent font-semibold text-[20px] leading-none text-(--accent-ink) max-wide:absolute max-wide:left-[calc(-1*(var(--rail)+var(--colgap)))] max-wide:top-[3px] max-wide:w-7 max-wide:py-0.5 max-wide:px-0 max-wide:font-mono max-wide:text-[9.5px] max-wide:font-normal max-wide:tracking-[.5px] max-wide:text-center max-wide:bg-paper"
-          aria-hidden="true"
-        />
-        <h2
-          className="m-0 font-display font-semibold text-prose-h2 text-ink underline decoration-wavy decoration-[color:color-mix(in_oklab,var(--accent)_55%,transparent)] decoration-[1.6px] underline-offset-9 max-wide:decoration-[1.4px] max-wide:underline-offset-6 max-wide:[text-decoration-skip-ink:none]"
-          {...rest}
-        >
+        <span className={`${SECTION_NO} ${SECTION_NO_RAIL}`} aria-hidden="true" />
+        <h2 className={SECTION_H2} {...rest}>
           {children}
         </h2>
       </div>
@@ -210,15 +241,21 @@ export const mdxComponents: MDXComponents = {
     <h3 className={`mt-7 mx-0 mb-2.5 ${MEASURE} font-display font-semibold text-prose-h3 text-ink`} {...p} />
   ),
   ul: (p: ComponentPropsWithoutRef<"ul">) => (
-    <ul
-      className={`list-none p-0 mt-1.5 mx-0 mb-6 ${MEASURE} [&>li]:relative [&>li]:pl-7 [&>li]:mb-[11px] [&>li]:font-display [&>li]:text-prose-list [&>li]:before:content-[''] [&>li]:before:absolute [&>li]:before:left-0.5 [&>li]:before:top-[11px] [&>li]:before:size-2 [&>li]:before:border-[1.6px] [&>li]:before:border-[color:var(--accent)] [&>li]:before:rounded-[2px] [&>li]:before:[transform:rotate(45deg)]`}
+    <ul className={`${LIST} p-0 ${UL_ITEM} ${UL_MARK}`} {...p} />
+  ),
+  ol: (p: ComponentPropsWithoutRef<"ol">) => (
+    <ol
+      className={`${LIST} pl-0.5 font-display text-prose-list [counter-reset:oli] ${OL_ITEM} ${OL_NUMBER}`}
       {...p}
     />
   ),
-  // Numbered by a CSS counter (journal.css): preflight removes the markers.
-  // The footnote list is an <ol> too, and reuses the counter for its numbers.
-  ol: (p: ComponentPropsWithoutRef<"ol">) => <ol className="je-ol" {...p} />,
-  li: (p: ComponentPropsWithoutRef<"li">) => <li {...p} />,
+  // A footnote; :target is the one a ref just jumped to.
+  li: (p: ComponentPropsWithoutRef<"li">) =>
+    p.id?.startsWith("user-content-fn-") ? (
+      <li className={FOOTNOTE} {...p} />
+    ) : (
+      <li {...p} />
+    ),
   blockquote: (p: ComponentPropsWithoutRef<"blockquote">) => <blockquote className={QUOTE} {...p} />,
   pre: Pre,
   code: (p: ComponentPropsWithoutRef<"code">) => (
@@ -229,18 +266,23 @@ export const mdxComponents: MDXComponents = {
   ),
   strong: (p: ComponentPropsWithoutRef<"strong">) => <strong className="font-semibold" {...p} />,
   // remark-gfm's footnote links carry their own class; merge, don't overwrite.
+  // Footnote refs and ↩ backrefs keep the link look: they're links.
   a: ({ className, ...p }: ComponentPropsWithoutRef<"a">) => (
     <a
       {...p}
-      className={`text-electric no-underline border-b-[1.5px] border-dotted border-b-[color:color-mix(in_oklab,var(--color-electric)_55%,transparent)] hover:text-ink hover:border-b-ink ${className ?? ""}`.trim()}
+      className={`text-electric no-underline border-b-[1.5px] border-dotted border-b-[color:color-mix(in_oklab,var(--color-electric)_55%,transparent)] hover:text-ink hover:border-b-ink ${
+        "data-footnote-backref" in p ? "px-1" : ""
+      } ${className ?? ""}`.trim()}
     />
   ),
-  sup: (p: ComponentPropsWithoutRef<"sup">) => <sup className="je-fnref" {...p} />,
+  sup: (p: ComponentPropsWithoutRef<"sup">) => (
+    <sup className={`${FN_REF} ${FN_REF_PILL} ${FN_REF_TINT} ${FN_REF_TAP}`} {...p} />
+  ),
   // remark-gfm's footnote list carries its own class="footnotes", so spread
   // first and merge — otherwise it overwrites ours.
   section: ({ children, className, ...rest }: ComponentPropsWithoutRef<"section">) =>
     "data-footnotes" in rest ? (
-      <section {...rest} className={`je-fnlist ${INHERIT_P} ${className ?? ""}`.trim()}>
+      <section {...rest} className={`${FOOTNOTES} ${className ?? ""}`.trim()}>
         <div className="mb-2.5 font-mono text-stamp uppercase text-ink-faint">footnotes</div>
         {children}
       </section>
