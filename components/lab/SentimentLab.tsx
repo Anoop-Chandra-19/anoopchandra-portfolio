@@ -70,8 +70,8 @@ function verdictLabel(s: number): string {
 
 // Word chips: tinted by which way the lexicon pulls the word.
 const TOKEN_TONE = {
-  pos: "bg-[color-mix(in_oklab,var(--color-teal)_18%,var(--color-paper))] text-[color:color-mix(in_oklab,var(--color-teal)_70%,var(--color-ink))]",
-  neg: "bg-[color-mix(in_oklab,var(--color-coral)_20%,var(--color-paper))] text-[color:color-mix(in_oklab,var(--color-coral)_72%,var(--color-ink))]",
+  pos: "bg-[color-mix(in_oklab,var(--color-teal)_18%,var(--color-paper))] text-teal-deep",
+  neg: "bg-[color-mix(in_oklab,var(--color-coral)_20%,var(--color-paper))] text-coral-deep",
   neutral: "bg-[color-mix(in_oklab,var(--color-ink)_6%,transparent)] text-ink-soft",
 } as const;
 
@@ -163,7 +163,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
           </div>
         </div>
         <form
-          className="flex items-center gap-2.5 mt-5 py-2 px-3 border-2 border-ink rounded-[4px] bg-paper focus-within:outline-3 focus-within:outline-offset-3 focus-within:outline-[var(--lxa,var(--color-teal))]"
+          className="flex items-center gap-2.5 mt-5 py-2 px-3 border-2 border-ink rounded-[4px] bg-paper focus-within:outline-2 focus-within:outline-offset-3 focus-within:outline-electric"
           onSubmit={(event) => {
             event.preventDefault();
             void run();

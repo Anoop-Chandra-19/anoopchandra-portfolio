@@ -14,16 +14,13 @@ const BASE =
 // `enabled:` keeps a disabled button from lifting.
 const LIFT =
   "enabled:hover:[transform:translate(-1px,-1px)] enabled:hover:shadow-[2px_2px_0_color-mix(in_oklab,var(--color-ink)_18%,transparent)]";
-// Lab pages set --lxa to the experiment's accent; elsewhere the ring is electric.
-const RING =
-  "focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[var(--lxa,var(--color-electric))]";
 
 const KIND: Record<ButtonKind, string> = {
   /* The lab's square-cornered button. */
-  box: `rounded-[3px] whitespace-nowrap [transition:transform_0.1s,background_0.14s] ${LIFT} ${RING}`,
+  box: `rounded-[3px] whitespace-nowrap [transition:transform_0.1s,background_0.14s] ${LIFT}`,
   /* A 34px square key, for steppers and k pickers. Pressing drops the lift so
      a held auto-repeat reads as held. */
-  key: `rounded-[3px] size-[34px] text-[13px] [transition:transform_0.12s,background_0.12s,border-color_0.12s,color_0.12s] ${LIFT} enabled:active:[transform:none] enabled:active:shadow-none ${RING}`,
+  key: `rounded-[3px] size-[34px] text-[13px] [transition:transform_0.12s,background_0.12s,border-color_0.12s,color_0.12s] ${LIFT} enabled:active:[transform:none] enabled:active:shadow-none`,
   /* The journal's kind filters: index tabs, alternately tilted. */
   tab: "rounded-md font-normal text-[14px] px-3.5 py-0.5 [transform:rotate(-0.5deg)] odd:[transform:rotate(0.5deg)] [transition:background_0.15s,color_0.15s]",
   pill: "rounded-full",

@@ -50,7 +50,7 @@ export default function FootnoteSheet() {
       // journey never happened.
       clone.querySelectorAll("[data-footnote-backref]").forEach((a) => a.remove());
       const num = document.createElement("span");
-      num.className = "n";
+      num.className = "mr-[7px] font-mono text-meta text-(--accent-ink)";
       num.textContent = `${open.label.padStart(2, "0")}.`;
       // The number belongs to the first line of the note, not a line of its own.
       (clone.firstElementChild ?? clone).prepend(num);
@@ -63,14 +63,17 @@ export default function FootnoteSheet() {
   return (
     <BottomSheet
       open={open !== null}
-      classPrefix="je-fnsheet"
+      bodyClassName="font-display"
       label="footnote"
       ariaLabel={open ? `footnote ${open.label}` : "footnote"}
       opener={open?.opener}
       onCloseAction={close}
       dismissQuery={PHONE_QUERY}
     >
-      <div ref={bodyRef} />
+      <div
+        ref={bodyRef}
+        className="[&_p]:m-0 [&_p]:[font-size:inherit] [&_p]:[line-height:inherit] [&_p]:text-inherit [&_p+p]:mt-[9px] [&_a]:text-(--accent-ink) [&_a]:underline [&_a]:border-b-0"
+      />
     </BottomSheet>
   );
 }

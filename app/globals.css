@@ -115,16 +115,32 @@
   --breakpoint-wide: 721px;
   --breakpoint-mid: 1001px;  /* Work slabs stack */
   --breakpoint-nav: 901px;
+
+  /* Bottom sheet entry (components/ui/BottomSheet). */
+  --animate-sheet-up: sheet-up 0.27s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+  --animate-sheet-fade: sheet-fade 0.18s ease-out both;
+  @keyframes sheet-up {
+    from { transform: translateY(101%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes sheet-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 }
 
-/* Text-safe accents (4.5:1 on paper) from the Work redesign, for small
-   labels the brand accents above are too light to carry. `static` because
-   they're read as var(--color-${tone}-ink) in inline styles, which Tailwind
-   can't see; without it the variables are never emitted. */
+/* Text-safe accents, for small labels the brand accents are too light to
+   carry. `-ink` clears 4.5:1 on paper. `-deep` is for text on a tint of its
+   own accent (tabs, chips), where `-ink` drops to about 3.6:1 on hover.
+   `static` because the `-ink` ones are read as var(--color-${tone}-ink) in
+   inline styles, which Tailwind can't see; without it the variables are
+   never emitted. */
 @theme static {
   --color-coral-ink: #b8402c;
   --color-teal-ink: #137a6d;
   --color-electric-ink: #a800be;
+  --color-coral-deep: color-mix(in oklab, var(--color-coral) 58%, var(--color-ink));
+  --color-teal-deep: color-mix(in oklab, var(--color-teal) 62%, var(--color-ink));
 }
 
 /* A role resizes itself on phones, so elements don't carry a max-wide: size. */

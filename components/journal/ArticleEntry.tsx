@@ -9,7 +9,7 @@ import { Plate, mdxComponents } from "@/components/journal/mdx-components";
 import FootnoteSheet from "@/components/journal/FootnoteSheet";
 import ReadingProgress from "@/components/journal/ReadingProgress";
 import SectionRail from "@/components/journal/SectionRail";
-import JournalBackLink from "@/components/journal/JournalBackLink";
+import BackLink from "@/components/ui/BackLink";
 import Label from "@/components/ui/Label";
 import Pill from "@/components/ui/Pill";
 import { imageDims } from "@/lib/image-dims";
@@ -50,7 +50,7 @@ export default function ArticleEntry({
       // The article's layout variables: rail and gutter widths, the reading
       // measure, the margin-note column. Use --accent-ink for small text; pure
       // --accent is reserved for graphics.
-      className="font-display text-ink [--accent:var(--color-coral)] [--accent-ink:color-mix(in_oklab,var(--accent)_63%,var(--color-ink))] [--je-measure:640px] [--col:640px] [--rail:132px] [--colgap:30px] [--side-w:330px] [--side-gap:34px] max-[1300px]:[--je-measure:600px] max-[1300px]:[--col:600px] max-[1300px]:[--side-w:288px] max-[1300px]:[--side-gap:26px] max-mid:[--rail:104px] max-mid:[--colgap:22px] max-nav:[--rail:26px] max-nav:[--colgap:14px] max-wide:[--rail:14px] max-wide:[--colgap:20px]"
+      className="font-display text-ink [--accent:var(--color-coral)] [--accent-ink:var(--color-coral-ink)] [--je-measure:640px] [--col:640px] [--rail:132px] [--colgap:30px] [--side-w:330px] [--side-gap:34px] max-[1300px]:[--je-measure:600px] max-[1300px]:[--col:600px] max-[1300px]:[--side-w:288px] max-[1300px]:[--side-gap:26px] max-mid:[--rail:104px] max-mid:[--colgap:22px] max-nav:[--rail:26px] max-nav:[--colgap:14px] max-wide:[--rail:14px] max-wide:[--colgap:20px]"
     >
       <ReadingProgress />
       {/* Delegated over the whole entry — the [^N] refs are MDX output, so there
@@ -58,7 +58,7 @@ export default function ArticleEntry({
       <FootnoteSheet />
       <div className="relative w-[1280px] max-w-full mx-auto pt-11 px-10 pb-25 max-mid:w-full max-mid:pt-8 max-mid:px-6.5 max-mid:pb-20 max-wide:pt-6 max-wide:px-[18px] max-wide:pb-18">
         <nav className="flex items-center justify-between flex-wrap gap-2.5 pb-4 mb-9.5 border-b-[1.5px] border-dashed border-ink-faint">
-          <JournalBackLink href="/journal">← back to journal</JournalBackLink>
+          <BackLink href="/journal">← back to journal</BackLink>
           <Label kind="eyebrow" as="span">
             the journal · vol. 02 · p.{pad(entry.page)}
           </Label>

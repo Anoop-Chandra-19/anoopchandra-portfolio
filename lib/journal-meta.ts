@@ -63,12 +63,12 @@ export const tabColors = (kind: JournalEntryMeta["kind"]) =>
     ? {
         background: "color-mix(in oklab, var(--color-coral) 15%, var(--color-paper))",
         borderColor: "var(--color-coral)",
-        color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
+        color: "var(--color-coral-deep)",
       }
     : {
         background: "color-mix(in oklab, var(--color-teal) 15%, var(--color-paper))",
         borderColor: "var(--color-teal)",
-        color: "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
+        color: "var(--color-teal-deep)",
       };
 
 /** Same palette as `tabColors`, split for the /journal index, where the tab is
@@ -84,8 +84,8 @@ export const tabAccent = (kind: JournalEntryMeta["kind"]): CSSProperties =>
     "--tab-c": kind === "case" ? "var(--color-coral)" : "var(--color-teal)",
     "--tab-ink":
       kind === "case"
-        ? "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))"
-        : "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
+        ? "var(--color-coral-deep)"
+        : "var(--color-teal-deep)",
   }) as CSSProperties;
 
 export const pad = (n: number) => String(n).padStart(3, "0");

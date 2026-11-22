@@ -36,17 +36,15 @@ export function LabPanel({ out = false, children }: { out?: boolean; children: R
 // The drawing surfaces: paper with a faint grid.
 const GRID_PAPER =
   "border-2 border-ink rounded-[4px] bg-[#fdfaf2] bg-[linear-gradient(color-mix(in_oklab,var(--color-ink)_6%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklab,var(--color-ink)_6%,transparent)_1px,transparent_1px)] cursor-crosshair touch-none";
-const FOCUS_RING =
-  "focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[var(--lxa,var(--color-electric))]";
 
 export const CANVAS = `${GRID_PAPER} block max-w-full [background-size:20px_20px]`;
 
 /** The k-means / perceptron point field and what sits on it. */
-export const FIELD = `${GRID_PAPER} ${FOCUS_RING} relative w-full aspect-square overflow-hidden [container-type:inline-size] [background-size:24px_24px]`;
+export const FIELD = `${GRID_PAPER} relative w-full aspect-square overflow-hidden [container-type:inline-size] [background-size:24px_24px]`;
 export const POINT =
   "absolute size-3 rounded-full border-[1.5px] border-ink [transform:translate(-50%,-50%)] [transition:background_0.3s] motion-reduce:transition-none";
 /** A point you can click: a larger invisible hit area. */
-export const POINT_BUTTON = `${POINT} p-0 cursor-pointer after:content-[''] after:absolute after:-inset-2.5 after:rounded-full ${FOCUS_RING}`;
+export const POINT_BUTTON = `${POINT} p-0 cursor-pointer after:content-[''] after:absolute after:-inset-2.5 after:rounded-full`;
 /** Centroids (✕) and the keyboard cursor (+). */
 export const MARK =
   "absolute pointer-events-none font-mono text-[22px] font-bold [transform:translate(-50%,-52%)] [transition:left_0.55s_cubic-bezier(0.3,0.7,0.3,1),top_0.55s_cubic-bezier(0.3,0.7,0.3,1)] [text-shadow:0_1px_0_var(--color-paper),0_0_3px_var(--color-paper)] motion-reduce:transition-none";

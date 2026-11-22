@@ -8,6 +8,7 @@
 import { useState } from "react";
 import BottomSheet from "@/components/ui/BottomSheet";
 import Button from "@/components/ui/Button";
+import Label from "@/components/ui/Label";
 import Pill from "@/components/ui/Pill";
 import { PHONE_QUERY } from "@/lib/breakpoints";
 import {
@@ -114,7 +115,7 @@ export default function JournalFilterSheet({
     <BottomSheet
       open={open}
       id={id}
-      classPrefix="je-filtersheet"
+      bodyClassName="font-mono"
       label="✎ filter the book"
       ariaLabel="filter the book"
       closeLabel="close filters"
@@ -122,10 +123,10 @@ export default function JournalFilterSheet({
       onCloseAction={onCloseAction}
       dismissQuery={PHONE_QUERY}
       footer={
-        <div className="journal-sheet-foot">
+        <div className="flex items-center gap-2.5 mt-[9px] pt-[9px] border-t border-dashed border-ink-faint">
           <button
             type="button"
-            className="journal-sheet-clear"
+            className="inline-flex items-center min-h-11 -my-1 p-0 bg-transparent font-mono text-control-sm text-ink-soft cursor-pointer"
             onClick={() => set({ filter: "all", tag: null, year: null })}
           >
             clear all
@@ -145,9 +146,9 @@ export default function JournalFilterSheet({
         </div>
       }
     >
-      <div className="journal-chipgrp" role="radiogroup" aria-label="kind">
-        <div className="journal-chipgrp-lbl">kind</div>
-        <div className="journal-chips">
+      <div className="mb-[15px]" role="radiogroup" aria-label="kind">
+        <Label kind="stamp" className="mb-2">kind</Label>
+        <div className="flex flex-wrap gap-[7px]">
           {KINDS.map(([k, label]) => (
             <Chip key={k} on={draft.filter === k} onSelect={() => set({ filter: k })}>
               {label} <span className="text-[11px] opacity-70">{count({ filter: k })}</span>
@@ -156,9 +157,9 @@ export default function JournalFilterSheet({
         </div>
       </div>
 
-      <div className="journal-chipgrp" role="radiogroup" aria-label="subject">
-        <div className="journal-chipgrp-lbl">subject</div>
-        <div className="journal-chips">
+      <div className="mb-[15px]" role="radiogroup" aria-label="subject">
+        <Label kind="stamp" className="mb-2">subject</Label>
+        <div className="flex flex-wrap gap-[7px]">
           <Chip on={draft.tag === null} onSelect={() => set({ tag: null })}>
             all
           </Chip>
@@ -185,9 +186,9 @@ export default function JournalFilterSheet({
       </div>
 
       {years.length > 1 && (
-        <div className="journal-chipgrp" role="radiogroup" aria-label="year">
-          <div className="journal-chipgrp-lbl">year</div>
-          <div className="journal-chips">
+        <div className="mb-[15px]" role="radiogroup" aria-label="year">
+          <Label kind="stamp" className="mb-2">year</Label>
+          <div className="flex flex-wrap gap-[7px]">
             <Chip on={draft.year === null} onSelect={() => set({ year: null })}>
               all
             </Chip>
@@ -200,9 +201,9 @@ export default function JournalFilterSheet({
         </div>
       )}
 
-      <div className="journal-chipgrp" role="radiogroup" aria-label="sort">
-        <div className="journal-chipgrp-lbl">sort</div>
-        <div className="journal-chips">
+      <div className="mb-[15px]" role="radiogroup" aria-label="sort">
+        <Label kind="stamp" className="mb-2">sort</Label>
+        <div className="flex flex-wrap gap-[7px]">
           {SORTS.map(([k, label]) => {
             const on = draft.sort.key === k;
             return (

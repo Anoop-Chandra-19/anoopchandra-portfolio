@@ -8,7 +8,7 @@ import {
   type Filter,
   type JournalEntryMeta,
 } from "@/lib/journal-meta";
-import JournalBackLink from "@/components/journal/JournalBackLink";
+import BackLink from "@/components/ui/BackLink";
 import Button from "@/components/ui/Button";
 import Label from "@/components/ui/Label";
 import Pill from "@/components/ui/Pill";
@@ -42,10 +42,8 @@ const SORTERS: Record<SortKey, (x: JournalEntryMeta, y: JournalEntryMeta) => num
   title: (x, y) => x.title.localeCompare(y.title),
 };
 
-const FOCUS = "focus-visible:outline-2 focus-visible:outline-ink focus-visible:outline-offset-2";
-
 // Edge tabs take their hue from the row (`tabAccent` sets --tab-c/--tab-ink).
-const EDGE_TAB = `absolute -right-0.5 top-1/2 [transform:translateY(-50%)] inline-flex items-center justify-center py-[3px] pr-2 pl-2.5 font-mono text-caption text-center cursor-pointer text-(--tab-ink) bg-[color-mix(in_oklab,var(--tab-c)_15%,var(--color-paper))] hover:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] focus-visible:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] border-[1.2px] border-(--tab-c) border-r-0 rounded-l-[3px] [transition:min-width_0.16s,opacity_0.16s,box-shadow_0.16s,background_0.16s] ${FOCUS} max-wide:hidden`;
+const EDGE_TAB = `absolute -right-0.5 top-1/2 [transform:translateY(-50%)] inline-flex items-center justify-center py-[3px] pr-2 pl-2.5 font-mono text-caption text-center cursor-pointer text-(--tab-ink) bg-[color-mix(in_oklab,var(--tab-c)_15%,var(--color-paper))] hover:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] focus-visible:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] border-[1.2px] border-(--tab-c) border-r-0 rounded-l-[3px] [transition:min-width_0.16s,opacity_0.16s,box-shadow_0.16s,background_0.16s] max-wide:hidden`;
 const EDGE_TAB_OFF =
   "min-w-[90px] hover:min-w-[96px] focus-visible:min-w-[96px] hover:[box-shadow:-2px_2px_0_color-mix(in_oklab,var(--color-ink)_45%,transparent)] focus-visible:[box-shadow:-2px_2px_0_color-mix(in_oklab,var(--color-ink)_45%,transparent)]";
 const EDGE_TAB_ON = "min-w-[100px] font-medium [box-shadow:-2px_2px_0_var(--color-ink)]";
@@ -75,7 +73,7 @@ function SortHead({
     <span className={align === "right" ? "text-right" : undefined}>
       <button
         type="button"
-        className={`inline-flex items-center gap-1 [font:inherit] [letter-spacing:inherit] [text-transform:inherit] bg-transparent p-0 border-b cursor-pointer ${FOCUS} ${
+        className={`inline-flex items-center gap-1 [font:inherit] [letter-spacing:inherit] [text-transform:inherit] bg-transparent p-0 border-b cursor-pointer ${
           on ? "text-ink border-ink" : "text-inherit border-transparent hover:text-ink"
         }`}
         onClick={() => onSort(sortKey)}
@@ -175,9 +173,9 @@ export default function JournalIndex({
         className="flex items-center justify-between flex-wrap gap-[13px] mb-7.5 pb-[15px]"
         style={{ borderBottom: "1.5px dashed var(--color-ink-faint)" }}
       >
-        <JournalBackLink href="/" peel>
+        <BackLink href="/" peel>
           ← back to portfolio
-        </JournalBackLink>
+        </BackLink>
         <Label kind="eyebrow">
           anoop parampalli · journal · vol. 02
         </Label>
@@ -197,11 +195,8 @@ export default function JournalIndex({
         <Label
           kind="tag"
           tone="inherit"
-          className="absolute top-[22px] right-[26px] py-1 px-[11px] rounded-[3px] border-[1.5px] border-coral max-wide:static max-wide:inline-block max-wide:mt-3.5"
-          style={{
-            transform: "rotate(3deg)",
-            color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
-          }}
+          className="absolute top-[22px] right-[26px] py-1 px-[11px] rounded-[3px] border-[1.5px] border-coral text-coral-ink max-wide:static max-wide:inline-block max-wide:mt-3.5"
+          style={{ transform: "rotate(3deg)" }}
         >
           est. 2025
         </Label>
@@ -223,7 +218,7 @@ export default function JournalIndex({
           <label className="relative inline-flex items-center gap-[7px] ml-1 font-mono text-tag uppercase text-ink-soft after:content-['⌄'] after:absolute after:right-2 after:top-1/2 after:[translate:0_-56%] after:text-ink-soft after:pointer-events-none">
             <span>year ↦</span>
             <select
-              className={`appearance-none min-w-[104px] py-1 pr-[25px] pl-2.5 border-[1.5px] border-ink rounded-md bg-paper hover:bg-paper-2 text-ink font-mono text-control leading-[1.2] cursor-pointer ${FOCUS}`}
+              className={`appearance-none min-w-[104px] py-1 pr-[25px] pl-2.5 border-[1.5px] border-ink rounded-md bg-paper hover:bg-paper-2 text-ink font-mono text-control leading-[1.2] cursor-pointer`}
               value={year ?? ""}
               onChange={(event) => setYear(event.target.value || null)}
             >
@@ -266,7 +261,7 @@ export default function JournalIndex({
           <Label kind="stamp" as="span">filter</Label>
           <span
             className={`min-w-0 truncate ${
-              isFiltered ? "text-[color-mix(in_oklab,var(--color-coral)_58%,var(--color-ink))]" : ""
+              isFiltered ? "text-coral-ink" : ""
             }`}
           >
             {pillText}

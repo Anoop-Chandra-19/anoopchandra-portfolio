@@ -83,6 +83,12 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 /* Keep element defaults layered so Tailwind utilities can override them. */
 @layer base {
 
+  /* One ring for every control, in the link colour. */
+  :focus-visible {
+    outline: 2px solid var(--color-electric);
+    outline-offset: 3px;
+  }
+
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 600;
@@ -116,6 +122,12 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 
 @media (max-width: 1100px) {
   @layer base {
+
+  /* One ring for every control, in the link colour. */
+  :focus-visible {
+    outline: 2px solid var(--color-electric);
+    outline-offset: 3px;
+  }
     h1 { font-size: 60px; }
     h2 { font-size: 36px; }
     h3 { font-size: 25px; }
@@ -127,6 +139,12 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
   body { font-size: 16px; line-height: 1.6; }
 
   @layer base {
+
+  /* One ring for every control, in the link colour. */
+  :focus-visible {
+    outline: 2px solid var(--color-electric);
+    outline-offset: 3px;
+  }
     h1 { font-size: 42px; line-height: 1.03; letter-spacing: -0.022em; }
     h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.014em; }
     h3 { font-size: 20px; line-height: 1.2; letter-spacing: -0.012em; }

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useInkTransition } from "@/components/transition/InkTransitionProvider";
+import BackLink from "@/components/ui/BackLink";
 import { LAB_EXPS, type LabExp } from "@/lib/lab-meta";
 import DoodleLab from "@/components/lab/DoodleLab";
 import SentimentLab from "@/components/lab/SentimentLab";
@@ -48,17 +49,9 @@ export default function LabShell({ exp }: { exp: LabExp }) {
       style={{ "--lxa": `var(--color-${exp.accent})` } as React.CSSProperties}
     >
       <div className="flex justify-between items-center gap-3.5 mb-6.5">
-        <Link
-          href="/"
-          className="inline-flex items-center py-[7px] px-3.5 bg-paper border-[1.5px] border-ink rounded-[3px] cursor-pointer font-mono text-[13px] tracking-[0.5px] text-ink no-underline [transition:transform_0.12s] hover:[transform:translate(-2px,-1px)] hover:shadow-[2px_2px_0_color-mix(in_oklab,var(--color-ink)_14%,transparent)]"
-          onClick={(event) => {
-            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-            event.preventDefault();
-            navigate("/", { effect: "peel" });
-          }}
-        >
+        <BackLink href="/" kind="box" peel>
           ← back to portfolio
-        </Link>
+        </BackLink>
         <nav className="flex gap-2" aria-label="Experiments">
           {LAB_EXPS.map((x) =>
             x.slug === exp.slug ? (

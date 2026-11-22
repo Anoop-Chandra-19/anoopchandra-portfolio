@@ -12,7 +12,7 @@ const CHOICE_TONE: Record<PillTone, { off: string; on: string }> = {
   ink: { off: "border-ink bg-paper text-ink", on: "border-ink bg-ink text-paper" },
   teal: {
     off: "border-[color-mix(in_oklab,var(--color-ink)_34%,transparent)] bg-paper text-ink-soft",
-    on: "border-teal bg-[color-mix(in_oklab,var(--color-teal)_16%,var(--color-paper))] text-[color-mix(in_oklab,var(--color-teal)_62%,var(--color-ink))]",
+    on: "border-teal bg-[color-mix(in_oklab,var(--color-teal)_16%,var(--color-paper))] text-teal-deep",
   },
 };
 const FILTER =

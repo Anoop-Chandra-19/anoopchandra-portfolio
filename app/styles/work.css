@@ -51,11 +51,7 @@ details.more > summary::before {
 }
 details.more[open] > summary::before { content: "−"; }
 details.more > summary:hover { color: var(--color-ink); }
-details.more > summary:focus-visible {
-  outline: 2px solid var(--color-electric);
-  outline-offset: 3px;
-  border-radius: 4px;
-}
+details.more > summary:focus-visible { border-radius: 4px; }
 /* Open/close motion. Durations are placeholders pending a value from the
    design; browsers without ::details-content open instantly. */
 details.more::details-content {
