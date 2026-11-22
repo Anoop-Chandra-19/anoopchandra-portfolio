@@ -16,11 +16,6 @@ import { imageDims } from "@/lib/image-dims";
 // full width once the side rail narrows.
 const MEASURE = "max-w-(--je-measure) max-mid:max-w-full";
 
-// MDX wraps block JSX children in <p>. Inside these blocks the paragraph takes
-// the block's type instead of the body's.
-const INHERIT_P =
-  "[&_p]:[font-family:inherit] [&_p]:[font-size:inherit] [&_p]:[line-height:inherit] [&_p]:[color:inherit] [&_p]:m-0 [&_p]:max-w-none";
-
 type CalloutVariant = "note" | "warning" | "tip";
 
 // Each variant sets the whole look rather than overriding a base: two colour
@@ -46,7 +41,7 @@ function Callout({ variant = "note", children }: { variant?: CalloutVariant; chi
   const look = CALLOUT[variant];
   return (
     <aside
-      className={`relative ${MEASURE} my-[26px] mx-0 py-[15px] px-5 border border-l-[3px] border-l-[color:var(--cal)] rounded-[3px] font-display font-normal text-prose-list text-ink text-pretty max-wide:py-[13px] max-wide:px-4 ${INHERIT_P} [&_p+p]:mt-2.5 ${look.box}`}
+      className={`relative ${MEASURE} my-[26px] mx-0 py-[15px] px-5 border border-l-[3px] border-l-[color:var(--cal)] rounded-[3px] font-display font-normal text-prose-list text-ink text-pretty max-wide:py-[13px] max-wide:px-4 inherit-p [&_p+p]:mt-2.5 ${look.box}`}
     >
       {label && (
         <span className={`flex items-center gap-[7px] mb-2 font-mono text-stamp font-medium uppercase ${look.lbl}`}>
@@ -133,7 +128,7 @@ export function Plate({
       />
       {caption ? (
         <figcaption
-          className={`mt-[11px] pl-3.5 [border-left:2px_solid_var(--accent)] font-mono text-meta leading-[1.55] text-ink-faint ${INHERIT_P}`}
+          className={`mt-[11px] pl-3.5 [border-left:2px_solid_var(--accent)] font-mono text-meta leading-[1.55] text-ink-faint inherit-p`}
         >
           {caption}
         </figcaption>
@@ -212,7 +207,7 @@ const FN_REF_TAP = "max-wide:after:content-[''] max-wide:after:absolute max-wide
 
 // The footnote list. Hidden on phones, where FootnoteSheet shows one note at
 // a time; it stays in the DOM because the sheet clones from it.
-const FOOTNOTES = `clear-right mt-[38px] pt-3.5 border-t border-dashed border-ink-faint max-w-(--je-measure) font-display text-small text-ink-soft max-wide:hidden [&>ol]:m-0 [&>ol]:pl-0 ${INHERIT_P}`;
+const FOOTNOTES = `clear-right mt-[38px] pt-3.5 border-t border-dashed border-ink-faint max-w-(--je-measure) font-display text-small text-ink-soft max-wide:hidden [&>ol]:m-0 [&>ol]:pl-0 inherit-p`;
 const FOOTNOTE =
   "text-small scroll-mt-[120px] target:bg-[color-mix(in_oklab,var(--accent)_12%,transparent)] target:rounded-[3px] target:before:text-ink";
 

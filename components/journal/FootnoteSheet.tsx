@@ -72,7 +72,7 @@ export default function FootnoteSheet() {
     >
       <div
         ref={bodyRef}
-        className="[&_p]:m-0 [&_p]:[font-size:inherit] [&_p]:[line-height:inherit] [&_p]:text-inherit [&_p+p]:mt-[9px] [&_a]:text-(--accent-ink) [&_a]:underline [&_a]:border-b-0"
+        className="inherit-p [&_p+p]:mt-[9px] [&_a]:text-(--accent-ink) [&_a]:underline [&_a]:border-b-0"
       />
     </BottomSheet>
   );
