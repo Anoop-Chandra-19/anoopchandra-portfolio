@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeMdxCodeProps from "rehype-mdx-code-props";
@@ -77,9 +78,14 @@ export default function ArticleEntry({
           <h1 className="m-0 mb-[18px] font-display font-semibold text-display text-ink text-balance">{entry.title}</h1>
           <p className="m-0 mb-6 max-w-[680px] font-display italic text-dek text-ink-soft text-pretty">{entry.dek}</p>
           <div className="flex items-center gap-[11px] py-[13px] border-y border-ink-faint font-mono text-meta text-ink-faint">
-            <span
-              className="flex-[0_0_auto] size-[22px] rounded-full border-[1.5px] border-ink bg-[repeating-linear-gradient(45deg,transparent_0_3px,rgba(0,0,0,.09)_3px_4px)]"
-              aria-hidden="true"
+            {/* Empty alt: the name sits right beside it, so a screen reader would hear it twice. */}
+            <Image
+              className="flex-[0_0_auto] size-[22px] rounded-full border-[1.5px] border-ink object-cover"
+              src="/anoopchandra.webp"
+              alt=""
+              width={22}
+              height={22}
+              sizes="22px"
             />
             <b className="font-medium text-ink">{AUTHOR}</b>
             {entry.sub && <span className="text-ink-soft">{entry.sub}</span>}
