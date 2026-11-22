@@ -5,7 +5,6 @@ import "./globals.css";
 import "./animations.css";
 import "./ink-transition.css";
 import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import StructuredData from "@/components/StructuredData";
 import InkTransitionProvider from "@/components/transition/InkTransitionProvider";
 
@@ -31,12 +30,15 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-/* Caveat's small x-height makes 20px the minimum aside size. */
+/* Caveat's small x-height makes 20px the minimum aside size.
+   Not preloaded: it only sets the handwritten asides, and at 51KB a preload
+   competed with what first paint needs on slow connections. */
 const caveat = Caveat({
   variable: "--font-accent",
   subsets: ["latin"],
   weight: ["600"],
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -116,7 +118,6 @@ export default function RootLayout({
         </a>
         <InkTransitionProvider>{children}</InkTransitionProvider>
         <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );
