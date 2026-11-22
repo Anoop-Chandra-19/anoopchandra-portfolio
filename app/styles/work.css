@@ -53,8 +53,12 @@ details.more[open] > summary::before { content: "−"; }
 details.more > summary:hover { color: var(--color-ink); }
 details.more > summary:focus-visible { border-radius: 4px; }
 /* Open/close motion. Durations are placeholders pending a value from the
-   design; browsers without ::details-content open instantly. */
+   design; browsers without ::details-content open instantly.
+   flow-root keeps the list's top margin inside the animated box. Without it the
+   margin collapses out of the box only while the content is visible, so it
+   pops in 12px at the start of opening and drops out at the end of closing. */
 details.more::details-content {
+  display: flow-root;
   height: 0;
   opacity: 0;
   overflow: clip;
