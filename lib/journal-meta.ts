@@ -73,7 +73,7 @@ export const tabColors = (kind: JournalEntryMeta["kind"]) =>
 
 /** Same palette as `tabColors`, split for the /journal index, where the tab is
  *  a filter button: only the hue and the small-text colour are per-row: the
- *  tint DEPTH is a state (rest 15% / hover 34%), so `.journal-edge-tab`
+ *  tint DEPTH is a state (rest 15% / hover 34%), so the edge tab
  *  composes the background itself from `--tab-c` rather than being handed a
  *  finished colour. §05's tabs are static and keep `tabColors`. */
 /* This rides on the row `<li>`, not the tab, because the phone kind label needs
