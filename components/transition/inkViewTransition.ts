@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import {
   INK,
+  JITTER,
   SPATTERS,
   SPATTER_BIRTHS,
   blobPath,
@@ -23,6 +24,11 @@ const SHADOW_H = 24;
 /** Keyframes sampled along the bleed. Every path keeps the same structure, so
     the browser interpolates between samples. */
 const BLEED_SAMPLES = 40;
+/** Share of the bleed, at the end, over which the ragged edge settles into a
+    circle. The eased radius is nearly full by then, and a dent in the edge
+    pointing at a far corner would otherwise leave a sliver of the old page
+    showing there until the transition ends. */
+const SETTLE = 0.3;
 /** easeInOutCubic as a CSS curve: the peel's geometry is linear in its
     progress, so two keyframes and this easing replace per-frame sampling. */
 export const PEEL_EASING = "cubic-bezier(0.65, 0, 0.35, 1)";
@@ -88,6 +94,7 @@ export function bleedKeyframes({ cx, cy, vw, vh }: InkOrigin) {
     const mainLocal = Math.max(0, (local - 0.04) / 0.96);
     const grown = maxR * easeOutQuart(mainLocal);
     const mainR = grown > 4 ? grown : 0;
+    const jitter = JITTER * Math.min(1, (1 - local) / SETTLE);
 
     // A spatter not yet born is a zero-radius blob, so the path keeps its shape.
     const spatters = SPATTERS.map((s, k) => {
@@ -95,7 +102,7 @@ export function bleedKeyframes({ cx, cy, vw, vh }: InkOrigin) {
       const r = born ? s.r * scale * easeOutCubic(Math.min(1, (local - SPATTER_BIRTHS[k]) / 0.22)) : 0;
       return spatterPath(cx + s.dx * scale, cy + s.dy * scale, r, s.seed);
     });
-    holes.push({ offset: local, clipPath: `path("${blobPath(cx, cy, mainR)}${spatters.join("")}")` });
+    holes.push({ offset: local, clipPath: `path("${blobPath(cx, cy, mainR, 1, jitter)}${spatters.join("")}")` });
 
     // The rim is the halo texture scaled to just past the hole's edge, with the
     // hole itself cut out in the texture's own (unscaled) coordinates.
@@ -109,7 +116,7 @@ export function bleedKeyframes({ cx, cy, vw, vh }: InkOrigin) {
     const box = HALO_R * 2;
     haloHole.push({
       offset: local,
-      clipPath: `path(evenodd, "M0 0H${box}V${box}H0Z${blobPath(HALO_R, HALO_R, mainR, 1 / s)}")`,
+      clipPath: `path(evenodd, "M0 0H${box}V${box}H0Z${blobPath(HALO_R, HALO_R, mainR, 1 / s, jitter)}")`,
     });
   }
 
