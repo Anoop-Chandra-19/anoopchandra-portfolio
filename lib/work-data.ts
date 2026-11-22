@@ -308,10 +308,10 @@ export const PROJECTS: Project[] = [
     org: "self · in progress",
     cat: "desktop · local-first",
     k: "electric",
-    img: "/projects/mosaic-suggestions.png",
+    img: "/projects/mosaic-editor.png",
     imgW: 1536,
     imgH: 918,
-    imgAlt: "Mosaic reviewing AI suggestions on a sample resume: changes are highlighted on the page, and the side panel flags a rewrite that turned “Assisted” into “Led” as claiming more.",
+    imgAlt: "Mosaic's editor on a sample resume: sections and bullets on the left with one bullet open for editing, beside the live A4 page preview.",
     imgFit: "contain",
     d: "A desktop resume builder that keeps everything on your machine. Tailor one resume per application, keep every version, and let an optional AI assistant suggest edits you approve one by one.",
     bullets: [
