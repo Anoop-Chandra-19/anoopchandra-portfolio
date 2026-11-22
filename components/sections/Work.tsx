@@ -145,6 +145,7 @@ function DiagramImg({
       height={d.h}
       sizes={sizes}
       className={`diagram ${className}`.trim()}
+      defer
     />
   );
 }
