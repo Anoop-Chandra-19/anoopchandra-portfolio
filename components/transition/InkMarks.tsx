@@ -1,13 +1,15 @@
 "use client";
 import { ViewTransition, type CSSProperties, type ViewTransitionInstance } from "react";
-import { transitionMs } from "@/lib/ink-bleed";
+import { hasBleedRim, transitionMs } from "@/lib/ink-bleed";
 import {
   PEEL_EASING,
+  REVEAL_END,
   animateRoot,
   bleedKeyframes,
   dropStyle,
   haloStyle,
   peelKeyframes,
+  revealRoot,
   shadowStyle,
   type InkEffect,
   type InkOrigin,
@@ -31,6 +33,9 @@ export default function InkMarks({
 }) {
   const duration = transitionMs(effect, origin.vw);
   const timing = { duration, fill: "both" } as const;
+  // The reveal finishes a little early; marks that follow its edge keep pace.
+  const revealMs = duration * REVEAL_END;
+  const revealTiming = { ...timing, duration: revealMs };
 
   // Ends the transition once every animation has finished, and cancels them if
   // React tears the view transition down early.
@@ -45,16 +50,20 @@ export default function InkMarks({
     const frames = bleedKeyframes(origin);
     return (
       <>
-        <Mark
-          name="ink-halo"
-          style={haloStyle(origin)}
-          onEnter={(vt) => track([vt.group.animate(frames.halo, timing), vt.new.animate(frames.haloHole, timing)])}
-        />
+        {hasBleedRim(origin.vw) && (
+          <Mark
+            name="ink-halo"
+            style={haloStyle(origin)}
+            onEnter={(vt) =>
+              track([vt.group.animate(frames.halo, revealTiming), vt.new.animate(frames.haloHole, revealTiming)])
+            }
+          />
+        )}
         <Mark
           name="ink-drop"
           style={dropStyle(origin)}
           onEnter={(vt) =>
-            track([vt.new.animate(frames.drop, timing), animateRoot("new", frames.holes, duration)])
+            track([vt.new.animate(frames.drop, timing), revealRoot(frames.holes, revealMs)])
           }
         />
       </>
@@ -62,7 +71,7 @@ export default function InkMarks({
   }
 
   const frames = peelKeyframes(origin);
-  const peelTiming = { ...timing, easing: PEEL_EASING };
+  const peelTiming = { ...revealTiming, easing: PEEL_EASING };
   return (
     <Mark
       name="ink-shadow"
@@ -71,7 +80,7 @@ export default function InkMarks({
         track([
           vt.group.animate(frames.band, peelTiming),
           vt.new.animate(frames.bandOpacity, peelTiming),
-          animateRoot("new", frames.reveal, duration, PEEL_EASING),
+          revealRoot(frames.reveal, revealMs, PEEL_EASING),
           animateRoot("old", frames.dim, duration, PEEL_EASING),
         ])
       }
