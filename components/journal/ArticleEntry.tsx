@@ -10,6 +10,7 @@ import FootnoteSheet from "@/components/journal/FootnoteSheet";
 import ReadingProgress from "@/components/journal/ReadingProgress";
 import SectionRail from "@/components/journal/SectionRail";
 import JournalBackLink from "@/components/journal/JournalBackLink";
+import Pill from "@/components/ui/Pill";
 import ZoomableImage from "@/components/ui/ZoomableImage";
 import { imageDims } from "@/lib/image-dims";
 
@@ -48,8 +49,8 @@ export default function ArticleEntry({
             <span className="dash" /><span>the journal · vol. 02</span>
           </div>
           <div className="je-chips">
-            <span className="je-chip">{entry.dateDisplay}</span>
-            <span className="je-chip">{entry.read} read</span>
+            <Pill kind="tag">{entry.dateDisplay}</Pill>
+            <Pill kind="tag">{entry.read} read</Pill>
           </div>
           <h1 className="je-title">{entry.title}</h1>
           <p className="je-dek">{entry.dek}</p>
@@ -107,9 +108,9 @@ export default function ArticleEntry({
               <div className="je-alsolbl">also in this notebook</div>
               <div className="je-also">
                 {related.map((r) => (
-                  <Link key={r.slug} className="je-chip" href={`/journal/${r.slug}`}>
+                  <Pill key={r.slug} kind="tag" href={`/journal/${r.slug}`}>
                     {r.title} · p.{pad(r.page)}
-                  </Link>
+                  </Pill>
                 ))}
               </div>
             </>

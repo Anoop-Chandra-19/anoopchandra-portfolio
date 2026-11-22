@@ -7,6 +7,8 @@
 "use client";
 import { useState } from "react";
 import BottomSheet from "@/components/ui/BottomSheet";
+import Button from "@/components/ui/Button";
+import Pill from "@/components/ui/Pill";
 import { PHONE_QUERY } from "@/lib/breakpoints";
 import {
   TAGS,
@@ -38,29 +40,30 @@ function Chip({
   on,
   disabled,
   onSelect,
-  className,
+  tone,
   children,
   srSuffix,
 }: {
   on: boolean;
   disabled?: boolean;
   onSelect: () => void;
-  className?: string;
+  tone?: "teal";
   children: React.ReactNode;
   srSuffix?: string;
 }) {
   return (
-    <button
-      type="button"
+    <Pill
+      kind="choice"
+      tone={tone}
+      on={on}
       role="radio"
       aria-checked={on}
       disabled={disabled}
-      className={`journal-chip ${className ?? ""} ${on ? "is-on" : ""}`}
       onClick={onSelect}
     >
       {children}
       {srSuffix && <span className="sr-only">{srSuffix}</span>}
-    </button>
+    </Pill>
   );
 }
 
@@ -127,9 +130,10 @@ export default function JournalFilterSheet({
           >
             clear all
           </button>
-          <button
-            type="button"
-            className="journal-sheet-apply"
+          <Button
+            kind="pill"
+            filled
+            className="ml-auto"
             aria-live="polite"
             onClick={() => {
               onApplyAction(draft);
@@ -137,7 +141,7 @@ export default function JournalFilterSheet({
             }}
           >
             show {resultCount} {resultCount === 1 ? "entry" : "entries"}
-          </button>
+          </Button>
         </div>
       }
     >
@@ -146,7 +150,7 @@ export default function JournalFilterSheet({
         <div className="journal-chips">
           {KINDS.map(([k, label]) => (
             <Chip key={k} on={draft.filter === k} onSelect={() => set({ filter: k })}>
-              {label} <span className="journal-chip-n">{count({ filter: k })}</span>
+              {label} <span className="text-[11px] opacity-70">{count({ filter: k })}</span>
             </Chip>
           ))}
         </div>
@@ -165,7 +169,7 @@ export default function JournalFilterSheet({
             return (
               <Chip
                 key={t}
-                className="is-tag"
+                tone="teal"
                 on={draft.tag === t}
                 /* Never the current pick: narrowing kind can zero out the subject
                    you already chose, and a checked-but-disabled chip is a trap. */
@@ -189,7 +193,7 @@ export default function JournalFilterSheet({
             </Chip>
             {years.map((y) => (
               <Chip key={y} on={draft.year === y} onSelect={() => set({ year: y })}>
-                {y} <span className="journal-chip-n">{count({ year: y })}</span>
+                {y} <span className="text-[11px] opacity-70">{count({ year: y })}</span>
               </Chip>
             ))}
           </div>
@@ -210,7 +214,7 @@ export default function JournalFilterSheet({
               >
                 {label}
                 {on && (
-                  <span aria-hidden="true" className="journal-chip-dir">
+                  <span aria-hidden="true" className="opacity-80">
                     {draft.sort.dir === "asc" ? "↑" : "↓"}
                   </span>
                 )}

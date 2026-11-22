@@ -32,9 +32,8 @@
   --color-teal: #1ea896;
   --color-navy: #25283d;
 
-  /* Mono label roles. No line-height: labels inherit it, as they always have.
-     Case is set at the call site (`uppercase`), as Mosaic does. meta's
-     -0.2px was the old .mono default, now said on the role itself. */
+  /* Mono label roles. No line-height: labels inherit it.
+     Case is set at the call site (`uppercase`), as Mosaic does. */
   --text-eyebrow: 11px;
   --text-eyebrow--letter-spacing: 3px;
   --text-tag: 10.5px;
@@ -55,6 +54,35 @@
   --text-intro--line-height: 1.6;
   --text-small: 15px;
   --text-small--line-height: 1.6;
+
+  /* Mono text on controls: buttons, pills, chips, selects, back links. */
+  --text-control: 12px;
+  --text-control--letter-spacing: 0;
+  --text-control-sm: 11px;
+  --text-control-sm--letter-spacing: 0;
+
+  /* Journal article reading sizes. The MDX body is markup we don't write, so
+     journal.css reads these as var(--text-prose) etc. Phone sizes below. */
+  --text-display: 72px;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -1.4px;
+  --text-dek: 24px;
+  --text-dek--line-height: 1.42;
+  --text-prose: 20px;
+  --text-prose--line-height: 1.75;
+  --text-prose-list: 19px;
+  --text-prose-list--line-height: 1.6;
+  --text-prose-h2: 33px;
+  --text-prose-h2--line-height: 1.12;
+  --text-prose-h2--letter-spacing: -0.016em;
+  --text-prose-h3: 24px;
+  --text-prose-h3--line-height: 1.2;
+  --text-pullquote: 36px;
+  --text-pullquote--line-height: 1.22;
+  --text-aside: 21px;
+  --text-aside--line-height: 1.3;
+  --text-code: 13.5px;
+  --text-code--line-height: 1.72;
 
   /* Tailwind's scales in px. html is 17px (the reading-size basis), so the
      rem defaults landed on fractions: p-4 was 17px, mb-6 25.5px. In px,
@@ -95,11 +123,33 @@
 }
 
 /* A role resizes itself on phones, so elements don't carry a max-wide: size. */
+@media (max-width: 1000px) {
+  :root {
+    --text-display: 54px;
+  }
+}
 @media (max-width: 720px) {
   :root {
     --text-summary: 17px;
     --text-summary--line-height: 1.55;
     --text-intro: 16px;
     --text-intro--line-height: 1.62;
+
+    --text-display: 34px;
+    --text-display--line-height: 1.04;
+    --text-display--letter-spacing: -0.8px;
+    --text-dek: 18px;
+    --text-prose: 17px;
+    --text-prose--line-height: 1.7;
+    --text-prose-list: 17px;
+    --text-prose-h2: 21px;
+    --text-prose-h2--line-height: 1.15;
+    --text-prose-h2--letter-spacing: -0.012em;
+    --text-prose-h3: 19px;
+    --text-pullquote: 28px;
+    --text-aside: 20px;
+    --text-aside--line-height: 1.36;
+    --text-code: 12px;
+    --text-code--line-height: 1.7;
   }
 }

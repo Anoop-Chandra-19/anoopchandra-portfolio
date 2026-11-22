@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { LabAccent } from "@/lib/lab-meta";
-import LabButton from "./LabButton";
+import Button from "@/components/ui/Button";
 
 /* A single-layer perceptron trained on normalized user points. One waypoint is
    recorded per epoch, then replayed at constant visual speed along the smoothed
@@ -434,10 +434,10 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           {`${pts.length} points placed. Cursor at ${Math.round(cursor.x * 100)}, ${Math.round(cursor.y * 100)} percent. Current class ${cls ? "B" : "A"}.`}
         </div>
         <div className="lx-krow">
-          <span className="mono faint">class</span>
+          <span className="font-mono text-[13px] tracking-[-0.2px] faint">class</span>
           <button
             type="button"
-            className="lx-cswatch mono"
+            className="lx-cswatch"
             aria-label={`Current point class ${cls ? "B" : "A"}. Activate to switch class.`}
             aria-pressed={cls === 1}
             disabled={training}
@@ -446,23 +446,22 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           >
             {cls ? "B" : "A"}
           </button>
-          <span className="mono faint lx-chint">click to switch</span>
+          <span className="faint lx-chint">click to switch</span>
           <span className="lx-krow-sp" />
-          <LabButton sm onClick={scatter} disabled={training}>
+          <Button kind="box" size="sm" onClick={scatter} disabled={training}>
             scatter
-          </LabButton>
-          <LabButton accent={accent} sm onClick={train} disabled={training || !ready}>
+          </Button>
+          <Button kind="box" size="sm" filled accent={accent} onClick={train} disabled={training || !ready}>
             ▸ train
-          </LabButton>
-          <LabButton sm onClick={clear} disabled={training}>
+          </Button>
+          <Button kind="box" size="sm" onClick={clear} disabled={training}>
             clear
-          </LabButton>
+          </Button>
         </div>
         <div className="lx-krow">
-          <span className="mono faint">epochs</span>
-          <button
-            type="button"
-            className="lx-kbtn"
+          <span className="font-mono text-[13px] tracking-[-0.2px] faint">epochs</span>
+          <Button
+            kind="key"
             aria-label="Fewer epochs"
             disabled={training || epochs <= MIN_EPOCHS}
             onClick={(event) => {
@@ -476,13 +475,12 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
             onPointerCancel={endHold}
           >
             −
-          </button>
-          <output className="lx-epn mono" aria-label="Epoch count">
+          </Button>
+          <output className="lx-epn" aria-label="Epoch count">
             {epochs}
           </output>
-          <button
-            type="button"
-            className="lx-kbtn"
+          <Button
+            kind="key"
             aria-label="More epochs"
             disabled={training || epochs >= MAX_EPOCHS}
             onClick={(event) => {
@@ -496,12 +494,12 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
             onPointerCancel={endHold}
           >
             +
-          </button>
-          <span className="mono faint lx-chint">max passes before it gives up</span>
+          </Button>
+          <span className="faint lx-chint">max passes before it gives up</span>
         </div>
       </div>
       <div className="lx-panel lx-out">
-        <div className="mono faint lx-cap">
+        <div className="faint lx-cap">
           $ perceptron --lr {LR} --epochs {epochs}
         </div>
         <div className="lx-kstat">
@@ -521,7 +519,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
         </div>
         <div className="lx-klegend">
           {CLASS_COLORS.map((c, i) => (
-            <span key={i} className="mono lx-kleg-row">
+            <span key={i} className="lx-kleg-row">
               <span className="lx-kdot" style={{ background: `var(--color-${c})` }} />
               class {i ? "B" : "A"}
               <span className="faint">· {pts.filter((p) => p.l === i).length} pts</span>
@@ -529,7 +527,7 @@ export default function PerceptronLab({ accent }: { accent: LabAccent }) {
           ))}
         </div>
         {shownW && (
-          <div className="mono lx-cw">w = [{shownW.map((v) => v.toFixed(2)).join(", ")}]</div>
+          <div className="lx-cw">w = [{shownW.map((v) => v.toFixed(2)).join(", ")}]</div>
         )}
         {w && !training && acc < 1 && (
           <div className="lx-cnote">

@@ -47,7 +47,7 @@ export default function Hero() {
               <Chip>resume.pdf</Chip>
             </a>
           </div>
-          <div className="mono faint anim-rise d-meta mt-7.5 text-[12px] leading-[17px] max-wide:order-7 max-wide:mt-[20px] max-wide:text-[10.5px] max-wide:tracking-[0.5px] max-xs:mt-[14px]">
+          <div className="font-mono tracking-[-0.2px] faint anim-rise d-meta mt-7.5 text-[12px] leading-[17px] max-wide:order-7 max-wide:mt-[20px] max-wide:text-[10.5px] max-wide:tracking-[0.5px] max-xs:mt-[14px]">
             open to interesting work · Cleveland, OH
           </div>
         </div>

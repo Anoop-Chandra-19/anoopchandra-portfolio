@@ -154,7 +154,7 @@ export default function Stack() {
           >
             <h3 className="card-title" style={{ color: col.c }}>{col.h}</h3>
             <Label kind="meta" className="mt-0.5">{col.note}</Label>
-            <ul className="mono list-none p-0 mt-[17px] text-[13px] tracking-[-0.01em] leading-[1.4] max-wide:text-[12.5px]">
+            <ul className="font-mono list-none p-0 mt-[17px] text-[13px] tracking-[-0.01em] leading-[1.4] max-wide:text-[12.5px]">
               {col.items.map(([name, years, obsession]) => (
                 <li
                   key={name}

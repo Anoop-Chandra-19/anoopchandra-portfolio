@@ -39,8 +39,8 @@
   gap: 8px;
 }
 .lx-tab {
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: var(--text-caption);
+  letter-spacing: var(--text-caption--letter-spacing);
   padding: 5px 12px;
   border: 1.5px solid color-mix(in oklab, var(--color-ink) 26%, transparent);
   border-radius: 3px;
@@ -48,6 +48,7 @@
   color: var(--color-ink-faint);
   text-decoration: none;
   transition: all 0.14s;
+  font-family: var(--font-mono);
 }
 .lx-tab:hover {
   color: var(--color-ink-soft);
@@ -68,14 +69,15 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: var(--text-caption);
+  letter-spacing: var(--text-caption--letter-spacing);
   text-transform: uppercase;
   color: var(--color-ink-soft);
   padding: 4px 11px;
   border: 1.5px solid var(--lxa);
   border-radius: 3px;
   background: color-mix(in oklab, var(--lxa) 14%, var(--color-paper));
+  font-family: var(--font-mono);
 }
 .lx-livedot {
   width: 7px;
@@ -112,47 +114,11 @@
   min-width: 0;
 }
 .lx-cap {
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: var(--text-caption);
+  letter-spacing: var(--text-caption--letter-spacing);
   margin-bottom: 8px;
-}
-.lx-btn,
-.lx-kbtn {
   font-family: var(--font-mono);
-  font-size: 13px;
-  border: 1.5px solid var(--color-ink);
-  border-radius: 3px;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  cursor: pointer;
 }
-.lx-btn {
-  padding: 9px 16px;
-  transition: transform 0.1s, background 0.14s;
-  white-space: nowrap;
-}
-.lx-btn:hover:not(:disabled),
-.lx-kbtn:hover:not(:disabled) {
-  transform: translate(-1px, -1px);
-  box-shadow: 2px 2px 0 color-mix(in oklab, var(--color-ink) 18%, transparent);
-}
-.lx-btn.on,
-.lx-kbtn.on {
-  background: var(--lxa);
-  border-color: var(--lxa);
-  color: #fff;
-}
-.lx-btn.sm {
-  font-size: 12px;
-  padding: 7px 13px;
-}
-.lx-btn:disabled,
-.lx-kbtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.lx-btn:focus-visible,
-.lx-kbtn:focus-visible,
 .lx-kfield:focus-visible,
 .lx-cpt:focus-visible {
   outline: 3px solid var(--lxa, var(--color-electric));
@@ -192,6 +158,7 @@
   font-size: 10px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
+  font-family: var(--font-mono);
 }
 .lx-keymap dl {
   display: flex;
@@ -331,6 +298,8 @@
 .lx-g-rank {
   font-size: 13px;
   color: var(--color-ink-faint);
+  font-family: var(--font-mono);
+  letter-spacing: -0.2px;
 }
 .lx-g-name {
   font-family: var(--font-body);
@@ -357,6 +326,8 @@
   color: var(--color-ink-soft);
   min-width: 44px;
   text-align: right;
+  font-family: var(--font-mono);
+  letter-spacing: -0.2px;
 }
 
 /* Sentiment */
@@ -394,6 +365,7 @@
   font-size: 16px;
   margin-left: 8px;
   color: var(--color-ink-soft);
+  letter-spacing: -0.2px;
 }
 .lx-inputrow {
   display: flex;
@@ -451,6 +423,7 @@
   margin-top: 12px;
   max-width: 340px;
   line-height: 1.5;
+  letter-spacing: -0.2px;
 }
 .lx-scroll {
   display: flex;
@@ -528,17 +501,6 @@
   margin-top: 16px;
   flex-wrap: wrap;
 }
-.lx-kbtn {
-  width: 34px;
-  height: 34px;
-  transition: transform 0.12s, background 0.12s, border-color 0.12s, color 0.12s;
-}
-/* The auto-repeating epoch stepper needs a held state, not only hover. */
-.lx-kbtn:active:not(:disabled) {
-  transform: translate(0, 0);
-  box-shadow: none;
-}
-
 .lx-krow-sp {
   flex: 1;
 }
@@ -560,6 +522,8 @@
   gap: 8px;
   font-size: 13px;
   color: var(--color-ink-soft);
+  font-family: var(--font-mono);
+  letter-spacing: -0.2px;
 }
 .lx-kdot {
   width: 12px;
@@ -593,6 +557,8 @@
   font-size: 12px;
   color: #fff;
   padding: 0;
+  font-family: var(--font-mono);
+  letter-spacing: -0.2px;
 }
 .lx-cswatch:disabled {
   opacity: 0.5;
@@ -600,18 +566,23 @@
 }
 .lx-chint {
   font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: -0.2px;
 }
 .lx-epn {
   min-width: 24px;
   text-align: center;
   font-size: 13px;
   color: var(--color-ink);
+  font-family: var(--font-mono);
+  letter-spacing: -0.2px;
 }
 .lx-cw {
   font-size: 12px;
   color: var(--color-ink-soft);
   letter-spacing: 0.5px;
   margin-top: 16px;
+  font-family: var(--font-mono);
 }
 .lx-cnote {
   font-family: var(--font-mono);
@@ -668,10 +639,11 @@
   background: color-mix(in oklab, var(--lxa) 8%, var(--color-paper));
 }
 .lx-aside-mark {
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: var(--text-caption);
+  letter-spacing: var(--text-caption--letter-spacing);
   text-transform: uppercase;
   color: var(--lxa);
+  font-family: var(--font-mono);
 }
 .lx-aside-body {
   font-size: 17.5px;
@@ -712,8 +684,6 @@
   .lx-blurb { font-size: 17px; line-height: 1.5; }
 
   .lx-aside-body { font-size: 17px; line-height: 1.55; }
-  .lx-tag { font-size: 10px; letter-spacing: 1px; }
-  .lx-cap { font-size: 9.5px; letter-spacing: 1.5px; }
 
   .lx-empty { font-size: 13.5px; line-height: 1.6; }
   .lx-canvas-hint { font-size: 13px; line-height: 1.55; }

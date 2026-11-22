@@ -9,7 +9,7 @@ import {
   type ModelPhase,
 } from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
-import LabButton from "./LabButton";
+import Button from "@/components/ui/Button";
 import BenchBoot from "./BenchBoot";
 
 /* Drawing pad + the QuickDraw CNN from the old site (public/models/doodle/v1).
@@ -247,7 +247,7 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
   return (
     <div className="lx-body">
       <div className="lx-panel">
-        <div id="doodle-instructions" className="mono faint lx-cap">
+        <div id="doodle-instructions" className="faint lx-cap">
           draw here ✎ · keyboard: use sample portrait
         </div>
         <div className="lx-canvaswrap">
@@ -263,46 +263,46 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
         </div>
         <div className="lx-prevrow">
           <div>
-            <div className="mono faint lx-cap">model input · {FIELD}×{FIELD}</div>
+            <div className="faint lx-cap">model input · {FIELD}×{FIELD}</div>
             <canvas ref={previewRef} width={FIELD} height={FIELD} className="lx-prev" />
           </div>
           <div className="lx-toolcol">
-            <LabButton accent={accent} disabled={!has || busy || phase !== "ready"} onClick={classify}>
+            <Button kind="box" filled accent={accent} disabled={!has || busy || phase !== "ready"} onClick={classify}>
               ▸ classify
-            </LabButton>
-            <button type="button" className="lx-btn sm" disabled={busy} onClick={drawSample}>
+            </Button>
+            <Button kind="box" size="sm" disabled={busy} onClick={drawSample}>
               sample portrait
-            </button>
-            <LabButton sm disabled={!has} onClick={clear}>
+            </Button>
+            <Button kind="box" size="sm" disabled={!has} onClick={clear}>
               clear
-            </LabButton>
+            </Button>
           </div>
         </div>
       </div>
       <div className="lx-panel lx-out">
-        <div className="mono faint lx-cap">$ classify ./sketch.png</div>
+        <div className="faint lx-cap">$ classify ./sketch.png</div>
         {error ? (
           <div className="lx-cnote" role="alert">
             {error.message}{" "}
-            <button
-              type="button"
-              className="lx-btn sm"
+            <Button
+              kind="box"
+              size="sm"
               disabled={busy}
               onClick={error.kind === "load" ? retryLoad : classify}
             >
               retry
-            </button>
+            </Button>
           </div>
         ) : guesses ? (
           <ul className="lx-guess">
             {guesses.map((g, i) => (
               <li key={g.name}>
-                <span className="mono lx-g-rank">{i + 1}.</span>
+                <span className="lx-g-rank">{i + 1}.</span>
                 <span className="lx-g-name">{g.name}</span>
                 <span className="lx-bar">
                   <span className="lx-bar-fill" style={{ width: `${Math.round(g.p * 100)}%` }} />
                 </span>
-                <span className="mono lx-g-pct">{Math.round(g.p * 100)}%</span>
+                <span className="lx-g-pct">{Math.round(g.p * 100)}%</span>
               </li>
             ))}
           </ul>

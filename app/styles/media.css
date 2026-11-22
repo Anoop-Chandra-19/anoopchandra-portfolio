@@ -97,6 +97,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   font-size: 12px;
   letter-spacing: 1px;
   text-transform: uppercase;
+  font-family: var(--font-mono);
 }
 .lightbox-bar button {
   flex-shrink: 0;

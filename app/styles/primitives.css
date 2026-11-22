@@ -12,6 +12,9 @@
   text-decoration: none;
   transform: translateY(calc(-100% - 20px));
   transition: transform 0.12s ease-out;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: -0.2px;
 }
 .skip-link:focus-visible { transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {

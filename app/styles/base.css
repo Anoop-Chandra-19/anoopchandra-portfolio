@@ -109,8 +109,6 @@ html.lenis:not(.lenis-autoToggle).lenis-stopped {
 
 /* Keep role defaults layered so local Tailwind sizes can override them. */
 @layer components {
-  .mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: -0.2px; }
-
   .hand { font-family: var(--font-display); }
   .accent { font-family: var(--font-accent); font-weight: 600; }
   .faint { color: var(--color-ink-faint); }

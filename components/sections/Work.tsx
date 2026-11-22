@@ -302,7 +302,7 @@ function AlsoList() {
     <ul className="list-none p-0 m-0 grid gap-[13px]">
       {ALSO.map((a) => (
         <li key={a.d} className="grid grid-cols-[20px_1fr] gap-[13px] items-start max-wide:grid-cols-[14px_1fr]">
-          <span className="mono text-[13px] leading-[1.6] text-ink-faint">•</span>
+          <span className="font-mono tracking-[-0.2px] text-[13px] leading-[1.6] text-ink-faint">•</span>
           <span className="text-small">
             <Copy long={a.d} short={a.shortD} />
           </span>

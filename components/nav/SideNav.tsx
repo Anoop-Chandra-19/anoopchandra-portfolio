@@ -21,7 +21,7 @@ export default function SideNav({
       className="max-nav:hidden fixed left-[30px] top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-[2px] py-[14px] pr-[10px] pl-[14px]"
       aria-label="Section navigation"
     >
-      <div className="mono faint anim-rail d-rail-h text-[9px] leading-[12px] tracking-[3px] uppercase mb-[10px] pl-[2px]">
+      <div className="font-mono faint anim-rail d-rail-h text-[9px] leading-[12px] tracking-[3px] uppercase mb-[10px] pl-[2px]">
         index
       </div>
       {NAV_ITEMS.map(([id, num, label], idx) => {
@@ -38,7 +38,7 @@ export default function SideNav({
             }}
           >
             <span
-              className={`mono text-[10px] min-w-[18px] ${
+              className={`font-mono tracking-[-0.2px] text-[10px] min-w-[18px] ${
                 isActive ? "text-electric" : "text-ink-faint"
               }`}
             >

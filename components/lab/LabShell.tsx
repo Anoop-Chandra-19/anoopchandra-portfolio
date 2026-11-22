@@ -60,12 +60,12 @@ export default function LabShell({ exp }: { exp: LabExp }) {
         <nav className="lx-tabs" aria-label="Experiments">
           {LAB_EXPS.map((x) =>
             x.slug === exp.slug ? (
-              <span key={x.slug} className="lx-tab mono on" aria-current="page">
+              <span key={x.slug} className="lx-tab on" aria-current="page">
                 {x.num}
               </span>
             ) : (
               // static links — ink is a home-only ceremony
-              <Link key={x.slug} href={`/lab/${x.slug}`} className="lx-tab mono">
+              <Link key={x.slug} href={`/lab/${x.slug}`} className="lx-tab">
                 {x.num}
               </Link>
             )
@@ -74,7 +74,7 @@ export default function LabShell({ exp }: { exp: LabExp }) {
       </div>
 
       <header className="lx-head">
-        <span className="lx-tag mono">
+        <span className="lx-tag">
           {exp.tag}
           <span className="lx-livedot" aria-hidden="true" />
           live
@@ -87,7 +87,7 @@ export default function LabShell({ exp }: { exp: LabExp }) {
       <KeyboardLegend isVisible={isKeyboardMode} hasPointField={exp.slug === "kmeans"} />
 
       <div className="lx-aside">
-        <span className="lx-aside-mark mono">✎ how it actually works</span>
+        <span className="lx-aside-mark">✎ how it actually works</span>
         <span className="lx-aside-body">{exp.foot}</span>
       </div>
     </main>

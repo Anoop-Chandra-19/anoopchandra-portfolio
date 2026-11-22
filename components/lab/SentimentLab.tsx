@@ -10,6 +10,7 @@ import {
 } from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
 
+import Button from "@/components/ui/Button";
 import BenchBoot from "./BenchBoot";
 
 /* Gauge + input UI from the design, verdict from the real IMDB LSTM
@@ -149,7 +150,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
           </svg>
           <div className="lx-verdict" style={{ color: res ? color : "var(--color-ink-faint)" }}>
             {res ? verdictLabel(s) : "…"}
-            <span className="mono lx-verdict-pct">{res ? ` ${Math.round(Math.abs(s) * 100)}%` : ""}</span>
+            <span className="lx-verdict-pct">{res ? ` ${Math.round(Math.abs(s) * 100)}%` : ""}</span>
           </div>
         </div>
         <form
@@ -172,26 +173,27 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             placeholder="e.g. I loved every minute…"
             onChange={(event) => setText(event.target.value)}
           />
-          <button
+          <Button
+            kind="box"
             type="submit"
-            className="lx-btn on"
+            filled
+            accent={accent}
             disabled={!text.trim() || busy || phase !== "ready"}
-            style={{ "--lxa": `var(--color-${accent})` } as React.CSSProperties}
           >
             read
-          </button>
+          </Button>
         </form>
         {error && (
           <div className="lx-cnote" role="alert">
             {error.message}{" "}
-            <button
-              type="button"
-              className="lx-btn sm"
+            <Button
+              kind="box"
+              size="sm"
               disabled={busy}
               onClick={error.kind === "load" ? retryLoad : run}
             >
               retry
-            </button>
+            </Button>
           </div>
         )}
         {res && (
@@ -210,7 +212,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
           </div>
         )}
         {res && !res.matched && (
-          <div className="mono faint lx-hint2">
+          <div className="faint lx-hint2">
             none of these words are in the highlight lexicon. the needle still read the whole sentence
           </div>
         )}
@@ -221,9 +223,9 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
         </div>
       </div>
       <div className="lx-panel lx-out">
-        <div className="mono faint lx-cap">$ history</div>
+        <div className="faint lx-cap">$ history</div>
         {error?.kind === "load" ? (
-          <div className="mono lx-cnote">model unavailable. use retry above</div>
+          <div className="tracking-[-0.2px] lx-cnote">model unavailable. use retry above</div>
         ) : log.length === 0 ? (
           <BenchBoot
             id="sentiment"
@@ -235,7 +237,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
         ) : (
           <div className="lx-scroll">
             {[...log].reverse().map((h, i) => (
-              <div key={i} className="mono lx-scroll-row">
+              <div key={i} className="lx-scroll-row">
                 <span className="faint">$ {h.t}</span>
                 <span style={{ color: verdictColor(h.s) }}>
                   {verdictLabel(h.s).toLowerCase()} · {Math.round(Math.abs(h.s) * 100)}%

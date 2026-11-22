@@ -9,7 +9,9 @@ import {
   type JournalEntryMeta,
 } from "@/lib/journal-meta";
 import JournalBackLink from "@/components/journal/JournalBackLink";
+import Button from "@/components/ui/Button";
 import Label from "@/components/ui/Label";
+import Pill from "@/components/ui/Pill";
 import JournalFilterSheet, {
   type Sort,
   type SortKey,
@@ -194,19 +196,14 @@ export default function JournalIndex({
       {/* Kind uses the top filters; subject uses each row's edge tab. Below the
           breakpoint this whole row is replaced by the filter pill. */}
       <div className="flex items-center flex-wrap gap-[11px] mb-[22px] max-wide:hidden">
-        <span className="mono text-[11px] tracking-[1px] uppercase text-ink-soft">
+        <span className="font-mono text-caption uppercase text-ink-soft">
           filter ↦
         </span>
         {FILTERS.map(([k, label]) => (
-          <button
-            key={k}
-            type="button"
-            className={`journal-filter-btn ${filter === k ? "is-active" : ""}`}
-            onClick={() => setFilter(k)}
-          >
+          <Button key={k} kind="tab" pressed={filter === k} onClick={() => setFilter(k)}>
             {label}
             <Label kind="meta" tone="inherit" as="span" className="opacity-70 ml-1">({counts[k]})</Label>
-          </button>
+          </Button>
         ))}
         {years.length > 1 && (
           <label className="journal-year-filter">
@@ -226,16 +223,11 @@ export default function JournalIndex({
           </label>
         )}
         {tag && (
-          <button
-            type="button"
-            className="journal-subject-chip"
-            title="clear subject filter"
-            onClick={() => setTag(null)}
-          >
+          <Pill kind="filter" className="ml-1" title="clear subject filter" onClick={() => setTag(null)}>
             <span className="faint tracking-[1px]">subject:</span>
             {tag}
             <span aria-hidden="true">×</span>
-          </button>
+          </Pill>
         )}
       </div>
 
@@ -363,9 +355,9 @@ export default function JournalIndex({
               )}{" "}
               yet.
             </p>
-            <button
-              type="button"
-              className="mono text-[11px] tracking-[1px] py-[5px] px-[13px] border-[1.5px] border-ink rounded-full bg-paper text-ink cursor-pointer"
+            <Button
+              kind="pill"
+              size="sm"
               onClick={() => {
                 setFilter("all");
                 setTag(null);
@@ -373,7 +365,7 @@ export default function JournalIndex({
               }}
             >
               show the whole book
-            </button>
+            </Button>
           </div>
         )}
 
@@ -390,7 +382,7 @@ export default function JournalIndex({
                    was hiding the page number, kind, read time and date from
                    screen readers. The row's own text is the better name. */
               >
-                <Label kind="meta" tone="soft" as="span" className="text-right max-wide:[grid-area:page] max-wide:self-baseline max-wide:pt-0 max-wide:text-[10.5px] max-wide:text-ink-faint">
+                <Label kind="meta" tone="soft" as="span" className="text-right max-wide:[grid-area:page] max-wide:self-baseline max-wide:pt-0 max-wide:text-ink-faint">
                   p.{pad(e.page)}
                 </Label>
 
@@ -420,7 +412,7 @@ export default function JournalIndex({
                 <span className="contents max-wide:flex max-wide:[grid-area:meta] max-wide:items-center max-wide:flex-wrap max-wide:gap-[7px] max-wide:min-w-0">
                   {/* The ★ badge above is desktop-only; this is its phone
                       equivalent, and it has to read for notes too. */}
-                  <span className="journal-toc-kind hidden max-wide:inline max-wide:order-1 font-mono text-[9px] tracking-[1.6px] uppercase whitespace-nowrap text-[color:var(--tab-ink)]">
+                  <span className="journal-toc-kind hidden max-wide:inline max-wide:order-1 font-mono text-stamp uppercase whitespace-nowrap text-[color:var(--tab-ink)]">
                     {e.kind === "case" ? (
                       <>
                         <span aria-hidden="true">★ </span>case
@@ -429,7 +421,7 @@ export default function JournalIndex({
                       "note"
                     )}
                   </span>
-                  <span className="journal-toc-tag hidden max-wide:inline max-wide:order-2 font-mono text-[10.5px] text-ink-soft">{e.tag}</span>
+                  <span className="journal-toc-tag hidden max-wide:inline max-wide:order-2 font-mono text-meta text-ink-soft">{e.tag}</span>
                   <Label kind="meta" tone="soft" as="span" className="text-right max-wide:order-4 max-wide:text-left max-wide:whitespace-nowrap">
                     {e.read}
                   </Label>
@@ -480,7 +472,7 @@ export default function JournalIndex({
         </div>
       </div>
 
-      <div style={{ marginTop: 40, textAlign: "center" }} className="mono faint">
+      <div style={{ marginTop: 40, textAlign: "center" }} className="font-mono text-[13px] tracking-[-0.2px] faint">
         — © 2026 Anoopchandra Parampalli · journal —
       </div>
     </main>

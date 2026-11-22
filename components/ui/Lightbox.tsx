@@ -223,7 +223,7 @@ export default function Lightbox({
           style={{ transform: `translate(${z.x}px, ${z.y}px) scale(${z.s})` }}
         />
       </div>
-      <div className="lightbox-bar mono">
+      <div className="lightbox-bar">
         {/* A div, not a span: a plate's caption comes from MDX and can be a <p>. */}
         <div className="lightbox-cap">{caption}</div>
         <span className="lightbox-hint">

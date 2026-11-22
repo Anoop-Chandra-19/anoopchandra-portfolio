@@ -134,7 +134,7 @@ export default function MobileIndexNav({
           aria-label="Section index"
         >
           <div className="flex justify-between items-center gap-[12px] pb-[14px] mb-[14px] border-b-2 border-dashed border-ink text-[10px] tracking-[2.5px] uppercase">
-            <span className="mono faint">✎ index — jump to</span>
+            <span className="font-mono text-[13px] tracking-[-0.2px] faint">✎ index — jump to</span>
             <button
               type="button"
               className="font-mono py-[4px] px-[8px] -my-[4px] -mx-[8px] border-0 bg-transparent text-ink text-[10px] tracking-[2.5px] uppercase cursor-pointer"
