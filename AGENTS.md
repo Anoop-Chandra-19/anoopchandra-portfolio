@@ -7,8 +7,8 @@ Guidance for coding agents working on this portfolio. Keep changes focused, pres
 - **Framework:** Next.js 16.4.6, App Router
 - **UI:** React 19.2.8
 - **Language:** TypeScript 6.0.3 with strict checking
-- **Styling:** Tailwind CSS 4.1.11 plus global CSS
-- **Animation:** Framer Motion and GSAP
+- **Styling:** Tailwind CSS 4.3.5 plus global CSS
+- **Animation:** CSS animations and view transitions
 - **Content:** Local MDX journal entries rendered with `next-mdx-remote`
 - **ML:** TensorFlow.js models loaded and run in the browser
 - **Package manager:** npm; keep `package-lock.json` in sync
