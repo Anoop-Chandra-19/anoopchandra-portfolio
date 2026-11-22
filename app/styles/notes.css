@@ -1,0 +1,14 @@
+.notes-edge-tab {
+  font-family: var(--font-mono);
+  border: 1.2px solid;
+  border-right: none;
+  border-radius: 3px 0 0 3px;
+}
+
+@media (max-width: 720px) {
+  .notes-edge-tab {
+    transform: none;
+    border-right: 1.2px solid;
+    border-radius: 3px;
+  }
+}

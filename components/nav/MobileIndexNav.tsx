@@ -111,40 +111,45 @@ export default function MobileIndexNav({
       <button
         ref={chipRef}
         type="button"
-        className={`m-nav-tab${tucked ? " tucked" : ""}`}
+        className={`m-nav-tab nav:hidden${tucked ? " tucked" : ""}`}
         aria-label="Open section index"
         aria-expanded={open}
         hidden={open}
         onClick={frozen ? undefined : () => setOpen(true)}
       >
-        <span className="m-nav-tab-lines" aria-hidden="true">
-          <i />
-          <i />
-          <i />
+        <span className="inline-flex flex-col gap-[3px] w-[16px]" aria-hidden="true">
+          <i className="h-[2px] bg-ink rounded-[2px]" />
+          <i className="h-[2px] w-[70%] bg-ink rounded-[2px]" />
+          <i className="h-[2px] bg-ink rounded-[2px]" />
         </span>
-        <span className="mono">index</span>
+        <span className="font-mono text-[11px] tracking-[1px]">index</span>
       </button>
 
       {open && (
         <div
           ref={overlayRef}
-          className="m-nav-overlay"
+          className="m-nav-overlay nav:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Section index"
         >
-          <div className="m-nav-overlay-head">
-            <span className="mono faint">✎ index — jump to</span>
-            <button type="button" className="m-nav-close mono" onClick={() => setOpen(false)}>
+          <div className="flex justify-between items-center gap-[12px] pb-[14px] mb-[14px] border-b-2 border-dashed border-ink text-[10px] tracking-[2.5px] uppercase">
+            <span className="font-mono text-[13px] tracking-[-0.2px] faint">✎ index — jump to</span>
+            <button
+              type="button"
+              className="font-mono py-[4px] px-[8px] -my-[4px] -mx-[8px] border-0 bg-transparent text-ink text-[10px] tracking-[2.5px] uppercase cursor-pointer"
+              onClick={() => setOpen(false)}
+            >
               esc ×
             </button>
           </div>
-          <ul className="m-nav-overlay-list">
+          <ul className="flex-1 list-none p-0 m-0">
             {NAV_ITEMS.map(([id, num, label]) => {
               const on = active === id;
               return (
-                <li key={id} className={on ? "on" : undefined}>
+                <li key={id} className="[border-bottom:1px_dashed_color-mix(in_oklab,var(--color-ink)_14%,transparent)]">
                   <a
+                    className="flex items-center gap-[12px] py-[13px] px-0 text-ink no-underline"
                     href={`#sec-${id}`}
                     aria-current={on ? "true" : undefined}
                     onClick={(e) => {
@@ -152,19 +157,28 @@ export default function MobileIndexNav({
                       go(id);
                     }}
                   >
-                    <span className="mono m-nav-ov-num">{num}</span>
+                    <span className="font-mono text-[11px] tracking-[1px] text-ink-faint min-w-[22px]">{num}</span>
                     {/* the overlay is chrome end to end — the labels go mono
                         with the numbers rather than staying display type */}
-                    <span className="mono m-nav-ov-label">{label}</span>
-                    <span className="m-nav-ov-rule" aria-hidden="true" />
-                    {on && <span className="mono m-nav-ov-here">← here</span>}
+                    <span
+                      className={`font-mono text-[19px] leading-[1.1] font-medium tracking-[-0.02em] ${on ? "text-electric" : ""}`}
+                    >
+                      {label}
+                    </span>
+                    <span
+                      className="flex-1 min-w-[16px] [border-bottom:1.5px_dotted_var(--color-ink-faint)]"
+                      aria-hidden="true"
+                    />
+                    {on && (
+                      <span className="font-mono text-[11px] tracking-[1.5px] uppercase text-electric">← here</span>
+                    )}
                   </a>
                 </li>
               );
             })}
           </ul>
-          <div className="mono faint m-nav-overlay-foot">
-            — © 2026 Anoopchandra Parampalli · made by hand —
+          <div className="font-mono faint text-[9.5px] tracking-[1.5px] text-center mt-[14px]">
+            — © 2026 Anoopchandra Parampalli —
           </div>
         </div>
       )}

@@ -1,0 +1,5 @@
+.postcard { transform: rotate(-0.6deg); }
+
+@media (max-width: 720px) {
+  .postcard { transform: none; }
+}

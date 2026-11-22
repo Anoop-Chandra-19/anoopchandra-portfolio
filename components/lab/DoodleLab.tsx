@@ -9,7 +9,9 @@ import {
   type ModelPhase,
 } from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
-import LabButton from "./LabButton";
+import Button from "@/components/ui/Button";
+import Label from "@/components/ui/Label";
+import { CANVAS, CENTER_HINT, LabBody, LabPanel, NOTE } from "./lab-ui";
 import BenchBoot from "./BenchBoot";
 
 /* Drawing pad + the QuickDraw CNN from the old site (public/models/doodle/v1).
@@ -245,64 +247,64 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
   }, [updatePreview]);
 
   return (
-    <div className="lx-body">
-      <div className="lx-panel">
-        <div id="doodle-instructions" className="mono faint lx-cap">
+    <LabBody>
+      <LabPanel>
+        <Label kind="caption" id="doodle-instructions" className="mb-2">
           draw here ✎ · keyboard: use sample portrait
-        </div>
-        <div className="lx-canvaswrap">
+        </Label>
+        <div className="relative w-fit max-w-full">
           <canvas
             ref={canvasRef}
             width={360}
             height={360}
-            className="lx-canvas"
+            className={CANVAS}
             aria-label="Drawing pad"
             aria-describedby="doodle-instructions"
           />
-          {!has && <span className="lx-canvas-hint">try a portrait, bird, bee…</span>}
+          {!has && <span className={`${CENTER_HINT} whitespace-nowrap text-[13.5px] leading-[1.6] max-wide:text-[13px] max-wide:leading-[1.55]`}>try a portrait, bird, bee…</span>}
         </div>
-        <div className="lx-prevrow">
+        <div className="flex items-end gap-5 mt-4">
           <div>
-            <div className="mono faint lx-cap">model input · {FIELD}×{FIELD}</div>
-            <canvas ref={previewRef} width={FIELD} height={FIELD} className="lx-prev" />
+            <Label kind="caption" className="mb-2">model input · {FIELD}×{FIELD}</Label>
+            <canvas ref={previewRef} width={FIELD} height={FIELD} className="size-18 [image-rendering:pixelated] border-[1.5px] border-ink rounded-[3px] bg-black" />
           </div>
-          <div className="lx-toolcol">
-            <LabButton accent={accent} disabled={!has || busy || phase !== "ready"} onClick={classify}>
+          <div className="flex flex-col gap-[9px] mb-0.5">
+            <Button kind="box" filled accent={accent} disabled={!has || busy || phase !== "ready"} onClick={classify}>
               ▸ classify
-            </LabButton>
-            <button type="button" className="lx-btn sm" disabled={busy} onClick={drawSample}>
+            </Button>
+            <Button kind="box" size="sm" disabled={busy} onClick={drawSample}>
               sample portrait
-            </button>
-            <LabButton sm disabled={!has} onClick={clear}>
+            </Button>
+            <Button kind="box" size="sm" disabled={!has} onClick={clear}>
               clear
-            </LabButton>
+            </Button>
           </div>
         </div>
-      </div>
-      <div className="lx-panel lx-out">
-        <div className="mono faint lx-cap">$ classify ./sketch.png</div>
+      </LabPanel>
+      <LabPanel out>
+        <Label kind="caption" className="mb-2">$ classify ./sketch.png</Label>
         {error ? (
-          <div className="lx-cnote" role="alert">
+          <div className={NOTE} role="alert">
             {error.message}{" "}
-            <button
-              type="button"
-              className="lx-btn sm"
+            <Button
+              kind="box"
+              size="sm"
               disabled={busy}
               onClick={error.kind === "load" ? retryLoad : classify}
             >
               retry
-            </button>
+            </Button>
           </div>
         ) : guesses ? (
-          <ul className="lx-guess">
+          <ul className="flex flex-col gap-3.5 list-none mt-3 mx-0 mb-0 p-0">
             {guesses.map((g, i) => (
-              <li key={g.name}>
-                <span className="mono lx-g-rank">{i + 1}.</span>
-                <span className="lx-g-name">{g.name}</span>
-                <span className="lx-bar">
-                  <span className="lx-bar-fill" style={{ width: `${Math.round(g.p * 100)}%` }} />
+              <li key={g.name} className="grid grid-cols-[26px_auto_1fr_auto] items-center gap-[11px]">
+                <span className="font-mono text-[13px] tracking-[-0.2px] text-ink-faint max-wide:text-[11.5px]">{i + 1}.</span>
+                <span className="font-display text-[21px] leading-[1.1] font-normal max-wide:text-[18px] max-wide:leading-[1.15]">{g.name}</span>
+                <span className="h-3 overflow-hidden border-[1.5px] border-ink rounded-[7px] bg-paper">
+                  <span className="block h-full rounded-l-[7px] bg-(--lxa) [transition:width_0.5s_cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:transition-none" style={{ width: `${Math.round(g.p * 100)}%` }} />
                 </span>
-                <span className="mono lx-g-pct">{Math.round(g.p * 100)}%</span>
+                <span className="min-w-11 text-right font-mono text-[14px] tracking-[-0.2px] text-ink-soft max-wide:text-[11.5px]">{Math.round(g.p * 100)}%</span>
               </li>
             ))}
           </ul>
@@ -320,7 +322,7 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
             ? `Classification complete. Best match: ${guesses[0].name}, ${Math.round(guesses[0].p * 100)} percent.`
             : ""}
         </div>
-      </div>
-    </div>
+      </LabPanel>
+    </LabBody>
   );
 }

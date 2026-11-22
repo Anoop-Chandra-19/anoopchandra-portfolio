@@ -10,6 +10,9 @@ import {
 } from "@/lib/lab-models";
 import type { LabAccent } from "@/lib/lab-meta";
 
+import Button from "@/components/ui/Button";
+import Label from "@/components/ui/Label";
+import { LabBody, LabPanel, NOTE } from "./lab-ui";
 import BenchBoot from "./BenchBoot";
 
 /* Gauge + input UI from the design, verdict from the real IMDB LSTM
@@ -64,6 +67,13 @@ function verdictColor(s: number): string {
 function verdictLabel(s: number): string {
   return s > 0.15 ? "Positive" : s < -0.15 ? "Negative" : "Neutral";
 }
+
+// Word chips: tinted by which way the lexicon pulls the word.
+const TOKEN_TONE = {
+  pos: "bg-[color-mix(in_oklab,var(--color-teal)_18%,var(--color-paper))] text-teal-deep",
+  neg: "bg-[color-mix(in_oklab,var(--color-coral)_20%,var(--color-paper))] text-coral-deep",
+  neutral: "bg-[color-mix(in_oklab,var(--color-ink)_6%,transparent)] text-ink-soft",
+} as const;
 
 export default function SentimentLab({ accent }: { accent: LabAccent }) {
   const { active: isTransitionActive } = useInkTransition();
@@ -129,17 +139,17 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
   const color = verdictColor(s);
 
   return (
-    <div className="lx-body">
-      <div className="lx-panel">
-        <div className="lx-gauge-wrap">
-          <svg viewBox="0 0 200 116" className="lx-gauge" aria-hidden="true">
+    <LabBody>
+      <LabPanel>
+        <div className="flex flex-col items-center pt-2 pb-1">
+          <svg viewBox="0 0 200 116" className="w-[280px] max-w-full h-auto" aria-hidden="true">
             <path d="M18 104 A82 82 0 0 1 182 104" fill="none" stroke="var(--color-ink)" strokeWidth="2" />
             <path d="M18 104 A82 82 0 0 1 100 22" fill="none" stroke="var(--color-coral)" strokeWidth="6" strokeLinecap="round" opacity="0.85" />
             <path d="M100 22 A82 82 0 0 1 182 104" fill="none" stroke="var(--color-teal)" strokeWidth="6" strokeLinecap="round" opacity="0.85" />
-            <text x="20" y="114" className="lx-gauge-lab" fill="var(--color-coral)">neg</text>
-            <text x="163" y="114" className="lx-gauge-lab" fill="var(--color-teal)">pos</text>
+            <text x="20" y="114" className="font-mono text-[9px] uppercase tracking-[1px]" fill="var(--color-coral)">neg</text>
+            <text x="163" y="114" className="font-mono text-[9px] uppercase tracking-[1px]" fill="var(--color-teal)">pos</text>
             <g
-              className="lx-needle"
+              className="[transition:transform_0.6s_cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:transition-none"
               style={{ transform: `rotate(${s * 72}deg)`, transformOrigin: "100px 104px" }}
             >
               <line x1="100" y1="104" x2="100" y2="34" stroke="var(--color-ink)" strokeWidth="3" strokeLinecap="round" />
@@ -147,13 +157,13 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             </g>
             <circle cx="100" cy="104" r="7" fill="var(--color-paper)" stroke="var(--color-ink)" strokeWidth="2" />
           </svg>
-          <div className="lx-verdict" style={{ color: res ? color : "var(--color-ink-faint)" }}>
+          <div className="mt-1.5 font-accent font-semibold text-[34px] leading-none tracking-[-0.015em] max-wide:text-[32px]" style={{ color: res ? color : "var(--color-ink-faint)" }}>
             {res ? verdictLabel(s) : "…"}
-            <span className="mono lx-verdict-pct">{res ? ` ${Math.round(Math.abs(s) * 100)}%` : ""}</span>
+            <span className="ml-2 font-display text-[16px] tracking-[-0.2px] text-ink-soft max-wide:text-[15px]">{res ? ` ${Math.round(Math.abs(s) * 100)}%` : ""}</span>
           </div>
         </div>
         <form
-          className="lx-inputrow"
+          className="flex items-center gap-2.5 mt-5 py-2 px-3 border-2 border-ink rounded-[4px] bg-paper focus-within:outline-2 focus-within:outline-offset-3 focus-within:outline-electric"
           onSubmit={(event) => {
             event.preventDefault();
             void run();
@@ -167,40 +177,41 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             name="sentimentText"
             type="text"
             autoComplete="off"
-            className="lx-input"
+            className="flex-1 min-w-0 border-none bg-transparent font-display text-[17px] text-ink outline-none"
             value={text}
             placeholder="e.g. I loved every minute…"
             onChange={(event) => setText(event.target.value)}
           />
-          <button
+          <Button
+            kind="box"
             type="submit"
-            className="lx-btn on"
+            filled
+            accent={accent}
             disabled={!text.trim() || busy || phase !== "ready"}
-            style={{ "--lxa": `var(--color-${accent})` } as React.CSSProperties}
           >
             read
-          </button>
+          </Button>
         </form>
         {error && (
-          <div className="lx-cnote" role="alert">
+          <div className={NOTE} role="alert">
             {error.message}{" "}
-            <button
-              type="button"
-              className="lx-btn sm"
+            <Button
+              kind="box"
+              size="sm"
               disabled={busy}
               onClick={error.kind === "load" ? retryLoad : run}
             >
               retry
-            </button>
+            </Button>
           </div>
         )}
         {res && (
-          <div className="lx-tokens">
+          <div className="flex flex-wrap gap-[7px] mt-4">
             {res.hits.map(([w, v], i) => (
-              <span key={i} className={"lx-tok" + (v > 0 ? " pos" : v < 0 ? " neg" : "")}>
+              <span key={i} className={`py-[3px] px-2 rounded-[3px] font-mono text-[13px] max-wide:text-[11.5px] ${TOKEN_TONE[v > 0 ? "pos" : v < 0 ? "neg" : "neutral"]}`}>
                 {w}
                 {v !== 0 && (
-                  <sup>
+                  <sup className="ml-px text-[9px]">
                     {v > 0 ? "+" : ""}
                     {v}
                   </sup>
@@ -210,7 +221,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
           </div>
         )}
         {res && !res.matched && (
-          <div className="mono faint lx-hint2">
+          <div className="faint mt-3 max-w-[340px] font-mono text-[11.5px] leading-[1.5] tracking-[-0.2px]">
             none of these words are in the highlight lexicon. the needle still read the whole sentence
           </div>
         )}
@@ -219,11 +230,11 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             ? `Analysis complete. ${verdictLabel(res.s)}, ${Math.round(Math.abs(res.s) * 100)} percent.`
             : ""}
         </div>
-      </div>
-      <div className="lx-panel lx-out">
-        <div className="mono faint lx-cap">$ history</div>
+      </LabPanel>
+      <LabPanel out>
+        <Label kind="caption" className="mb-2">$ history</Label>
         {error?.kind === "load" ? (
-          <div className="mono lx-cnote">model unavailable. use retry above</div>
+          <div className={`${NOTE} tracking-[-0.2px]`}>model unavailable. use retry above</div>
         ) : log.length === 0 ? (
           <BenchBoot
             id="sentiment"
@@ -233,10 +244,10 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             readyHint="type a sentence ✎"
           />
         ) : (
-          <div className="lx-scroll">
+          <div className="flex flex-col gap-[9px] mt-3">
             {[...log].reverse().map((h, i) => (
-              <div key={i} className="mono lx-scroll-row">
-                <span className="faint">$ {h.t}</span>
+              <div key={i} className="flex justify-between gap-3.5 pb-2 border-b border-dashed border-b-[color:color-mix(in_oklab,var(--color-ink)_12%,transparent)] font-mono text-[12px] tracking-[-0.01em] max-wide:text-[11.5px]">
+                <span className="faint overflow-hidden text-ellipsis whitespace-nowrap">$ {h.t}</span>
                 <span style={{ color: verdictColor(h.s) }}>
                   {verdictLabel(h.s).toLowerCase()} · {Math.round(Math.abs(h.s) * 100)}%
                 </span>
@@ -244,7 +255,7 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </LabPanel>
+    </LabBody>
   );
 }

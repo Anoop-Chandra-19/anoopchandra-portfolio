@@ -1,4 +1,5 @@
 "use client";
+import Label from "@/components/ui/Label";
 import { NAV_ITEMS, useActiveSection, useSectionJump } from "@/hooks/useActiveSection";
 
 /** Desktop-only vertical left rail (>900px). Below that the index chip +
@@ -13,14 +14,14 @@ export default function SideNav({
   const jumpTo = useSectionJump();
 
   return (
-    /* Whole pixels only, never rem: at a 17px basis the usual Tailwind steps
-       land on fractions and the row pitch drifts, which puts each 2px dash on
-       a different sub-pixel phase and antialiases them to different weights. */
+    /* Whole pixels only: if the row pitch lands on a fraction it drifts, which
+       puts each 2px dash on a different sub-pixel phase and antialiases them
+       to different weights. */
     <nav
-      className="side-nav-desktop fixed left-[30px] top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-[2px] py-[14px] pr-[10px] pl-[14px]"
+      className="max-nav:hidden fixed left-[30px] top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-[2px] py-[14px] pr-[10px] pl-[14px]"
       aria-label="Section navigation"
     >
-      <div className="mono faint anim-rail d-rail-h text-[9px] leading-[12px] tracking-[3px] uppercase mb-[10px] pl-[2px]">
+      <div className="font-mono faint anim-rail d-rail-h text-[9px] leading-[12px] tracking-[3px] uppercase mb-[10px] pl-[2px]">
         index
       </div>
       {NAV_ITEMS.map(([id, num, label], idx) => {
@@ -30,14 +31,14 @@ export default function SideNav({
             key={id}
             href={`#sec-${id}`}
             aria-current={isActive ? "true" : undefined}
-            className={`anim-rail d-rail-${idx} flex h-[30px] items-center gap-[10px] no-underline text-ink px-[6px] rounded`}
+            className={`anim-rail d-rail-${idx} flex h-[30px] items-center gap-[10px] no-underline text-ink px-[6px] rounded-sm`}
             onClick={(e) => {
               e.preventDefault();
               jumpTo(id);
             }}
           >
             <span
-              className={`mono text-[10px] min-w-[18px] ${
+              className={`font-mono tracking-[-0.2px] text-[10px] min-w-[18px] ${
                 isActive ? "text-electric" : "text-ink-faint"
               }`}
             >
@@ -48,13 +49,16 @@ export default function SideNav({
                 isActive ? "w-[28px] bg-electric" : "w-[10px] bg-ink"
               }`}
             />
-            <span
-              className={`mono text-[11.5px] tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
+            <Label
+              kind="meta"
+              tone="inherit"
+              as="span"
+              className={`tracking-[0.06em] whitespace-nowrap transition-all duration-[180ms] ${
                 isActive ? "text-electric translate-x-0" : "text-ink -translate-x-[1px]"
               }`}
             >
               {label}
-            </span>
+            </Label>
           </a>
         );
       })}

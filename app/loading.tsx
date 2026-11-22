@@ -18,7 +18,7 @@ export default function Loading() {
         AP
       </div>
       <div
-        className="mono faint"
+        className="font-mono text-[13px] tracking-[-0.2px] faint"
         style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", marginTop: 18 }}
       >
         loading…

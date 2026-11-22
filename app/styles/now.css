@@ -1,0 +1,5 @@
+.now-card { transform: rotate(var(--rot, 0deg)); }
+
+@media (max-width: 720px) {
+  .now-card { transform: none; }
+}

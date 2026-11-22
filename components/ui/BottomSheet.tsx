@@ -37,9 +37,8 @@ export type BottomSheetProps = {
   label: string;
   ariaLabel?: string;
   closeLabel?: string;
-  /** Class stem for every part. The sheet ships no CSS, so the caller's
-   *  stylesheet owns the look and two sheets can share this without a skin. */
-  classPrefix: string;
+  /** The body's type: the sheet sets size and colour, the caller the face. */
+  bodyClassName?: string;
   opener?: HTMLElement | null;
   onCloseAction: () => void;
   /** Close when this stops matching. Right for a sheet that is one viewport's
@@ -56,7 +55,7 @@ export default function BottomSheet({
   label,
   ariaLabel,
   closeLabel,
-  classPrefix,
+  bodyClassName,
   opener,
   onCloseAction,
   dismissQuery,
@@ -151,7 +150,7 @@ export default function BottomSheet({
       closing ||
       !e.isPrimary ||
       (e.pointerType === "mouse" && e.button !== 0) ||
-      (e.target as Element).closest(`.${classPrefix}-x`)
+      closeRef.current?.contains(e.target as Node)
     )
       return;
     drag.current = { y0: e.clientY, t0: performance.now() };
@@ -182,10 +181,15 @@ export default function BottomSheet({
   };
 
   return createPortal(
-    <div className={`${classPrefix}-wrap`}>
+    // Portalled outside the article, so it redeclares the accent tokens.
+    <div className="fixed inset-0 z-120 flex flex-col justify-end [--accent:var(--color-coral)] [--accent-ink:var(--color-coral-ink)]">
       <button
         type="button"
-        className={`${classPrefix}-scrim${settled ? " settled" : ""}`}
+        // The entry animation comes off once settled, so the inline drag
+        // styles can take over.
+        className={`absolute inset-0 p-0 bg-[color-mix(in_srgb,var(--color-ink)_26%,transparent)] cursor-pointer ${
+          settled ? "" : "animate-sheet-fade motion-reduce:animate-none"
+        }`}
         onClick={close}
         aria-label={closeLabel ?? `close ${label}`}
         tabIndex={-1}
@@ -199,7 +203,9 @@ export default function BottomSheet({
       <div
         ref={dialogRef}
         id={id}
-        className={`${classPrefix}${settled ? " settled" : ""}`}
+        className={`relative flex flex-col max-h-[calc(100dvh_-_env(safe-area-inset-top)_-_16px)] pt-[9px] px-[18px] pb-[26px] bg-paper border-t-[1.4px] border-ink rounded-t-[15px] [box-shadow:0_-7px_24px_color-mix(in_srgb,var(--color-ink)_14%,transparent)] touch-pan-y ${
+          settled ? "" : "animate-sheet-up motion-reduce:animate-none"
+        }`}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel ?? label}
@@ -224,19 +230,22 @@ export default function BottomSheet({
         }}
       >
         <div
-          className={`${classPrefix}-drag`}
+          className="touch-none"
           onPointerDown={down}
           onPointerMove={move}
           onPointerUp={up}
           onPointerCancel={cancel}
         >
-          <span className={`${classPrefix}-grab`} aria-hidden="true" />
-          <div className={`${classPrefix}-head`}>
+          <span
+            className="block w-9 h-[3.5px] mx-auto mb-[13px] rounded-[3px] bg-[color-mix(in_oklab,var(--color-ink)_20%,transparent)] cursor-grab"
+            aria-hidden="true"
+          />
+          <div className="flex items-center justify-between gap-3 mb-[7px] font-mono text-stamp uppercase text-(--accent-ink)">
             <span>{label}</span>
             <button
               ref={closeRef}
               type="button"
-              className={`${classPrefix}-x`}
+              className="flex items-center justify-center size-11 -my-[13px] -mr-4 p-0 bg-transparent font-mono text-[15px] leading-none tracking-normal text-ink-soft active:text-ink cursor-pointer [-webkit-tap-highlight-color:transparent]"
               onClick={close}
               aria-label="close"
             >
@@ -244,7 +253,10 @@ export default function BottomSheet({
             </button>
           </div>
         </div>
-        <div className={`${classPrefix}-body`} data-lenis-prevent>
+        <div
+          className={`min-h-0 overflow-y-auto overscroll-contain touch-pan-y text-small text-ink-soft ${bodyClassName ?? ""}`}
+          data-lenis-prevent
+        >
           {children}
         </div>
         {footer}

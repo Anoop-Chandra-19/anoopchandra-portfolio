@@ -1,4 +1,5 @@
 import SectionHeader from "@/components/ui/SectionHeader";
+import Label from "@/components/ui/Label";
 
 function Tally({ n }: { n: number }) {
   const groups: number[] = [];
@@ -16,13 +17,13 @@ function Tally({ n }: { n: number }) {
       {groups.map((g, gi) => (
         <span
           key={gi}
-          className="relative inline-block h-3.5"
+          className="relative inline-block h-[15px]"
           style={{ width: g >= 5 ? 22 : g * 4 }}
         >
           {Array.from({ length: Math.min(g, 4) }).map((_, i) => (
             <span
               key={i}
-              className="absolute top-0 w-[1.5px] h-3.5 bg-ink-soft origin-top"
+              className="absolute top-0 w-[1.5px] h-[15px] bg-ink-soft origin-top"
               style={{ left: i * 4, transform: `rotate(${-2 + i}deg)` }}
             />
           ))}
@@ -44,7 +45,7 @@ function CircleMark({ color }: { color: string }) {
       viewBox="0 0 200 60"
       preserveAspectRatio="none"
       aria-hidden="true"
-      className="absolute -inset-x-2.5 -inset-y-1.5 pointer-events-none overflow-visible"
+      className="absolute -inset-x-[11px] -inset-y-1.5 pointer-events-none overflow-visible"
       style={{ width: "calc(100% + 20px)", height: "calc(100% + 12px)" }}
     >
       <ellipse
@@ -139,25 +140,25 @@ export default function Stack() {
   return (
     <section id="sec-stack" className="section">
       <SectionHeader num="04" title="Stack" meta="grouped by where I use it" />
-      <div className="mono faint stack-legend text-[11px] mb-[18px] flex gap-[18px] flex-wrap">
+      <Label kind="meta" className="mb-[18px] flex gap-[18px] flex-wrap max-wide:flex-col max-wide:gap-[3px] max-wide:text-[10.5px] max-wide:tracking-[0.5px]">
         <span>tally marks = rough years of use</span>
-        <span className="stack-legend-sep">·</span>
+        <span className="max-wide:hidden">·</span>
         <span>circled = current obsession</span>
-      </div>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
+      </Label>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6.5">
         {COLS.map((col) => (
           <div
             key={col.h}
-            className="sketch-box pr-[22px]"
+            className="sketch-box"
             style={{ borderTop: "5px solid", borderTopColor: col.c }}
           >
             <h3 className="card-title" style={{ color: col.c }}>{col.h}</h3>
-            <div className="mono faint text-[11px] mt-0.5">{col.note}</div>
-            <ul className="mono stack-list list-none p-0 mt-4 text-[13px] tracking-[-0.01em] leading-[1.4]">
+            <Label kind="meta" className="mt-0.5">{col.note}</Label>
+            <ul className="font-mono list-none p-0 mt-[17px] text-[13px] tracking-[-0.01em] leading-[1.4] max-wide:text-[12.5px]">
               {col.items.map(([name, years, obsession]) => (
                 <li
                   key={name}
-                  className="grid grid-cols-[1fr_auto] items-center gap-x-2.5 py-[7px]"
+                  className="grid grid-cols-[1fr_auto] items-center gap-x-[11px] py-[7px]"
                   style={{
                     borderBottom:
                       "1px dashed color-mix(in oklab, var(--color-ink) 12%, transparent)",

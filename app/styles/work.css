@@ -1,0 +1,98 @@
+/* Tailwind preflight removes list markers; restore them for the expanded lists. */
+details.more ul { list-style: disc; }
+
+.part + .part { border-top: 2px dashed rgba(0, 0, 0, 0.35); }
+.part-pic .zoom-wrap + .pic-cap { margin-top: 10px; }
+.diagram img { display: block; width: 100%; height: auto; }
+/* The enlarge pill gets its own row above each diagram so it never covers the
+   drawing. A caption, where there is one, shares that row on the left. */
+.diagram { padding-top: 34px; }
+.diagram .zoom-btn { top: 0; right: 0; }
+.diagram-cap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  margin-bottom: -34px;
+  padding-right: 104px;
+  pointer-events: none;
+}
+
+details.more {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1.5px dashed rgba(0, 0, 0, 0.25);
+  interpolate-size: allow-keywords;
+}
+details.more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before {
+  content: "+";
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-ink-soft);
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+}
+details.more[open] > summary::before { content: "−"; }
+details.more > summary:hover { color: var(--color-ink); }
+details.more > summary:focus-visible { border-radius: 4px; }
+/* Open/close motion. Durations are placeholders pending a value from the
+   design; browsers without ::details-content open instantly. */
+details.more::details-content {
+  height: 0;
+  opacity: 0;
+  overflow: clip;
+  transition: height 0.25s ease, opacity 0.2s ease, content-visibility 0.25s allow-discrete;
+}
+details.more[open]::details-content { height: auto; opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  details.more::details-content { transition: none; }
+}
+
+.project-media {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 200px;
+  background: var(--color-paper-2);
+  border-left: 2px solid var(--color-ink);
+  border-right: 2px solid var(--color-ink);
+  overflow: hidden;
+}
+
+.project-media[data-fit="contain"] { padding: 20px; }
+.project-media img { display: block; width: 100%; height: 100%; }
+.project-media[data-fit="contain"] img { object-fit: contain; }
+.project-media[data-fit="cover"] img { object-fit: cover; }
+
+@media (max-width: 1000px) {
+  .project-media {
+    order: 1;
+    border: none;
+    border-bottom: 2px solid var(--color-ink);
+    min-height: 200px;
+  }
+  .project-media img { height: auto; }
+}
+
+@media (max-width: 720px) {
+  .project-media { min-height: 0; padding: 16px; }
+  .project-media img { max-height: 190px; }
+}

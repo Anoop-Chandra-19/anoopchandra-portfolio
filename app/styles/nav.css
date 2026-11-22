@@ -1,0 +1,57 @@
+/* Navigation: the phone index tab and its overlay. Visibility at the 900px
+   switch is set on the elements (nav:hidden / max-nav:hidden). */
+.m-nav-tab {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 var(--color-ink);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.12s;
+}
+.m-nav-tab:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--color-ink);
+}
+/* Never tuck the mobile nav trigger while keyboard-focused. */
+.m-nav-tab.tucked:not(:focus-visible) {
+  transform: translateY(-70px);
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-nav-tab { transition: opacity 0.12s; }
+  .m-nav-tab.tucked:not(:focus-visible) { transform: none; }
+}
+
+.m-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  padding: 26px max(18px, env(safe-area-inset-left)) max(26px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-paper);
+  background-image: repeating-linear-gradient(
+    0deg, transparent 0, transparent 30px,
+    rgba(0,0,0,0.02) 30px, rgba(0,0,0,0.02) 31px
+  );
+  animation: navIn 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes navIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-nav-overlay { animation: none; }
+}

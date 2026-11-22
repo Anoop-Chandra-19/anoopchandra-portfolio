@@ -28,7 +28,7 @@ export default function FootnoteSheet() {
       if (!mq.matches || e.metaKey || e.ctrlKey || e.shiftKey) return;
       // The pill's tap target is a ::after on the <sup>, not on the anchor, so
       // a thumb landing in the padding resolves through the sup.
-      const ref = (e.target as Element | null)?.closest?.(".je-fnref");
+      const ref = (e.target as Element | null)?.closest?.("sup");
       const a = ref?.querySelector<HTMLAnchorElement>("a[data-footnote-ref]");
       const id = a?.getAttribute("href")?.slice(1);
       if (!ref || !a || !id || !document.getElementById(id)) return;
@@ -50,27 +50,30 @@ export default function FootnoteSheet() {
       // journey never happened.
       clone.querySelectorAll("[data-footnote-backref]").forEach((a) => a.remove());
       const num = document.createElement("span");
-      num.className = "n";
+      num.className = "mr-[7px] font-mono text-meta text-(--accent-ink)";
       num.textContent = `${open.label.padStart(2, "0")}.`;
       // The number belongs to the first line of the note, not a line of its own.
       (clone.firstElementChild ?? clone).prepend(num);
       el.replaceChildren(...clone.childNodes);
     }
-    open.marker.classList.add("is-on");
-    return () => open.marker.classList.remove("is-on");
+    open.marker.setAttribute("data-on", "");
+    return () => open.marker.removeAttribute("data-on");
   }, [open]);
 
   return (
     <BottomSheet
       open={open !== null}
-      classPrefix="je-fnsheet"
+      bodyClassName="font-display"
       label="footnote"
       ariaLabel={open ? `footnote ${open.label}` : "footnote"}
       opener={open?.opener}
       onCloseAction={close}
       dismissQuery={PHONE_QUERY}
     >
-      <div ref={bodyRef} />
+      <div
+        ref={bodyRef}
+        className="[&_p]:m-0 [&_p]:[font-size:inherit] [&_p]:[line-height:inherit] [&_p]:text-inherit [&_p+p]:mt-[9px] [&_a]:text-(--accent-ink) [&_a]:underline [&_a]:border-b-0"
+      />
     </BottomSheet>
   );
 }

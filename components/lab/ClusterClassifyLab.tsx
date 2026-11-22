@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { LabAccent } from "@/lib/lab-meta";
+import Button from "@/components/ui/Button";
 import KMeansLab from "./KMeansLab";
 import PerceptronLab from "./PerceptronLab";
 
@@ -15,18 +16,18 @@ export default function ClusterClassifyLab({ accent }: { accent: LabAccent }) {
   const [mode, setMode] = useState<(typeof MODES)[number][0]>("cluster");
   return (
     <div data-lab-mode={mode}>
-      <div className="lx-modes">
+      <div className="flex flex-wrap gap-2 mb-5">
         {MODES.map(([m, label]) => (
-          <button
+          <Button
             key={m}
-            type="button"
-            className={"lx-btn sm" + (mode === m ? " on" : "")}
-            aria-pressed={mode === m}
+            kind="box"
+            size="sm"
+            pressed={mode === m}
+            accent={accent}
             onClick={() => setMode(m)}
-            style={mode === m ? ({ "--lxa": `var(--color-${accent})` } as React.CSSProperties) : undefined}
           >
             {label}
-          </button>
+          </Button>
         ))}
       </div>
       <div style={{ display: mode === "cluster" ? "block" : "none" }}>

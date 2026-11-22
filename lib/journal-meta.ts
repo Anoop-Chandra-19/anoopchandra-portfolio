@@ -63,17 +63,17 @@ export const tabColors = (kind: JournalEntryMeta["kind"]) =>
     ? {
         background: "color-mix(in oklab, var(--color-coral) 15%, var(--color-paper))",
         borderColor: "var(--color-coral)",
-        color: "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))",
+        color: "var(--color-coral-deep)",
       }
     : {
         background: "color-mix(in oklab, var(--color-teal) 15%, var(--color-paper))",
         borderColor: "var(--color-teal)",
-        color: "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
+        color: "var(--color-teal-deep)",
       };
 
 /** Same palette as `tabColors`, split for the /journal index, where the tab is
  *  a filter button: only the hue and the small-text colour are per-row: the
- *  tint DEPTH is a state (rest 15% / hover 34%), so `.journal-edge-tab`
+ *  tint DEPTH is a state (rest 15% / hover 34%), so the edge tab
  *  composes the background itself from `--tab-c` rather than being handed a
  *  finished colour. §05's tabs are static and keep `tabColors`. */
 /* This rides on the row `<li>`, not the tab, because the phone kind label needs
@@ -84,8 +84,8 @@ export const tabAccent = (kind: JournalEntryMeta["kind"]): CSSProperties =>
     "--tab-c": kind === "case" ? "var(--color-coral)" : "var(--color-teal)",
     "--tab-ink":
       kind === "case"
-        ? "color-mix(in oklab, var(--color-coral) 58%, var(--color-ink))"
-        : "color-mix(in oklab, var(--color-teal) 62%, var(--color-ink))",
+        ? "var(--color-coral-deep)"
+        : "var(--color-teal-deep)",
   }) as CSSProperties;
 
 export const pad = (n: number) => String(n).padStart(3, "0");

@@ -30,8 +30,8 @@ export default function HomeContent({
       <Notes entries={journalEntries} />
       <hr className="divider" />
       <Contact />
-      <div style={{ marginTop: 40, textAlign: "center" }} className="mono faint">
-        — © 2026 Anoopchandra Parampalli · made by hand —
+      <div style={{ marginTop: 40, textAlign: "center" }} className="font-mono text-[13px] tracking-[-0.2px] faint">
+        — © 2026 Anoopchandra Parampalli —
       </div>
     </>
   );

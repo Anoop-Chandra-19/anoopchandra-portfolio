@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { LabAccent } from "@/lib/lab-meta";
-import LabButton from "./LabButton";
+import Button from "@/components/ui/Button";
+import Label from "@/components/ui/Label";
+import { CONTROL_ROW, FIELD, FIELD_HINT, LEGEND, LEGEND_DOT, LEGEND_ROW, LabBody, LabPanel, MARK, POINT, STATUS } from "./lab-ui";
 
 /* The real K-Means loop (assign → mean-update, ported from main's
    PlaygroundDemo) at the design's presentation pace: one Lloyd's step per
@@ -147,11 +149,11 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
   const { pts, cents, iter, done } = field;
 
   return (
-    <div className="lx-body lx-kbody">
-      <div className="lx-panel">
+    <LabBody field>
+      <LabPanel>
         <div
           ref={fieldRef}
-          className="lx-kfield"
+          className={FIELD}
           role="application"
           tabIndex={0}
           aria-label="K-means point field. Use arrow keys to move the cursor, hold two arrow keys to move diagonally, and hold Shift for larger steps. Press Enter or Space to place a point."
@@ -164,7 +166,7 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
           {pts.map((p, i) => (
             <span
               key={i}
-              className="lx-kpt"
+              className={POINT}
               style={{
                 left: `${p.x * 100}%`,
                 top: `${p.y * 100}%`,
@@ -175,7 +177,7 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
           {cents.map((c, i) => (
             <span
               key={`c${i}`}
-              className="lx-kcent"
+              className={MARK}
               style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%`, color: `var(--color-${CLUSTER_COLORS[i]})` }}
             >
               ✕
@@ -183,7 +185,7 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
           ))}
           {isKeyboardCursorActive && !running && (
             <span
-              className="lx-kcent"
+              className={MARK}
               aria-hidden="true"
               style={{ left: `${cursor.x * 100}%`, top: `${cursor.y * 100}%`, color: `var(--color-${accent})` }}
             >
@@ -191,42 +193,41 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
             </span>
           )}
           {!pts.length && (
-            <span className="lx-kfield-hint">click to place points · tab into the field for keyboard controls</span>
+            <span className={FIELD_HINT}>click to place points · tab into the field for keyboard controls</span>
           )}
         </div>
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {`${pts.length} points placed. Cursor at ${Math.round(cursor.x * 100)}, ${Math.round(cursor.y * 100)} percent.`}
         </div>
-        <div className="lx-krow">
-          <span className="mono faint">k =</span>
+        <div className={CONTROL_ROW}>
+          <span className="font-mono text-[13px] tracking-[-0.2px] faint">k =</span>
           {[2, 3, 4].map((n) => (
-            <button
+            <Button
               key={n}
-              type="button"
-              className={"lx-kbtn" + (k === n ? " on" : "")}
-              aria-pressed={k === n}
+              kind="key"
+              pressed={k === n}
+              accent={accent}
               disabled={running}
               onClick={() => setK(n)}
-              style={k === n ? ({ "--lxa": `var(--color-${accent})` } as React.CSSProperties) : undefined}
             >
               {n}
-            </button>
+            </Button>
           ))}
-          <span className="lx-krow-sp" />
-          <LabButton sm onClick={scatter} disabled={running}>
+          <span className="flex-1" />
+          <Button kind="box" size="sm" onClick={scatter} disabled={running}>
             scatter
-          </LabButton>
-          <LabButton accent={accent} sm onClick={start} disabled={running || pts.length < k}>
+          </Button>
+          <Button kind="box" size="sm" filled accent={accent} onClick={start} disabled={running || pts.length < k}>
             ▸ run
-          </LabButton>
-          <LabButton sm onClick={clear} disabled={running}>
+          </Button>
+          <Button kind="box" size="sm" onClick={clear} disabled={running}>
             clear
-          </LabButton>
+          </Button>
         </div>
-      </div>
-      <div className="lx-panel lx-out">
-        <div className="mono faint lx-cap">$ kmeans --k {k}</div>
-        <div className="lx-kstat">
+      </LabPanel>
+      <LabPanel out>
+        <Label kind="caption" className="mb-2">$ kmeans --k {k}</Label>
+        <div className={STATUS}>
           {running
             ? `iterating… step ${iter}`
             : done
@@ -235,10 +236,10 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
                 ? `${pts.length} points ready · pick k, then run`
                 : "drop some points to begin"}
         </div>
-        <div className="lx-klegend">
+        <div className={LEGEND}>
           {Array.from({ length: k }).map((_, i) => (
-            <span key={i} className="mono lx-kleg-row">
-              <span className="lx-kdot" style={{ background: `var(--color-${CLUSTER_COLORS[i]})` }} />
+            <span key={i} className={LEGEND_ROW}>
+              <span className={LEGEND_DOT} style={{ background: `var(--color-${CLUSTER_COLORS[i]})` }} />
               cluster {i + 1}
               <span className="faint">· {pts.filter((p) => p.c === i).length} pts</span>
             </span>
@@ -249,7 +250,7 @@ export default function KMeansLab({ accent }: { accent: LabAccent }) {
             ? `K-means complete. ${pts.length} points grouped into ${cents.length} clusters in ${iter} steps.`
             : ""}
         </div>
-      </div>
-    </div>
+      </LabPanel>
+    </LabBody>
   );
 }

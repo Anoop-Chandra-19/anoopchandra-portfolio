@@ -1,0 +1,11 @@
+/* Section and plate numbers. The rest of the article is styled in
+   components/journal/mdx-components.tsx; these stay here because the padded
+   counter style has no utility, and the escaped glyphs read better as CSS.
+   Built-in decimal-leading-zero pads only to two digits. */
+@counter-style plate-pad { system: extends decimal; pad: 3 "0"; }
+.je-plate-tab::before { content: "plate " counter(plate, plate-pad); }
+.je-secn::before { content: "\270E \A7" counter(sec, decimal-leading-zero); }
+
+@media (max-width: 720px) {
+  .je-secn::before { content: "\A7" counter(sec, decimal-leading-zero); }
+}

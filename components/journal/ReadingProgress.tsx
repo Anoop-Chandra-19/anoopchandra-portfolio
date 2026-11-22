@@ -13,5 +13,5 @@ export default function ReadingProgress() {
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  return <div className="je-progress" style={{ transform: `scaleX(${p})` }} aria-hidden="true" />;
+  return <div className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-(--accent) origin-[0_50%]" style={{ transform: `scaleX(${p})` }} aria-hidden="true" />;
 }

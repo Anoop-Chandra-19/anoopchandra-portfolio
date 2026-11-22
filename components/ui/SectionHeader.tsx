@@ -1,3 +1,5 @@
+import Label from "./Label";
+
 export default function SectionHeader({
   num,
   title,
@@ -8,10 +10,10 @@ export default function SectionHeader({
   meta: string;
 }) {
   return (
-    <div className="section-header">
-      <span className="num">{num}.</span>
-      <h2>{title}</h2>
-      <span className="meta">{meta}</span>
+    <div className="flex items-baseline gap-[18px] mb-[24px] pb-[8px] border-b-2 border-dashed border-ink max-wide:flex-wrap max-wide:gap-x-[14px] max-wide:gap-y-[6px] max-wide:mb-[20px] max-wide:pb-[8px]">
+      <span className="font-mono text-[14px] text-ink-soft max-wide:order-1 max-wide:text-[11px] max-wide:tracking-[1px]">{num}.</span>
+      <h2 className="flex-1 max-wide:order-3 max-wide:flex-[1_0_100%] max-wide:mt-[6px] max-wide:mb-0 max-wide:mx-0">{title}</h2>
+      <span className="font-mono text-[12px] text-ink-soft text-right max-wide:order-2 max-wide:ml-auto max-wide:text-[10.5px] max-wide:tracking-[0.5px]">{meta}</span>
     </div>
   );
 }
@@ -26,13 +28,13 @@ export function SectionHeaderArrow({
   meta: string;
 }) {
   return (
-    <div className="sh-arrow relative mb-8 pb-3 border-b-2 border-dashed border-ink">
+    <div className="relative mb-8.5 pb-[13px] border-b-2 border-dashed border-ink max-wide:mb-[20px] max-wide:pb-[8px]">
       <svg
         viewBox="0 0 220 90"
         width="180"
         height="74"
         aria-hidden="true"
-        className="sh-arrow-svg absolute -top-7 -left-2.5 pointer-events-none overflow-visible"
+        className="max-wide:hidden absolute -top-7.5 -left-[11px] pointer-events-none overflow-visible"
       >
         <path
           d="M 8 14 C 60 4, 110 38, 150 62"
@@ -56,13 +58,13 @@ export function SectionHeaderArrow({
           fontSize="20"
           transform="rotate(-6 14 10)"
         >
-          the work ↘
+          the work
         </text>
       </svg>
-      <div className="sh-arrow-row flex items-baseline gap-[18px] pl-[170px]">
-        <span className="sh-num mono text-sm text-ink-soft">{num}.</span>
-        <h2 className="flex-1 m-0">{title}</h2>
-        <span className="sh-meta mono text-xs text-ink-soft text-right">{meta}</span>
+      <div className="flex items-baseline gap-[18px] pl-[170px] max-wide:flex-wrap max-wide:gap-x-[14px] max-wide:gap-y-[6px] max-wide:pl-0">
+        <span className="font-mono text-[14px] text-ink-soft max-wide:order-1 max-wide:text-[11px] max-wide:tracking-[1px]">{num}.</span>
+        <h2 className="flex-1 m-0 max-wide:order-3 max-wide:flex-[1_0_100%] max-wide:mt-[6px]">{title}</h2>
+        <span className="font-mono text-[12px] text-ink-soft text-right max-wide:order-2 max-wide:ml-auto max-wide:text-[10.5px] max-wide:tracking-[0.5px]">{meta}</span>
       </div>
     </div>
   );
@@ -78,9 +80,9 @@ export function SectionHeaderStamp({
   meta: string;
 }) {
   return (
-    <div className="sh-stamp relative mb-8 pb-3 border-b-2 border-dashed border-ink flex items-center gap-[22px] flex-wrap">
+    <div className="relative mb-8.5 pb-[13px] border-b-2 border-dashed border-ink flex items-center gap-[22px] flex-wrap max-wide:mb-[20px] max-wide:gap-[12px]">
       <div
-        className="sh-stamp-box relative border-2 border-ink rounded-[3px] px-[22px] pt-2 pb-2.5"
+        className="relative border-2 border-ink rounded-[3px] px-[22px] pt-2 pb-[11px] max-wide:px-[16px] max-wide:pt-[6px] max-wide:pb-[8px]"
         style={{
           background: "color-mix(in oklab, var(--color-coral) 12%, var(--color-paper))",
           transform: "rotate(-1.2deg)",
@@ -91,23 +93,23 @@ export function SectionHeaderStamp({
           className="absolute inset-1 rounded-[1px] pointer-events-none"
           style={{ border: "1px dashed color-mix(in oklab, var(--color-ink) 50%, transparent)" }}
         />
-        <div className="mono text-[10px] tracking-[3px] uppercase text-ink-soft -mb-0.5">
+        <Label kind="tag" tone="soft" className="-mb-0.5">
           § {num} · postage paid
-        </div>
-        <h2 className="m-0 text-[40px] leading-[1.08] tracking-[-0.016em]">{title}</h2>
+        </Label>
+        <h2 className="m-0 text-[40px] leading-[1.08] tracking-[-0.016em] max-wide:text-[28px] max-wide:leading-[1.1] max-wide:tracking-[-0.014em]">{title}</h2>
       </div>
       <svg
         viewBox="0 0 200 40"
         width="180"
         height="36"
         aria-hidden="true"
-        className="sh-stamp-rule shrink-0"
+        className="shrink-0 max-wide:hidden"
       >
         <line x1="2" y1="12" x2="198" y2="12" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
         <line x1="2" y1="20" x2="198" y2="20" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
         <line x1="2" y1="28" x2="198" y2="28" stroke="var(--color-electric)" strokeWidth="1.4" opacity="0.9" />
       </svg>
-      <span className="sh-meta mono text-xs text-ink-soft ml-auto">{meta}</span>
+      <span className="font-mono text-[12px] text-ink-soft ml-auto max-wide:text-[10.5px] max-wide:tracking-[0.5px]">{meta}</span>
     </div>
   );
 }

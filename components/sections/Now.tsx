@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import SectionHeader from "@/components/ui/SectionHeader";
+import Label from "@/components/ui/Label";
 
 const CARDS = [
   {
@@ -27,10 +28,10 @@ export default function Now() {
     <section id="sec-now" className="section">
       <SectionHeader num="01" title="Now" meta="what has my attention lately" />
       <div
-        className="now-well p-10 rounded-lg"
+        className="p-10.5 rounded-lg max-wide:p-[18px] max-wide:rounded-[8px]"
         style={{ background: "color-mix(in oklab, var(--color-coral) 8%, var(--color-paper-2))" }}
       >
-        <div className="row items-stretch gap-6">
+        <div className="flex items-stretch gap-[18px] max-wide:flex-col max-wide:gap-[14px]">
           {CARDS.map((c) => (
             <div
               key={c.h}
@@ -39,7 +40,7 @@ export default function Now() {
               // it in CSS — an inline transform would need !important to undo
               style={{ "--rot": `${c.rot}deg` } as CSSProperties}
             >
-              <div className="mono faint text-[11px] mb-1.5">{c.tag}</div>
+              <Label kind="meta" className="mb-1.5">{c.tag}</Label>
               <h3 className="card-title">{c.h}</h3>
               <ul className="pl-[18px] mt-2 text-[16px] leading-[1.6]">
                 {c.items.map((i) => (
@@ -48,9 +49,6 @@ export default function Now() {
               </ul>
             </div>
           ))}
-        </div>
-        <div className="mono faint mt-[18px] text-[11px] text-right">
-          ↻ a snapshot, updated by hand
         </div>
       </div>
     </section>

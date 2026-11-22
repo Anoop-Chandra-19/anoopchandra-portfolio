@@ -18,7 +18,7 @@ export default function Postmark() {
       width="110"
       height="110"
       aria-hidden="true"
-      className="contact-postmark shrink-0 opacity-[0.78]"
+      className="shrink-0 opacity-[0.78] max-wide:w-[84px] max-wide:h-[84px]"
       style={{ transform: "rotate(-9deg)" }}
     >
       <circle cx="65" cy="65" r="58" fill="none" stroke="var(--color-electric)" strokeWidth="1.6" />

@@ -25,7 +25,14 @@ function bar(fraction: number): string {
   return "▸".repeat(n) + "░".repeat(10 - n);
 }
 
-type BootLine = { key: string; cls?: string; text: React.ReactNode };
+type BootTone = "err" | "ready";
+type BootLine = { key: string; tone?: BootTone; text: React.ReactNode };
+
+const TONE: Record<BootTone | "default", string> = {
+  default: "text-ink-soft",
+  err: "text-coral",
+  ready: "text-(--lxa)",
+};
 
 export default function BenchBoot({
   id,
@@ -46,10 +53,10 @@ export default function BenchBoot({
   const rank = PHASE_RANK[p.phase];
   const lines = useMemo<BootLine[]>(() => {
     const out: BootLine[] = [
-      { key: "cmd", cls: "faint", text: `$ ./wake ${num} --model ${modelFlag}` },
+      { key: "cmd", text: `$ ./wake ${num} --model ${modelFlag}` },
     ];
     if (p.phase === "error") {
-      out.push({ key: "err", cls: "err", text: "✗ model failed to load. reload to retry" });
+      out.push({ key: "err", tone: "err", text: "✗ model failed to load. reload to retry" });
       return out;
     }
     out.push({
@@ -57,7 +64,7 @@ export default function BenchBoot({
       text:
         rank > 0 ? (
           <>
-            fetching weights <span className="ok">✓</span>
+            fetching weights <span className="text-teal">✓</span>
             {p.fromCache ? " (cached)" : ` · ${sizeMB} MB`}
           </>
         ) : (
@@ -67,17 +74,17 @@ export default function BenchBoot({
     if (id === "sentiment" && rank >= 1) {
       out.push({
         key: "wi",
-        text: rank > 1 ? <>loading word index <span className="ok">✓</span></> : "loading word index …",
+        text: rank > 1 ? <>loading word index <span className="text-teal">✓</span></> : "loading word index …",
       });
     }
     if (rank >= 2) {
       out.push({
         key: "warm",
-        text: rank > 2 ? <>warming up gpu <span className="ok">✓</span></> : "warming up gpu …",
+        text: rank > 2 ? <>warming up gpu <span className="text-teal">✓</span></> : "warming up gpu …",
       });
     }
     if (p.phase === "ready") {
-      out.push({ key: "ready", cls: "ready", text: `ready: ${readyHint}` });
+      out.push({ key: "ready", tone: "ready", text: `ready: ${readyHint}` });
     }
     return out;
   }, [id, num, modelFlag, sizeMB, readyHint, p, rank]);
@@ -94,12 +101,15 @@ export default function BenchBoot({
   const booting = p.phase !== "ready" && p.phase !== "error";
 
   return (
-    <div className="lx-boot" aria-live="polite">
+    <div className="flex flex-col gap-[9px] mt-3" aria-live="polite">
       {visible.map((l, i) => (
-        <div key={l.key} className={`lx-boot-line${l.cls ? ` ${l.cls}` : ""}`}>
+        <div
+          key={l.key}
+          className={`font-mono text-[12.5px] tracking-[-0.2px] whitespace-nowrap overflow-hidden text-ellipsis ${TONE[l.tone ?? "default"]}`}
+        >
           {l.text}
           {(booting || shown < lines.length) && i === visible.length - 1 && (
-            <span className="lx-boot-cursor" />
+            <span className="inline-block w-2 h-[13px] ml-[3px] align-[-2px] bg-ink-soft animate-[lxPulse_1s_steps(2,end)_infinite] motion-reduce:animate-none" />
           )}
         </div>
       ))}

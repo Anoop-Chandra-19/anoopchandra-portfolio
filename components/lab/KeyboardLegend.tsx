@@ -6,7 +6,7 @@ type KeyboardLegendProps = {
 export default function KeyboardLegend({ isVisible, hasPointField }: KeyboardLegendProps) {
   return (
     <aside className={`lx-keymap${isVisible ? " is-visible" : ""}`} aria-hidden="true">
-      <div className="lx-keymap-title mono">⌨ key map</div>
+      <div className="lx-keymap-title">⌨ key map</div>
       <dl>
         <div>
           <dt>
