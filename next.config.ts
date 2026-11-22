@@ -6,11 +6,6 @@ const nextConfig: NextConfig = {
   agentRules: false,
   experimental: {
     agentUpgrade: "security",
-    // Ship the stylesheet inside the HTML. First paint was waiting on a
-    // separate 21KB CSS request that shares a slow connection with the fonts
-    // and the photo; most visitors here are first-time, so the lost separate
-    // CSS cache matters little.
-    inlineCss: true,
   },
   // AVIF first: for the photo and the Work diagrams it is typically 30-50%
   // smaller than WebP at the same quality. Browsers without it get WebP.
