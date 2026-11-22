@@ -12,6 +12,12 @@ const SM_MAX_W = 720;
 export const JITTER = 0.22;
 export const INK = "#0e0c08";
 
+/** Phone-sized viewports drop the bleed's dark rim. Its ragged cut-out is a
+    second full-screen clip mask on top of the page reveal, and redrawing both
+    every frame at phone pixel densities (3x and up) drops frames in the first
+    half of the bleed. Either mask alone holds 60fps. */
+export const hasBleedRim = (vw: number): boolean => vw > SM_MAX_W;
+
 /** Chosen once at navigate time from the captured viewport — no resize tracking
     mid-flight (the animation is ~1s and the viewport is locked anyway). */
 export const transitionMs = (effect: "bleed" | "peel", vw: number): number => {

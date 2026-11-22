@@ -1,6 +1,6 @@
 "use client";
 import { ViewTransition, type CSSProperties, type ViewTransitionInstance } from "react";
-import { transitionMs } from "@/lib/ink-bleed";
+import { hasBleedRim, transitionMs } from "@/lib/ink-bleed";
 import {
   PEEL_EASING,
   REVEAL_END,
@@ -50,11 +50,15 @@ export default function InkMarks({
     const frames = bleedKeyframes(origin);
     return (
       <>
-        <Mark
-          name="ink-halo"
-          style={haloStyle(origin)}
-          onEnter={(vt) => track([vt.group.animate(frames.halo, revealTiming), vt.new.animate(frames.haloHole, revealTiming)])}
-        />
+        {hasBleedRim(origin.vw) && (
+          <Mark
+            name="ink-halo"
+            style={haloStyle(origin)}
+            onEnter={(vt) =>
+              track([vt.group.animate(frames.halo, revealTiming), vt.new.animate(frames.haloHole, revealTiming)])
+            }
+          />
+        )}
         <Mark
           name="ink-drop"
           style={dropStyle(origin)}
