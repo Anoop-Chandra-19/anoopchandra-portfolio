@@ -19,7 +19,9 @@ export type InkEffect = "bleed" | "peel";
 export type InkOrigin = { cx: number; cy: number; vw: number; vh: number };
 
 /** Halo texture radius at scale 1; the snapshot is scaled to the bleed radius. */
-const HALO_R = 512;
+const HALO_R = 128;
+/** The rim's soft band, as a share of the halo radius. */
+const HALO_BAND = 54 / 512;
 const SHADOW_H = 24;
 /** Keyframes sampled along the bleed. Every path keeps the same structure, so
     the browser interpolates between samples. */
@@ -49,13 +51,30 @@ export function animateRoot(
   });
 }
 
+/** Share of the transition the reveal (and the marks that track its edge) runs
+    for. The rest keeps the transition open after the reveal clip has dropped. */
+export const REVEAL_END = 0.97;
+
+/** The destination page's reveal clip. It ends on a shape that covers the
+    whole screen and then drops away rather than holding: Chrome on Android
+    takes a frame to redraw a held clip-path after the animation ends, and in
+    that frame the new page isn't drawn, flashing the page being left. */
+export function revealRoot(keyframes: Keyframe[], duration: number, easing = "linear"): Animation {
+  return document.documentElement.animate(keyframes, {
+    duration,
+    easing,
+    fill: "backwards",
+    pseudoElement: "::view-transition-new(root)",
+  });
+}
+
 export function haloStyle({ cx, cy }: InkOrigin): CSSProperties {
   return {
     left: cx - HALO_R,
     top: cy - HALO_R,
     width: HALO_R * 2,
     height: HALO_R * 2,
-    background: `radial-gradient(circle, ${hexA(INK, 0.5)} ${HALO_R - 54}px, ${hexA(INK, 0)} ${HALO_R}px)`,
+    background: `radial-gradient(circle, ${hexA(INK, 0.5)} ${HALO_R * (1 - HALO_BAND)}px, ${hexA(INK, 0)} ${HALO_R}px)`,
   };
 }
 
