@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Image from "next/image";
+import Label from "@/components/ui/Label";
 import Lightbox from "@/components/ui/Lightbox";
 
 /** How far ahead of the viewport a deferred image starts loading: one screen
@@ -39,9 +40,17 @@ export default function ZoomableImage({
   priority?: boolean;
   defer?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  // Open with the on-page image's loaded candidate, if it has one, which the
+  // lightbox shows until its own full-size file arrives.
+  const [lightbox, setLightbox] = useState<{ previewSrc?: string } | null>(null);
   const [isNear, setIsNear] = useState(!defer);
   const placeholderRef = useRef<HTMLSpanElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  function openLightbox() {
+    const img = imageRef.current;
+    setLightbox({ previewSrc: img?.complete && img.naturalWidth > 0 ? img.currentSrc : undefined });
+  }
 
   useEffect(() => {
     const placeholder = placeholderRef.current;
@@ -58,6 +67,7 @@ export default function ZoomableImage({
 
   const image = (
     <Image
+      ref={imageRef}
       src={src}
       alt={alt}
       width={width}
@@ -66,31 +76,45 @@ export default function ZoomableImage({
       preload={priority}
       fetchPriority={priority ? "high" : undefined}
       className="zoomable"
-      onClick={() => setOpen(true)}
+      onClick={openLightbox}
+      // The head script in app/layout.tsx marks it data-loaded, possibly
+      // before hydration; that attribute is ours, not a mismatch.
+      data-mark-load
+      suppressHydrationWarning
     />
   );
   return (
     <div className={`zoom-wrap${className ? ` ${className}` : ""}`} data-fit={fit}>
       {isNear ? (
-        image
+        <>
+          {image}
+          {/* The paper well and its "loading image…" label (media.css). */}
+          <span className="zoom-wait" aria-hidden="true">
+            <Label kind="stamp" as="span" className="zoom-wait-label">
+              loading image…
+            </Label>
+          </span>
+        </>
       ) : (
-        // Same box the image will fill, so nothing moves when it arrives.
-        // The noscript copy keeps the image for visitors without JavaScript.
-        <span ref={placeholderRef} className="block w-full" style={{ aspectRatio: `${width} / ${height}` }}>
+        // Same box the image will fill, in the same paper well, so nothing
+        // moves when it arrives. The noscript copy keeps the image for
+        // visitors without JavaScript.
+        <span ref={placeholderRef} className="block w-full bg-paper-2" style={{ aspectRatio: `${width} / ${height}` }}>
           <noscript>{image}</noscript>
         </span>
       )}
-      <button type="button" className="zoom-btn" onClick={() => setOpen(true)}>
+      <button type="button" className="zoom-btn" onClick={openLightbox}>
         ⤡ enlarge
       </button>
-      {open && (
+      {lightbox && (
         <Lightbox
           src={src}
+          previewSrc={lightbox.previewSrc}
           alt={alt}
           caption={caption}
           width={width}
           height={height}
-          onClose={() => setOpen(false)}
+          onClose={() => setLightbox(null)}
         />
       )}
     </div>

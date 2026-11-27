@@ -70,16 +70,24 @@ export default function Hero() {
                   at 213px every 2-3x screen picks the 640w file (44KB) instead of
                   1080w (96KB) on 3x. That is still ~2x density in a ≤300px circle,
                   and on a slow connection the LCP photo arrives sooner. */}
-              <Image
-                className="anim-portrait-img w-full h-full object-cover block"
-                src="/anoopchandra.webp"
-                alt="Anoopchandra Parampalli"
-                width={460}
-                height={460}
-                sizes="(max-width: 720px) and (min-resolution: 2dppx) 213px, (max-width: 720px) min(300px, 74vw), 460px"
-                preload
-                fetchPriority="high"
-              />
+              {/* Holds the photo back until it has loaded, then plays its
+                  entrance from that moment (app/animations.css), so a photo
+                  that lands after the ring has closed still animates in. */}
+              <div className="portrait-load absolute inset-0">
+                <Image
+                  className="anim-portrait-img w-full h-full object-cover block"
+                  src="/anoopchandra.webp"
+                  alt="Anoopchandra Parampalli"
+                  width={460}
+                  height={460}
+                  sizes="(max-width: 720px) and (min-resolution: 2dppx) 213px, (max-width: 720px) min(300px, 74vw), 460px"
+                  preload
+                  fetchPriority="high"
+                  // Marked data-loaded by the head script in app/layout.tsx.
+                  data-mark-load
+                  suppressHydrationWarning
+                />
+              </div>
             </div>
             {/* The outline draws itself with two half-rings rotating into place,
                 not an animated stroke-dashoffset: a rotation runs on the

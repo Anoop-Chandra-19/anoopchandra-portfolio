@@ -282,7 +282,11 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
         </div>
       </LabPanel>
       <LabPanel out>
-        <Label kind="caption" className="mb-2">$ classify ./sketch.png</Label>
+        {/* Only once the command has run: on arrival the column is the boot
+            log, which this would read as the first line of. */}
+        {(error ? error.kind === "inference" : guesses) && (
+          <Label kind="caption" className="mb-2">$ classify ./sketch.png</Label>
+        )}
         {error ? (
           <div className={NOTE} role="alert">
             {error.message}{" "}

@@ -52,7 +52,12 @@ export default function BenchBoot({
 
   const rank = PHASE_RANK[p.phase];
   const lines = useMemo<BootLine[]>(() => {
+    // The lab loader (components/loading/LabOutline.tsx) prints the first two
+    // lines, so a page arriving after it carries the same log on. The model
+    // id is also the experiment's slug.
     const out: BootLine[] = [
+      { key: "open", text: `$ open lab/${id}` },
+      { key: "page", text: <>fetching page <span className="text-teal">✓</span></> },
       { key: "cmd", text: `$ ./wake ${num} --model ${modelFlag}` },
     ];
     if (p.phase === "error") {
@@ -90,7 +95,9 @@ export default function BenchBoot({
   }, [id, num, modelFlag, sizeMB, readyHint, p, rank]);
 
   // Stagger newly available lines so a cached load still reads as a sequence.
-  const [shown, setShown] = useState(1);
+  // The page and wake lines are already true when this mounts, so the first
+  // three print at once and only the model's progress is staggered.
+  const [shown, setShown] = useState(3);
   useEffect(() => {
     if (shown >= lines.length) return;
     const t = setTimeout(() => setShown((s) => s + 1), 170);

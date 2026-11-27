@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useModalLifecycle } from "@/hooks/useModalLifecycle";
@@ -52,6 +52,7 @@ function zoomAbout(p: Zoom, s1: number, px: number, py: number, r: DOMRect): Zoo
 
 export default function Lightbox({
   src,
+  previewSrc,
   alt,
   caption,
   width,
@@ -59,6 +60,10 @@ export default function Lightbox({
   onClose,
 }: {
   src: string;
+  /** The image already on the page (its loaded candidate), shown stretched
+   *  under the full-size one until that arrives, so the lightbox opens on a
+   *  picture instead of an empty frame. */
+  previewSrc?: string;
   alt: string;
   /** Free-form: a project title, or a plate's figcaption nodes straight from MDX. */
   caption: ReactNode;
@@ -78,6 +83,7 @@ export default function Lightbox({
   });
 
   const [z, setZ] = useState<Zoom>(RESET);
+  const [isFullLoaded, setIsFullLoaded] = useState(false);
   // Live pointers, keyed by id — two of them means a pinch.
   const pts = useRef(new Map<number, { x: number; y: number }>());
   const gest = useRef<Gesture | null>(null);
@@ -132,7 +138,7 @@ export default function Lightbox({
       gest.current = { mode: "pinch", d0: d, s0: z.s, x0: z.x, y0: z.y };
     } else if (arr.length === 1) {
       // Resolved here, before pointer capture retargets everything at the stage.
-      downOnPlate.current = Boolean((e.target as Element).closest("img"));
+      downOnPlate.current = Boolean((e.target as Element).closest(".lightbox-frame"));
       moved.current = false;
       gest.current = { mode: "pan", px: e.clientX, py: e.clientY, x0: z.x, y0: z.y };
     }
@@ -208,23 +214,44 @@ export default function Lightbox({
         onPointerUp={up}
         onPointerCancel={up}
       >
-        <Image
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          // Re-selection, not a src swap: both candidates sit in the same
-          // srcset, so zooming back out is a cache hit, not another download.
-          sizes={zoomed ? ZOOMED_SIZES : "100vw"}
-          draggable={false}
-          style={{ transform: `translate(${z.x}px, ${z.y}px) scale(${z.s})` }}
-        />
+        {/* Sized from the known aspect ratio, so it has its final shape
+            before either image loads; zoom and pan move both layers. */}
+        <div
+          className="lightbox-frame"
+          style={
+            {
+              "--ar": width / height,
+              "--w": width,
+              transform: `translate(${z.x}px, ${z.y}px) scale(${z.s})`,
+            } as CSSProperties
+          }
+        >
+          {previewSrc && (
+            // Already loaded on the page, so it shows at once; next/image
+            // would build a new URL and miss the cache.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="lightbox-preview" src={previewSrc} alt="" draggable={false} />
+          )}
+          <Image
+            className={`lightbox-full${isFullLoaded ? " is-loaded" : ""}`}
+            src={src}
+            alt={alt}
+            width={width}
+            height={height}
+            // Re-selection, not a src swap: both candidates sit in the same
+            // srcset, so zooming back out is a cache hit, not another download.
+            sizes={zoomed ? ZOOMED_SIZES : "100vw"}
+            draggable={false}
+            onLoad={() => setIsFullLoaded(true)}
+          />
+        </div>
       </div>
       <div className="lightbox-bar">
         {/* A div, not a span: a plate's caption comes from MDX and can be a <p>. */}
         <div className="lightbox-cap inherit-p">
           {caption}
         </div>
+        {!isFullLoaded && <span className="lightbox-wait">loading full size</span>}
         <span className="lightbox-hint">
           {/* Both wordings ship and CSS hides one, the same trick §02 uses for
               the phone copy — the gesture that works here is a property of the

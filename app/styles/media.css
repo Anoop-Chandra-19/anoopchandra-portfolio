@@ -29,6 +29,48 @@
   .zoom-btn { opacity: 1; transform: none; }
 }
 
+/* Image loading. The head script in app/layout.tsx adds .js to <html> and
+   marks each .zoomable [data-loaded] (they opt in with data-mark-load) once
+   it loads or fails, without waiting
+   for hydration. Until then the frame is an empty paper well (.zoom-wait,
+   over the image's content box); if the image is still loading after 400ms a
+   quiet label says so; when it lands it fades up from washed-out paper to
+   full colour as the well fades off it. Without JavaScript nothing is
+   marked, so nothing is hidden. */
+.zoom-wait { display: none; }
+.js .zoom-wait {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  /* The image fills the frame's content box (.diagram and contain-fit Work
+     media are padded), so the well matches it. */
+  padding: inherit;
+  background: var(--color-paper-2) content-box;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.js .zoomable {
+  transition: opacity 500ms ease, filter 500ms ease;
+}
+.js .zoomable:not([data-loaded]) {
+  opacity: 0;
+  filter: grayscale(1) contrast(0.75) sepia(0.4);
+}
+.js .zoomable:not([data-loaded]) ~ .zoom-wait { opacity: 1; }
+.zoom-wait-label { opacity: 0; }
+.js .zoomable:not([data-loaded]) ~ .zoom-wait .zoom-wait-label {
+  animation: zoom-wait-in 200ms ease 400ms both;
+}
+@keyframes zoom-wait-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .zoomable,
+  .js .zoom-wait { transition: none; }
+  .js .zoomable:not([data-loaded]) ~ .zoom-wait .zoom-wait-label { animation-duration: 0s; }
+}
+
 /* Image lightbox */
 @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
 
@@ -67,23 +109,37 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   min-height: 0;
   overflow: hidden;
   touch-action: none;
+  container-type: size;
 }
-.lightbox img {
-  /* Keep both axes auto so max-size clamps preserve the image aspect ratio. */
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-
+/* The plate: contained in the stage at the image's aspect ratio (--ar), never
+   past its own width (--w), so it has its final shape before anything loads.
+   Until the full-size file arrives it shows the image from the page,
+   stretched and a little soft; then the sharp one cross-fades in over it. */
+.lightbox-frame {
+  position: relative;
+  width: min(100cqw, 100cqh * var(--ar), var(--w) * 1px);
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  background: var(--color-paper-2);
   border: 2px solid var(--color-ink);
   box-shadow: 8px 8px 0 rgb(0 0 0 / 0.35);
 
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: zoom-in;
 }
-.lightbox-stage.is-gesturing img { transition: none; }
-.lightbox-stage.is-zoomed img { cursor: zoom-out; }
-.lightbox-stage.is-zoomed.is-gesturing img { cursor: grabbing; }
+.lightbox-frame img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lightbox-preview { filter: blur(1.2px); }
+.lightbox-full { opacity: 0; transition: opacity 300ms ease; }
+.lightbox-full.is-loaded { opacity: 1; }
+.lightbox-stage.is-gesturing .lightbox-frame { transition: none; }
+.lightbox-stage.is-zoomed .lightbox-frame { cursor: zoom-out; }
+.lightbox-stage.is-zoomed.is-gesturing .lightbox-frame { cursor: grabbing; }
 .lightbox-bar {
   display: flex;
   align-items: center;
@@ -111,6 +167,24 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 
 .lightbox-cap { min-width: 0; }
 
+/* Only if the full-size file is still loading after 400ms; never over the
+   image. */
+.lightbox-wait {
+  flex-shrink: 0;
+  font-size: 10px;
+  white-space: nowrap;
+  animation: lb-in 200ms ease 400ms both;
+}
+.lightbox-wait::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--color-electric);
+}
+
 .lightbox-hint { opacity: 0.65; font-size: 10px; }
 .hint-touch { display: none; }
 @media (hover: none) {
@@ -124,5 +198,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .lightbox { animation: none; }
-  .lightbox img { transition: none; }
+  .lightbox-frame,
+  .lightbox-full { transition: none; }
+  .lightbox-wait { animation-duration: 0s; }
 }

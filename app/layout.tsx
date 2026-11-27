@@ -41,6 +41,16 @@ const caveat = Caveat({
   preload: false,
 });
 
+/* Runs before the body is parsed. Adds .js to <html>, which lets CSS hide an
+   image until it loads (without JavaScript nothing would reveal it), and
+   marks each image that opts in with data-mark-load as data-loaded once it
+   loads or fails, so it can animate in without waiting for hydration:
+   ZoomableImage (app/styles/media.css) and the home portrait
+   (app/animations.css). Such an image needs suppressHydrationWarning, since
+   the mark can land before React hydrates it. load and error don't bubble,
+   so it listens in the capture phase. */
+const IMAGE_LOAD_SCRIPT = `document.documentElement.classList.add("js");["load","error"].forEach(function(t){document.addEventListener(t,function(e){var i=e.target;if(i instanceof HTMLImageElement&&i.hasAttribute("data-mark-load"))i.setAttribute("data-loaded","")},true)})`;
+
 export const metadata: Metadata = {
   title: {
     default: "Anoopchandra Parampalli | Full-stack dev × AI engineer",
@@ -103,8 +113,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the head script adds .js before hydration.
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: IMAGE_LOAD_SCRIPT }} />
         <link rel="icon" href="/favicon.png" type="image/png" />
         <StructuredData />
       </head>

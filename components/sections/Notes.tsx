@@ -88,7 +88,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
                   </Label>
 
                   <span
-                    className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-[11px] pr-2 max-wide:static max-wide:[grid-area:2/4/3/5] max-wide:justify-self-end max-wide:self-center max-wide:min-w-0 max-wide:py-[1px] max-wide:px-[7px] max-wide:text-[9px] max-xs:[grid-area:2/3/3/4]"
+                    className="notes-edge-tab absolute -right-0.5 top-1/2 -translate-y-1/2 max-wide:translate-y-0 inline-flex items-center justify-center text-[10px] tracking-[1px] text-center min-w-[70px] py-[3px] pl-[11px] pr-2 max-wide:static max-wide:[grid-area:2/4/3/5] max-wide:justify-self-end max-wide:self-center max-wide:min-w-0 max-wide:py-[1px] max-wide:px-[7px] max-wide:text-[9px] max-xs:[grid-area:2/3/3/4]"
                     // only the tab colour is dynamic — border/radius live in CSS
                     // so the mobile pass can turn the edge tab into a pill
                     style={tabColors(e.kind)}

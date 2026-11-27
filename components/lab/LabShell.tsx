@@ -45,7 +45,7 @@ export default function LabShell({ exp }: { exp: LabExp }) {
   return (
     <main
       id="main-content"
-      className="max-w-[920px] mx-auto pt-9.5 px-10 pb-20 max-wide:pt-6.5 max-wide:px-5 max-wide:pb-[70px]"
+      className="max-w-[920px] mx-auto pt-9.5 px-10 pb-20 max-wide:pt-6.5 max-wide:px-5 max-wide:pb-[70px] page-in:animate-page-in"
       style={{ "--lxa": `var(--color-${exp.accent})` } as React.CSSProperties}
     >
       <div className="flex justify-between items-center gap-3.5 mb-6.5">

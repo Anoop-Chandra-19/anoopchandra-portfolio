@@ -55,9 +55,12 @@
 .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
 .anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
 /* Each word's stripe takes its share of the 0.35s sweep (--ws start, --wl
-   length, both fractions of the phrase), so the words chain at one speed. */
+   length, both fractions of the phrase), so the words chain at one speed.
+   `backwards`, not `both`: once painted, the stripe drops its transform
+   (scaleX(1) looks the same) and with it the compositor layer, so the words'
+   stripes render as plain boxes rather than separately anti-aliased layers. */
 .marker-word::after {
-  animation: markerPaint calc(0.35s * var(--wl)) linear both;
+  animation: markerPaint calc(0.35s * var(--wl)) linear backwards;
   animation-delay: calc(var(--d, 0s) + 0.35s * var(--ws));
 }
 /* Each window clips to one half of the portrait; inside it, the sweep shows the
@@ -84,6 +87,16 @@
   animation: shadowIn 0.4s cubic-bezier(.2,.7,.2,1) both;
   animation-delay: 1.05s;
 }
+/* The photo's entrance is timed to the ring, which assumes the photo is
+   there by 0.90s. On a slow connection it isn't, so its wrapper holds it
+   back until the head script in app/layout.tsx marks it loaded, then plays
+   the same entrance from that moment. A photo already loaded (most visits)
+   runs this while the photo's own entrance still hides it, so nothing
+   changes there. Only with JavaScript; without it nothing marks the photo. */
+.js .portrait-load:not(:has(> img[data-loaded])) { opacity: 0; }
+.js .portrait-load:has(> img[data-loaded]) {
+  animation: portraitImgIn 0.4s cubic-bezier(.2,.7,.2,1) both;
+}
 
 .d-hello   { --d: 0.00s; }
 .d-name1   { --d: 0.40s; }
@@ -97,6 +110,25 @@
 .d-chip2   { --d: 1.78s; }
 .d-chip3   { --d: 1.86s; }
 .d-meta    { --d: 2.10s; }
+
+/* Journal index, first load (components/journal/JournalIndex.tsx). Rows rail
+   in 40ms apart, the first 8 staggered and the rest landing with the 8th;
+   phones are quicker, 30ms apart and capped at 6. Rows set --i. */
+.d-ix-top    { --d: 0s; }
+.d-ix-title  { --d: 0.06s; }
+.d-ix-sum    { --d: 0.16s; }
+.d-ix-stamp  { --d: 0.26s; }
+.d-ix-filter { --d: 0.30s; }
+.d-ix-row    { --d: calc(0.36s + min(var(--i, 0), 7) * 0.04s); }
+@media (max-width: 720px) {
+  .d-ix-row  { --d: calc(0.33s + min(var(--i, 0), 5) * 0.03s); }
+}
+/* A row's dotted leader draws 100ms behind its row. */
+.anim-lead {
+  transform-origin: left center;
+  animation: markerPaint 0.35s cubic-bezier(.2,.7,.2,1) both;
+  animation-delay: calc(var(--d, 0s) + 0.1s);
+}
 
 .d-annot1  { --d: 1.10s; }
 .d-annot2  { --d: 1.20s; }
@@ -114,10 +146,12 @@ body.ink-no-anim .anim-swipe,
 body.ink-no-anim .anim-rise,
 body.ink-no-anim .anim-stamp,
 body.ink-no-anim .anim-rail,
+body.ink-no-anim .anim-lead,
 body.ink-no-anim .ring-sweep,
 body.ink-no-anim .ring-done,
 body.ink-no-anim .anim-portrait-img,
 body.ink-no-anim .anim-portrait-shadow,
+body.ink-no-anim .portrait-load,
 body.ink-no-anim .marker-word::after {
   animation: none;
 }
@@ -128,10 +162,12 @@ body.ink-no-anim .marker-word::after {
   .anim-rise,
   .anim-stamp,
   .anim-rail,
+  .anim-lead,
   .ring-window .ring-sweep,
   .ring-done,
   .anim-portrait-img,
   .anim-portrait-shadow,
+  .portrait-load,
   .marker-word::after {
     animation: none;
   }

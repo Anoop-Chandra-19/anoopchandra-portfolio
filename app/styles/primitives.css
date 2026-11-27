@@ -55,8 +55,12 @@
   content: "";
   position: absolute;
   z-index: -1;
-  left: 0;
-  right: 0;
+  /* Overlap the next word's stripe by a pixel. Words land on fractional
+     pixels, and two stripes meeting edge to edge leave a hairline seam where
+     their anti-aliased edges touch. The stroke is solid, so the overlap is
+     invisible. */
+  left: -0.5px;
+  right: -0.5px;
   top: 84%;
   height: 12%;
   background: var(--marker);

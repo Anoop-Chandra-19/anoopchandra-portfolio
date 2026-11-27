@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -40,6 +41,17 @@ export default function InkTransitionProvider({ children }: { children: ReactNod
   const pathname = usePathname();
   const [transition, setTransition] = useState<Transition | null>(null);
   const active = transition !== null;
+
+  const [firstPathname] = useState(pathname);
+  // Entrance animations are a first-load ceremony: once there has been any
+  // client navigation (ink, a plain link, back/forward), every page renders
+  // settled. A layout effect, so the class lands before the new page paints.
+  // It stays on for the session (removing it would restart the suppressed
+  // CSS animations).
+  const hasNavigated = pathname !== firstPathname;
+  useLayoutEffect(() => {
+    if (hasNavigated) document.body.classList.add("ink-no-anim");
+  }, [hasNavigated]);
   const end = useCallback(() => {
     document.documentElement.style.removeProperty("view-transition-name");
     setTransition(null);
@@ -59,10 +71,8 @@ export default function InkTransitionProvider({ children }: { children: ReactNod
       const vh = window.innerHeight;
       const cx = opts.originRect ? opts.originRect.left + opts.originRect.width / 2 : vw / 2;
       const cy = opts.originRect ? opts.originRect.top + opts.originRect.height / 2 : vh / 2;
-      // Entrance animations are a first-load ceremony: once we start doing client
-      // navigations, every freshly pushed page should render settled. The class
-      // stays on for the rest of the session (removing it would restart the
-      // suppressed CSS animations).
+      // Set here too, ahead of the route change, so the page the ink reveals is
+      // already settled when it is captured (see hasNavigated above).
       document.body.classList.add("ink-no-anim");
       // React leaves the page out of its view transitions (it renames the root
       // to none) unless the root already has an inline name. The ink reveal
