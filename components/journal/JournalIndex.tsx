@@ -116,7 +116,7 @@ export default function JournalIndex({
   const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const { isArriving, markedSlug, rowsRef } = useIndexArrival();
+  const isArriving = useIndexArrival();
   /* The element, not a ref: useModalLifecycle returns focus here on close. */
   const [opener, setOpener] = useState<HTMLElement | null>(null);
 
@@ -406,23 +406,15 @@ export default function JournalIndex({
           </div>
         )}
 
-        {/* z-0: the here-mark sits behind a row, not behind the notebook. */}
-        <ul ref={rowsRef} className="relative z-0 list-none p-0 m-0 page-in-stagger [--page-in-from:120ms]">
+        <ul className="list-none p-0 m-0 page-in-stagger [--page-in-from:120ms]">
           {visible.map((e, i) => (
             /* On the row, not the tab: the phone kind label needs the same
                hue and sits inside the link. */
             <li
               key={e.slug}
-              data-slug={e.slug}
               className="relative [transition:background_0.15s] hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
               style={{ ...tabAccent(e.kind), "--i": i } as CSSProperties}
             >
-              {e.slug === markedSlug && (
-                <span
-                  aria-hidden="true"
-                  className="here-mark absolute inset-y-0.5 -left-1 right-[104px] -z-10 rounded-[2px_6px_3px_7px] bg-[color-mix(in_oklab,var(--tab-c)_30%,transparent)] pointer-events-none max-wide:-right-1"
-                />
-              )}
               <Link
                 href={`/journal/${e.slug}`}
                 className={`grid gap-3.5 grid-cols-[44px_1fr_90px_90px] py-3.5 pr-[110px] pl-1.5 items-baseline no-underline max-wide:grid-cols-[1fr_auto] max-wide:[grid-template-areas:'title_page'_'meta_meta'] max-wide:gap-y-[7px] max-wide:gap-x-[10px] max-wide:pt-[13px] max-wide:px-0 max-wide:pb-3${isArriving ? " anim-rail d-ix-row" : ""}`}

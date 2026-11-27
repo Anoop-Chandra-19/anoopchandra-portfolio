@@ -30,10 +30,7 @@ const SAFETY_MARGIN_MS = 3000;
 const InkTransitionContext = createContext<{
   navigate: (href: string, opts: NavigateOpts) => void;
   active: boolean;
-  /** The route before this one in the session, or null on the first page.
-      The journal index reads it to mark the entry you came back from. */
-  previousPathname: string | null;
-}>({ navigate: () => {}, active: false, previousPathname: null });
+}>({ navigate: () => {}, active: false });
 
 export function useInkTransition() {
   return useContext(InkTransitionContext);
@@ -45,20 +42,13 @@ export default function InkTransitionProvider({ children }: { children: ReactNod
   const [transition, setTransition] = useState<Transition | null>(null);
   const active = transition !== null;
 
-  // Updated while rendering, so a page mounting on a new route already sees
-  // where it came from.
-  const [route, setRoute] = useState<{ current: string; previous: string | null }>({
-    current: pathname,
-    previous: null,
-  });
-  if (route.current !== pathname) setRoute({ current: pathname, previous: route.current });
-
+  const [firstPathname] = useState(pathname);
   // Entrance animations are a first-load ceremony: once there has been any
   // client navigation (ink, a plain link, back/forward), every page renders
   // settled. A layout effect, so the class lands before the new page paints.
   // It stays on for the session (removing it would restart the suppressed
   // CSS animations).
-  const hasNavigated = route.previous !== null;
+  const hasNavigated = pathname !== firstPathname;
   useLayoutEffect(() => {
     if (hasNavigated) document.body.classList.add("ink-no-anim");
   }, [hasNavigated]);
@@ -120,7 +110,7 @@ export default function InkTransitionProvider({ children }: { children: ReactNod
   }, [active, end]);
 
   return (
-    <InkTransitionContext.Provider value={{ navigate, active, previousPathname: route.previous }}>
+    <InkTransitionContext.Provider value={{ navigate, active }}>
       {children}
       {/* Rendered only once the destination is the current route, so the marks
           mount in the navigation's own commit and join its view transition. */}
