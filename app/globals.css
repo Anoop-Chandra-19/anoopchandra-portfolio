@@ -127,6 +127,28 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
+
+  /* Route loaders (components/loading/RouteLoader). The highlighter swipes under
+     the monogram and lifts off the far side; the drying-ink pass runs along
+     each outline block. */
+  --animate-marker-sweep: marker-sweep 1.6s cubic-bezier(0.6, 0, 0.4, 1) infinite both;
+  --animate-ink-dry: ink-dry 1.6s ease-in-out infinite both;
+  /* The lab loader's indeterminate bar: one ▸ steps across a 10-cell track. */
+  --animate-loop-head: loop-head 1.2s steps(10, jump-none) infinite;
+  @keyframes marker-sweep {
+    0% { transform: skewX(-10deg) scaleX(0); transform-origin: left center; }
+    45% { transform: skewX(-10deg) scaleX(1); transform-origin: left center; }
+    55% { transform: skewX(-10deg) scaleX(1); transform-origin: right center; }
+    100% { transform: skewX(-10deg) scaleX(0); transform-origin: right center; }
+  }
+  @keyframes ink-dry {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
+  @keyframes loop-head {
+    from { transform: translateX(0); }
+    to { transform: translateX(9ch); }
+  }
 }
 
 /* Text-safe accents, for small labels the brand accents are too light to

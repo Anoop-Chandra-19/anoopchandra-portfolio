@@ -36,3 +36,19 @@ html:active-view-transition-type(ink-bleed, ink-peel)::view-transition-new(root)
 :active-view-transition .ink-mark {
   visibility: visible;
 }
+
+/* A route loader leaving as its page arrives (components/loading/RouteLoader.tsx).
+   Only the loader is named, so the page is already in place underneath and
+   the loader fading off it reads as a cross-fade. Ink navigations never see
+   this: the loader is part of the page snapshot the ink reveals. */
+::view-transition-old(.loader-out) {
+  animation: 280ms ease both loader-out;
+}
+@keyframes loader-out {
+  to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.loader-out) {
+    animation: none;
+  }
+}
