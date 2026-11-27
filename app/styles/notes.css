@@ -7,7 +7,6 @@
 
 @media (max-width: 720px) {
   .notes-edge-tab {
-    transform: none;
     border-right: 1.2px solid;
     border-radius: 3px;
   }
