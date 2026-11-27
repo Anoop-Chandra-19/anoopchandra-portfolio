@@ -15,7 +15,7 @@ export default function MonogramLoader() {
         aria-hidden="true"
       >
         AP
-        <span className="absolute -inset-x-2.5 bottom-3 h-6 -z-10 rounded-[3px_10px_4px_12px] bg-[color-mix(in_oklab,var(--color-electric)_22%,transparent)] -skew-x-10 animate-marker-sweep motion-reduce:animate-none" />
+        <span className="absolute -inset-x-2.5 bottom-3 h-6 -z-10 rounded-[3px_10px_4px_12px] bg-[color-mix(in_oklab,var(--color-electric)_22%,transparent)] -skew-x-10 origin-left animate-marker-sweep motion-reduce:animate-none" />
       </div>
       <Label kind="eyebrow" className="mt-[18px]" aria-hidden="true">
         loading…
