@@ -55,9 +55,12 @@
 .anim-stamp { animation: stampIn 0.3s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
 .anim-rail  { animation: railRowIn 0.3s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
 /* Each word's stripe takes its share of the 0.35s sweep (--ws start, --wl
-   length, both fractions of the phrase), so the words chain at one speed. */
+   length, both fractions of the phrase), so the words chain at one speed.
+   `backwards`, not `both`: once painted, the stripe drops its transform
+   (scaleX(1) looks the same) and with it the compositor layer, so the words'
+   stripes render as plain boxes rather than separately anti-aliased layers. */
 .marker-word::after {
-  animation: markerPaint calc(0.35s * var(--wl)) linear both;
+  animation: markerPaint calc(0.35s * var(--wl)) linear backwards;
   animation-delay: calc(var(--d, 0s) + 0.35s * var(--ws));
 }
 /* Each window clips to one half of the portrait; inside it, the sweep shows the
