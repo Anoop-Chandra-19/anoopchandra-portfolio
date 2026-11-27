@@ -111,6 +111,42 @@
 .d-chip3   { --d: 1.86s; }
 .d-meta    { --d: 2.10s; }
 
+/* Journal index, first load (components/journal/JournalIndex.tsx). Rows rail
+   in 40ms apart, the first 8 staggered and the rest landing with the 8th;
+   phones are quicker, 30ms apart and capped at 6. Rows set --i. */
+.d-ix-top    { --d: 0s; }
+.d-ix-title  { --d: 0.06s; }
+.d-ix-sum    { --d: 0.16s; }
+.d-ix-stamp  { --d: 0.26s; }
+.d-ix-filter { --d: 0.30s; }
+.d-ix-row    { --d: calc(0.36s + min(var(--i, 0), 7) * 0.04s); }
+@media (max-width: 720px) {
+  .d-ix-row  { --d: calc(0.33s + min(var(--i, 0), 5) * 0.03s); }
+}
+/* A row's dotted leader draws 100ms behind its row. */
+.anim-lead {
+  transform-origin: left center;
+  animation: markerPaint 0.35s cubic-bezier(.2,.7,.2,1) both;
+  animation-delay: calc(var(--d, 0s) + 0.1s);
+}
+
+/* Back from an entry: a marker wash behind the row you came from, in its kind
+   colour, swiped in then faded. It only ever follows a client navigation, so
+   ink-no-anim leaves it alone. */
+@keyframes hereSwipe {
+  from { transform: skewX(-8deg) scaleX(0); }
+  to   { transform: skewX(-8deg) scaleX(1); }
+}
+@keyframes hereFade { to { opacity: 0; } }
+@keyframes hereHold { from { opacity: 1; } to { opacity: 0; } }
+.here-mark {
+  transform-origin: left center;
+  transform: skewX(-8deg);
+  animation:
+    hereSwipe 0.35s cubic-bezier(.2,.7,.2,1) 0.15s both,
+    hereFade 0.5s ease 1.1s forwards;
+}
+
 .d-annot1  { --d: 1.10s; }
 .d-annot2  { --d: 1.20s; }
 .d-rail-h  { --d: 1.85s; }
@@ -127,6 +163,7 @@ body.ink-no-anim .anim-swipe,
 body.ink-no-anim .anim-rise,
 body.ink-no-anim .anim-stamp,
 body.ink-no-anim .anim-rail,
+body.ink-no-anim .anim-lead,
 body.ink-no-anim .ring-sweep,
 body.ink-no-anim .ring-done,
 body.ink-no-anim .anim-portrait-img,
@@ -142,6 +179,7 @@ body.ink-no-anim .marker-word::after {
   .anim-rise,
   .anim-stamp,
   .anim-rail,
+  .anim-lead,
   .ring-window .ring-sweep,
   .ring-done,
   .anim-portrait-img,
@@ -150,4 +188,5 @@ body.ink-no-anim .marker-word::after {
   .marker-word::after {
     animation: none;
   }
+  .here-mark { animation: hereHold 1.6s steps(1, end) both; }
 }

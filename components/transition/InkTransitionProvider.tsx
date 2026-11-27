@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -29,7 +30,10 @@ const SAFETY_MARGIN_MS = 3000;
 const InkTransitionContext = createContext<{
   navigate: (href: string, opts: NavigateOpts) => void;
   active: boolean;
-}>({ navigate: () => {}, active: false });
+  /** The route before this one in the session, or null on the first page.
+      The journal index reads it to mark the entry you came back from. */
+  previousPathname: string | null;
+}>({ navigate: () => {}, active: false, previousPathname: null });
 
 export function useInkTransition() {
   return useContext(InkTransitionContext);
@@ -40,6 +44,24 @@ export default function InkTransitionProvider({ children }: { children: ReactNod
   const pathname = usePathname();
   const [transition, setTransition] = useState<Transition | null>(null);
   const active = transition !== null;
+
+  // Updated while rendering, so a page mounting on a new route already sees
+  // where it came from.
+  const [route, setRoute] = useState<{ current: string; previous: string | null }>({
+    current: pathname,
+    previous: null,
+  });
+  if (route.current !== pathname) setRoute({ current: pathname, previous: route.current });
+
+  // Entrance animations are a first-load ceremony: once there has been any
+  // client navigation (ink, a plain link, back/forward), every page renders
+  // settled. A layout effect, so the class lands before the new page paints.
+  // It stays on for the session (removing it would restart the suppressed
+  // CSS animations).
+  const hasNavigated = route.previous !== null;
+  useLayoutEffect(() => {
+    if (hasNavigated) document.body.classList.add("ink-no-anim");
+  }, [hasNavigated]);
   const end = useCallback(() => {
     document.documentElement.style.removeProperty("view-transition-name");
     setTransition(null);
@@ -59,10 +81,8 @@ export default function InkTransitionProvider({ children }: { children: ReactNod
       const vh = window.innerHeight;
       const cx = opts.originRect ? opts.originRect.left + opts.originRect.width / 2 : vw / 2;
       const cy = opts.originRect ? opts.originRect.top + opts.originRect.height / 2 : vh / 2;
-      // Entrance animations are a first-load ceremony: once we start doing client
-      // navigations, every freshly pushed page should render settled. The class
-      // stays on for the rest of the session (removing it would restart the
-      // suppressed CSS animations).
+      // Set here too, ahead of the route change, so the page the ink reveals is
+      // already settled when it is captured (see hasNavigated above).
       document.body.classList.add("ink-no-anim");
       // React leaves the page out of its view transitions (it renames the root
       // to none) unless the root already has an inline name. The ink reveal
@@ -100,7 +120,7 @@ export default function InkTransitionProvider({ children }: { children: ReactNod
   }, [active, end]);
 
   return (
-    <InkTransitionContext.Provider value={{ navigate, active }}>
+    <InkTransitionContext.Provider value={{ navigate, active, previousPathname: route.previous }}>
       {children}
       {/* Rendered only once the destination is the current route, so the marks
           mount in the navigation's own commit and join its view transition. */}

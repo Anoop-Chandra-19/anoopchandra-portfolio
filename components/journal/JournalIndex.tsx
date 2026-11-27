@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import {
   matchesEntry,
@@ -16,6 +16,7 @@ import JournalFilterSheet, {
   type Sort,
   type SortKey,
 } from "@/components/journal/JournalFilterSheet";
+import { useIndexArrival } from "./useIndexArrival";
 
 const FILTERS: ReadonlyArray<[Filter, string]> = [
   ["all", "all entries"],
@@ -43,10 +44,15 @@ const SORTERS: Record<SortKey, (x: JournalEntryMeta, y: JournalEntryMeta) => num
 };
 
 // Edge tabs take their hue from the row (`tabAccent` sets --tab-c/--tab-ink).
-const EDGE_TAB = `absolute -right-0.5 top-1/2 [transform:translateY(-50%)] inline-flex items-center justify-center py-[3px] pr-2 pl-2.5 font-mono text-caption text-center cursor-pointer text-(--tab-ink) bg-[color-mix(in_oklab,var(--tab-c)_15%,var(--color-paper))] hover:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] focus-visible:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] border-[1.2px] border-(--tab-c) border-r-0 rounded-l-[3px] [transition:min-width_0.16s,opacity_0.16s,box-shadow_0.16s,background_0.16s] max-wide:hidden`;
+const EDGE_TAB = `absolute -right-0.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center py-[3px] pr-2 pl-2.5 font-mono text-caption text-center cursor-pointer text-(--tab-ink) bg-[color-mix(in_oklab,var(--tab-c)_15%,var(--color-paper))] hover:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] focus-visible:bg-[color-mix(in_oklab,var(--tab-c)_34%,var(--color-paper))] border-[1.2px] border-(--tab-c) border-r-0 rounded-l-[3px] [transition:min-width_0.16s,opacity_0.16s,box-shadow_0.16s,background_0.16s] max-wide:hidden`;
 const EDGE_TAB_OFF =
   "min-w-[90px] hover:min-w-[96px] focus-visible:min-w-[96px] hover:[box-shadow:-2px_2px_0_color-mix(in_oklab,var(--color-ink)_45%,transparent)] focus-visible:[box-shadow:-2px_2px_0_color-mix(in_oklab,var(--color-ink)_45%,transparent)]";
 const EDGE_TAB_ON = "min-w-[100px] font-medium [box-shadow:-2px_2px_0_var(--color-ink)]";
+
+// The first-load entrance (anim-*) and the after-loader fade (page-in) never
+// share an element: ink-no-anim's `animation: none` would cancel the fade too.
+const PAGE_IN_CARD = "page-in:animate-page-in page-in:[animation-delay:40ms]";
+const PAGE_IN_FILTERS = "page-in:animate-page-in page-in:[animation-delay:80ms]";
 
 // Phone meta line. On the items so they follow `order`, and trailing so a
 // wrapped line never opens with a stray dot. Read time is last, so it has none.
@@ -109,6 +115,8 @@ export default function JournalIndex({
   const [year, setYear] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const { isArriving, markedSlug, rowsRef } = useIndexArrival();
   /* The element, not a ref: useModalLifecycle returns focus here on close. */
   const [opener, setOpener] = useState<HTMLElement | null>(null);
 
@@ -166,118 +174,123 @@ export default function JournalIndex({
   return (
     <main
       id={inert ? undefined : "main-content"}
-      className="page page-in:animate-page-in"
+      className="page"
       inert={inert}
     >
-      <div
-        className="flex items-center justify-between flex-wrap gap-[13px] mb-7.5 pb-[15px]"
-        style={{ borderBottom: "1.5px dashed var(--color-ink-faint)" }}
-      >
-        <BackLink href="/" peel>
-          ← back to portfolio
-        </BackLink>
-        <Label kind="eyebrow">
-          anoop parampalli · journal · vol. 02
-        </Label>
+      <div className="page-in:animate-page-in">
+        <div
+          className="flex items-center justify-between flex-wrap gap-[13px] mb-7.5 pb-[15px] anim-rise d-ix-top"
+          style={{ borderBottom: "1.5px dashed var(--color-ink-faint)" }}
+        >
+          <BackLink href="/" peel>
+            ← back to portfolio
+          </BackLink>
+          <Label kind="eyebrow">
+            anoop parampalli · journal · vol. 02
+          </Label>
+        </div>
       </div>
 
-      <div className="relative before:content-[''] before:absolute before:inset-[7px] before:border before:border-[color-mix(in_oklab,var(--color-ink)_50%,transparent)] before:rounded-[4px] before:pointer-events-none bg-paper border-2 border-ink rounded-[7px] py-7 px-8 mb-9 max-wide:py-5 max-wide:px-[18px]">
-        <Label kind="eyebrow" className="mb-[15px]">
+      <div className={`relative before:content-[''] before:absolute before:inset-[7px] before:border before:border-[color-mix(in_oklab,var(--color-ink)_50%,transparent)] before:rounded-[4px] before:pointer-events-none bg-paper border-2 border-ink rounded-[7px] py-7 px-8 mb-9 max-wide:py-5 max-wide:px-[18px] ${PAGE_IN_CARD}`}>
+        <Label kind="eyebrow" className="mb-[15px] anim-rise d-ix-top">
           a working notebook · {ppRange}
         </Label>
-        <h1 className="mb-2 leading-[0.95] max-wide:text-[40px] max-wide:leading-[1.02] max-wide:tracking-[-0.02em]">
+        <h1 className="mb-2 leading-[0.95] max-wide:text-[40px] max-wide:leading-[1.02] max-wide:tracking-[-0.02em] anim-swipe d-ix-title">
           The <span className="text-coral">Journal</span>
         </h1>
-        <p className="text-summary italic font-normal mt-[11px] mb-0 max-w-[720px] text-ink-soft max-wide:leading-[1.5]">
+        <p className="text-summary italic font-normal mt-[11px] mb-0 max-w-[720px] text-ink-soft max-wide:leading-[1.5] anim-rise d-ix-sum">
           A working notebook for bug stories, personal projects, opinions, and things I figured
           out the hard way.
         </p>
         <Label
           kind="tag"
           tone="inherit"
-          className="absolute top-[22px] right-[26px] py-1 px-[11px] rounded-[3px] border-[1.5px] border-coral text-coral-ink max-wide:static max-wide:inline-block max-wide:mt-3.5"
-          style={{ transform: "rotate(3deg)" }}
+          // `rotate`, so anim-stamp's transform doesn't straighten it.
+          className="absolute top-[22px] right-[26px] py-1 px-[11px] rounded-[3px] border-[1.5px] border-coral text-coral-ink rotate-3 max-wide:static max-wide:inline-block max-wide:mt-3.5 anim-stamp d-ix-stamp"
         >
           est. 2025
         </Label>
       </div>
 
-      {/* Kind uses the top filters; subject uses each row's edge tab. Below the
-          breakpoint this whole row is replaced by the filter pill. */}
-      <div className="flex items-center flex-wrap gap-[11px] mb-[22px] max-wide:hidden">
-        <span className="font-mono text-caption uppercase text-ink-soft">
-          filter ↦
-        </span>
-        {FILTERS.map(([k, label]) => (
-          <Button key={k} kind="tab" pressed={filter === k} onClick={() => setFilter(k)}>
-            {label}
-            <Label kind="meta" tone="inherit" as="span" className="opacity-70 ml-1">({counts[k]})</Label>
-          </Button>
-        ))}
-        {years.length > 1 && (
-          <label className="relative inline-flex items-center gap-[7px] ml-1 font-mono text-tag uppercase text-ink-soft after:content-['⌄'] after:absolute after:right-2 after:top-1/2 after:[translate:0_-56%] after:text-ink-soft after:pointer-events-none">
-            <span>year ↦</span>
-            <select
-              className={`appearance-none min-w-[104px] py-1 pr-[25px] pl-2.5 border-[1.5px] border-ink rounded-md bg-paper hover:bg-paper-2 text-ink font-mono text-control leading-[1.2] cursor-pointer`}
-              value={year ?? ""}
-              onChange={(event) => setYear(event.target.value || null)}
-            >
-              <option value="">all years</option>
-              {years.map((entryYear) => (
-                <option key={entryYear} value={entryYear}>
-                  {entryYear}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {tag && (
-          <Pill kind="filter" className="ml-1" title="clear subject filter" onClick={() => setTag(null)}>
-            <span className="faint tracking-[1px]">subject:</span>
-            {tag}
-            <span aria-hidden="true">×</span>
-          </Pill>
-        )}
-      </div>
-
-      {/* Phone-only: one pill stands in for the kind buttons, the year select and
-          the sort headers; the sheet owns subject filtering. The ✕ is a sibling,
-          not a child: nesting it inside the pill would be a button in a button. */}
-      <div className="hidden max-wide:flex items-center gap-2 mb-4">
-        <button
-          type="button"
-          className={`flex items-center gap-[7px] flex-1 min-w-0 min-h-11 box-border px-3.5 font-mono text-control-sm text-ink bg-paper border-[1.5px] rounded-full cursor-pointer ${
-            isFiltered
-              ? "border-coral [box-shadow:2px_2px_0_color-mix(in_oklab,var(--color-coral)_30%,transparent)]"
-              : "border-ink [box-shadow:2px_2px_0_color-mix(in_oklab,var(--color-ink)_16%,transparent)]"
-          }`}
-          aria-expanded={sheetOpen}
-          aria-controls="journal-filter-sheet"
-          onClick={(e) => {
-            setOpener(e.currentTarget);
-            setSheetOpen(true);
-          }}
-        >
-          <Label kind="stamp" as="span">filter</Label>
-          <span
-            className={`min-w-0 truncate ${
-              isFiltered ? "text-coral-ink" : ""
-            }`}
-          >
-            {pillText}
+      <div className={PAGE_IN_FILTERS}>
+        {/* Kind uses the top filters; subject uses each row's edge tab. Below the
+            breakpoint this whole row is replaced by the filter pill. */}
+        <div className="flex items-center flex-wrap gap-[11px] mb-[22px] max-wide:hidden anim-rise d-ix-filter">
+          <span className="font-mono text-caption uppercase text-ink-soft">
+            filter ↦
           </span>
-          <span className="ml-auto text-ink-faint">{visible.length}</span>
-        </button>
-        {isFiltered && (
+          {FILTERS.map(([k, label]) => (
+            <Button key={k} kind="tab" pressed={filter === k} onClick={() => setFilter(k)}>
+              {label}
+              <Label kind="meta" tone="inherit" as="span" className="opacity-70 ml-1">({counts[k]})</Label>
+            </Button>
+          ))}
+          {years.length > 1 && (
+            <label className="relative inline-flex items-center gap-[7px] ml-1 font-mono text-tag uppercase text-ink-soft after:content-['⌄'] after:absolute after:right-2 after:top-1/2 after:[translate:0_-56%] after:text-ink-soft after:pointer-events-none">
+              <span>year ↦</span>
+              <select
+                className={`appearance-none min-w-[104px] py-1 pr-[25px] pl-2.5 border-[1.5px] border-ink rounded-md bg-paper hover:bg-paper-2 text-ink font-mono text-control leading-[1.2] cursor-pointer`}
+                value={year ?? ""}
+                onChange={(event) => setYear(event.target.value || null)}
+              >
+                <option value="">all years</option>
+                {years.map((entryYear) => (
+                  <option key={entryYear} value={entryYear}>
+                    {entryYear}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {tag && (
+            <Pill kind="filter" className="ml-1" title="clear subject filter" onClick={() => setTag(null)}>
+              <span className="faint tracking-[1px]">subject:</span>
+              {tag}
+              <span aria-hidden="true">×</span>
+            </Pill>
+          )}
+        </div>
+
+        {/* Phone-only: one pill stands in for the kind buttons, the year select and
+            the sort headers; the sheet owns subject filtering. The ✕ is a sibling,
+            not a child: nesting it inside the pill would be a button in a button. */}
+        <div className="hidden max-wide:flex items-center gap-2 mb-4 anim-rise d-ix-filter">
           <button
             type="button"
-            className="flex items-center justify-center flex-none size-11 p-0 bg-transparent font-mono text-control text-ink-soft cursor-pointer"
-            aria-label="clear all filters"
-            onClick={clearAll}
+            className={`flex items-center gap-[7px] flex-1 min-w-0 min-h-11 box-border px-3.5 font-mono text-control-sm text-ink bg-paper border-[1.5px] rounded-full cursor-pointer ${
+              isFiltered
+                ? "border-coral [box-shadow:2px_2px_0_color-mix(in_oklab,var(--color-coral)_30%,transparent)]"
+                : "border-ink [box-shadow:2px_2px_0_color-mix(in_oklab,var(--color-ink)_16%,transparent)]"
+            }`}
+            aria-expanded={sheetOpen}
+            aria-controls="journal-filter-sheet"
+            onClick={(e) => {
+              setOpener(e.currentTarget);
+              setSheetOpen(true);
+            }}
           >
-            <span aria-hidden="true">✕</span>
+            <Label kind="stamp" as="span">filter</Label>
+            <span
+              className={`min-w-0 truncate ${
+                isFiltered ? "text-coral-ink" : ""
+              }`}
+            >
+              {pillText}
+            </span>
+            <span className="ml-auto text-ink-faint">{visible.length}</span>
           </button>
-        )}
+          {isFiltered && (
+            <button
+              type="button"
+              className="flex items-center justify-center flex-none size-11 p-0 bg-transparent font-mono text-control text-ink-soft cursor-pointer"
+              aria-label="clear all filters"
+              onClick={clearAll}
+            >
+              <span aria-hidden="true">✕</span>
+            </button>
+          )}
+        </div>
+
       </div>
 
       {isFiltered && (
@@ -393,14 +406,26 @@ export default function JournalIndex({
           </div>
         )}
 
-        <ul className="list-none p-0 m-0">
-          {visible.map((e) => (
+        {/* z-0: the here-mark sits behind a row, not behind the notebook. */}
+        <ul ref={rowsRef} className="relative z-0 list-none p-0 m-0 page-in-stagger [--page-in-from:120ms]">
+          {visible.map((e, i) => (
             /* On the row, not the tab: the phone kind label needs the same
                hue and sits inside the link. */
-            <li key={e.slug} className="relative [transition:background_0.15s] hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]" style={tabAccent(e.kind)}>
+            <li
+              key={e.slug}
+              data-slug={e.slug}
+              className="relative [transition:background_0.15s] hover:bg-[color-mix(in_oklab,var(--color-paper-2)_60%,transparent)]"
+              style={{ ...tabAccent(e.kind), "--i": i } as CSSProperties}
+            >
+              {e.slug === markedSlug && (
+                <span
+                  aria-hidden="true"
+                  className="here-mark absolute inset-y-0.5 -left-1 right-[104px] -z-10 rounded-[2px_6px_3px_7px] bg-[color-mix(in_oklab,var(--tab-c)_30%,transparent)] pointer-events-none max-wide:-right-1"
+                />
+              )}
               <Link
                 href={`/journal/${e.slug}`}
-                className="grid gap-3.5 grid-cols-[44px_1fr_90px_90px] py-3.5 pr-[110px] pl-1.5 items-baseline no-underline max-wide:grid-cols-[1fr_auto] max-wide:[grid-template-areas:'title_page'_'meta_meta'] max-wide:gap-y-[7px] max-wide:gap-x-[10px] max-wide:pt-[13px] max-wide:px-0 max-wide:pb-3"
+                className={`grid gap-3.5 grid-cols-[44px_1fr_90px_90px] py-3.5 pr-[110px] pl-1.5 items-baseline no-underline max-wide:grid-cols-[1fr_auto] max-wide:[grid-template-areas:'title_page'_'meta_meta'] max-wide:gap-y-[7px] max-wide:gap-x-[10px] max-wide:pt-[13px] max-wide:px-0 max-wide:pb-3${isArriving ? " anim-rail d-ix-row" : ""}`}
                 /* Areas, not reordering: the `page → title → metas` source order stays. */
                 /* No aria-label: on a link it replaces the whole subtree, so it
                    was hiding the page number, kind, read time and date from
@@ -422,7 +447,7 @@ export default function JournalIndex({
                   )}
                   <span
                     aria-hidden="true"
-                    className="flex-1 h-0 min-w-6.5 -translate-y-1 max-wide:hidden"
+                    className={`flex-1 h-0 min-w-6.5 -translate-y-1 max-wide:hidden${isArriving ? " anim-lead" : ""}`}
                     style={{ borderBottom: "1.5px dotted var(--color-ink-faint)" }}
                   />
                 </span>
@@ -461,7 +486,7 @@ export default function JournalIndex({
                 type="button"
                 className={`${EDGE_TAB} ${
                   tag === e.tag ? EDGE_TAB_ON : EDGE_TAB_OFF
-                }`}
+                }${isArriving ? " anim-rail d-ix-row" : ""}`}
                 title={tag === e.tag ? `showing ${e.tag}; click to clear` : `filter to ${e.tag}`}
                 onClick={() => setTag(tag === e.tag ? null : e.tag)}
               >
