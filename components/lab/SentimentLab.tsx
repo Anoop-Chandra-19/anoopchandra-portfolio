@@ -232,7 +232,11 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
         </div>
       </LabPanel>
       <LabPanel out>
-        <Label kind="caption" className="mb-2">$ history</Label>
+        {/* Only once there is history: on arrival the column is the boot log,
+            which this would read as the first line of. */}
+        {error?.kind !== "load" && log.length > 0 && (
+          <Label kind="caption" className="mb-2">$ history</Label>
+        )}
         {error?.kind === "load" ? (
           <div className={`${NOTE} tracking-[-0.2px]`}>model unavailable. use retry above</div>
         ) : log.length === 0 ? (
