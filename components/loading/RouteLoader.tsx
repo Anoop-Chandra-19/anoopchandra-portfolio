@@ -1,4 +1,4 @@
-import { ViewTransition, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import PageInCue from "./PageInCue";
 
 /**
@@ -6,11 +6,10 @@ import PageInCue from "./PageInCue";
  * through its visually hidden label; callers hide their drawing from
  * assistive tech.
  *
- * The ViewTransition names the loader only as it leaves, when its page
- * arrives, so it fades off the page beneath (`.loader-out` in
- * app/ink-transition.css) while the page fades in (`page-in:`, cued by
- * PageInCue). Entering, it stays part of the page, which keeps an ink
- * navigation that lands on a loader exactly as it is.
+ * When its page arrives the loader goes at once and the page fades in over it
+ * (`page-in:`, cued by PageInCue). A view transition fading the loader out
+ * was tried: on slow phones it overlapped the end of the ink transition and
+ * the browser aborted it ("Viewport size changed").
  */
 export default function RouteLoader({
   label,
@@ -22,13 +21,11 @@ export default function RouteLoader({
   children: ReactNode;
 }) {
   return (
-    <ViewTransition enter="none" exit="loader-out" update="none" default="none">
-      <div role="status" className={className}>
-        <span className="sr-only">{label}</span>
-        <PageInCue />
-        {children}
-      </div>
-    </ViewTransition>
+    <div role="status" className={className}>
+      <span className="sr-only">{label}</span>
+      <PageInCue />
+      {children}
+    </div>
   );
 }
 
