@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Image from "next/image";
+import Label from "@/components/ui/Label";
 import Lightbox from "@/components/ui/Lightbox";
 
 /** How far ahead of the viewport a deferred image starts loading: one screen
@@ -67,16 +68,28 @@ export default function ZoomableImage({
       fetchPriority={priority ? "high" : undefined}
       className="zoomable"
       onClick={() => setOpen(true)}
+      // The head script in app/layout.tsx may mark it data-loaded before
+      // hydration; that attribute is ours, not a mismatch.
+      suppressHydrationWarning
     />
   );
   return (
     <div className={`zoom-wrap${className ? ` ${className}` : ""}`} data-fit={fit}>
       {isNear ? (
-        image
+        <>
+          {image}
+          {/* The paper well and its "loading image…" label (media.css). */}
+          <span className="zoom-wait" aria-hidden="true">
+            <Label kind="stamp" as="span" className="zoom-wait-label">
+              loading image…
+            </Label>
+          </span>
+        </>
       ) : (
-        // Same box the image will fill, so nothing moves when it arrives.
-        // The noscript copy keeps the image for visitors without JavaScript.
-        <span ref={placeholderRef} className="block w-full" style={{ aspectRatio: `${width} / ${height}` }}>
+        // Same box the image will fill, in the same paper well, so nothing
+        // moves when it arrives. The noscript copy keeps the image for
+        // visitors without JavaScript.
+        <span ref={placeholderRef} className="block w-full bg-paper-2" style={{ aspectRatio: `${width} / ${height}` }}>
           <noscript>{image}</noscript>
         </span>
       )}

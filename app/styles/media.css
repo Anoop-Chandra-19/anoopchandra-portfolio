@@ -29,6 +29,47 @@
   .zoom-btn { opacity: 1; transform: none; }
 }
 
+/* Image loading. The head script in app/layout.tsx adds .js to <html> and
+   marks each .zoomable [data-loaded] once it loads or fails, without waiting
+   for hydration. Until then the frame is an empty paper well (.zoom-wait,
+   over the image's content box); if the image is still loading after 400ms a
+   quiet label says so; when it lands it fades up from washed-out paper to
+   full colour as the well fades off it. Without JavaScript nothing is
+   marked, so nothing is hidden. */
+.zoom-wait { display: none; }
+.js .zoom-wait {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  /* The image fills the frame's content box (.diagram and contain-fit Work
+     media are padded), so the well matches it. */
+  padding: inherit;
+  background: var(--color-paper-2) content-box;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.js .zoomable {
+  transition: opacity 500ms ease, filter 500ms ease;
+}
+.js .zoomable:not([data-loaded]) {
+  opacity: 0;
+  filter: grayscale(1) contrast(0.75) sepia(0.4);
+}
+.js .zoomable:not([data-loaded]) ~ .zoom-wait { opacity: 1; }
+.zoom-wait-label { opacity: 0; }
+.js .zoomable:not([data-loaded]) ~ .zoom-wait .zoom-wait-label {
+  animation: zoom-wait-in 200ms ease 400ms both;
+}
+@keyframes zoom-wait-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .zoomable,
+  .js .zoom-wait { transition: none; }
+  .js .zoomable:not([data-loaded]) ~ .zoom-wait .zoom-wait-label { animation-duration: 0s; }
+}
+
 /* Image lightbox */
 @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
 
