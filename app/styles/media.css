@@ -108,23 +108,37 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
   min-height: 0;
   overflow: hidden;
   touch-action: none;
+  container-type: size;
 }
-.lightbox img {
-  /* Keep both axes auto so max-size clamps preserve the image aspect ratio. */
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-
+/* The plate: contained in the stage at the image's aspect ratio (--ar), never
+   past its own width (--w), so it has its final shape before anything loads.
+   Until the full-size file arrives it shows the image from the page,
+   stretched and a little soft; then the sharp one cross-fades in over it. */
+.lightbox-frame {
+  position: relative;
+  width: min(100cqw, 100cqh * var(--ar), var(--w) * 1px);
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  background: var(--color-paper-2);
   border: 2px solid var(--color-ink);
   box-shadow: 8px 8px 0 rgb(0 0 0 / 0.35);
 
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: zoom-in;
 }
-.lightbox-stage.is-gesturing img { transition: none; }
-.lightbox-stage.is-zoomed img { cursor: zoom-out; }
-.lightbox-stage.is-zoomed.is-gesturing img { cursor: grabbing; }
+.lightbox-frame img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lightbox-preview { filter: blur(1.2px); }
+.lightbox-full { opacity: 0; transition: opacity 300ms ease; }
+.lightbox-full.is-loaded { opacity: 1; }
+.lightbox-stage.is-gesturing .lightbox-frame { transition: none; }
+.lightbox-stage.is-zoomed .lightbox-frame { cursor: zoom-out; }
+.lightbox-stage.is-zoomed.is-gesturing .lightbox-frame { cursor: grabbing; }
 .lightbox-bar {
   display: flex;
   align-items: center;
@@ -152,6 +166,24 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 
 .lightbox-cap { min-width: 0; }
 
+/* Only if the full-size file is still loading after 400ms; never over the
+   image. */
+.lightbox-wait {
+  flex-shrink: 0;
+  font-size: 10px;
+  white-space: nowrap;
+  animation: lb-in 200ms ease 400ms both;
+}
+.lightbox-wait::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--color-electric);
+}
+
 .lightbox-hint { opacity: 0.65; font-size: 10px; }
 .hint-touch { display: none; }
 @media (hover: none) {
@@ -165,5 +197,7 @@ html:has(.lightbox) ::-webkit-scrollbar-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .lightbox { animation: none; }
-  .lightbox img { transition: none; }
+  .lightbox-frame,
+  .lightbox-full { transition: none; }
+  .lightbox-wait { animation-duration: 0s; }
 }
