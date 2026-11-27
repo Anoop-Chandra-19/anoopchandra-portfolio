@@ -6,6 +6,8 @@ import RouteLoader, { Sketch } from "./RouteLoader";
    column starts the boot log with the one step that is really happening. */
 const LINE = "inline-block align-middle";
 const OUTLINE = "border-2 border-dashed border-[color-mix(in_oklab,var(--color-ink)_35%,transparent)] rounded-[4px]";
+/** The line box of each column's `<Label kind="caption" className="mb-2">`. */
+const CAPTION = "mb-2 font-mono text-caption";
 
 export default function LabOutline() {
   return (
@@ -39,10 +41,16 @@ export default function LabOutline() {
 
         <div className="grid [align-items:start] gap-7.5 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] max-wide:grid-cols-1 max-wide:gap-6">
           <div className="min-w-0">
-            <Sketch className="block w-[150px] h-[9px] mb-3" />
+            <div className={CAPTION}>
+              <Sketch className={`${LINE} w-[150px] h-[9px]`} />
+            </div>
             <div className={`${OUTLINE} w-[360px] max-w-full aspect-square`} />
           </div>
           <div className="min-w-0 pl-7 [border-left:1.5px_dashed_color-mix(in_oklab,var(--color-ink)_22%,transparent)] max-wide:pl-0 max-wide:pt-5 max-wide:[border-left:none] max-wide:[border-top:1.5px_dashed_color-mix(in_oklab,var(--color-ink)_22%,transparent)]">
+            <div className={CAPTION}>
+              <Sketch className={`${LINE} w-[110px] h-[9px]`} />
+            </div>
+            {/* Set like BenchBoot's lines, which carry this log on. */}
             <div className="flex flex-col gap-[9px] mt-3 font-mono text-[12.5px] tracking-[-0.2px] text-ink-soft">
               <div>
                 $ open <CurrentPath />
