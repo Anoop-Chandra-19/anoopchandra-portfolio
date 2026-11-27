@@ -12,10 +12,8 @@ import BackLink from "@/components/ui/BackLink";
 import Button from "@/components/ui/Button";
 import Label from "@/components/ui/Label";
 import Pill from "@/components/ui/Pill";
-import JournalFilterSheet, {
-  type Sort,
-  type SortKey,
-} from "@/components/journal/JournalFilterSheet";
+import type { Sort, SortKey } from "@/components/journal/JournalFilterSheet";
+import JournalFilterPill from "./JournalFilterPill";
 import { useIndexArrival } from "./useIndexArrival";
 
 const FILTERS: ReadonlyArray<[Filter, string]> = [
@@ -114,11 +112,8 @@ export default function JournalIndex({
   const [tag, setTag] = useState<string | null>(null);
   const [year, setYear] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>({ key: "date", dir: "desc" });
-  const [sheetOpen, setSheetOpen] = useState(false);
 
   const isArriving = useIndexArrival();
-  /* The element, not a ref: useModalLifecycle returns focus here on close. */
-  const [opener, setOpener] = useState<HTMLElement | null>(null);
 
   const counts = useMemo(
     () => ({
@@ -255,30 +250,20 @@ export default function JournalIndex({
             the sort headers; the sheet owns subject filtering. The ✕ is a sibling,
             not a child: nesting it inside the pill would be a button in a button. */}
         <div className="hidden max-wide:flex items-center gap-2 mb-4 anim-rise d-ix-filter">
-          <button
-            type="button"
-            className={`flex items-center gap-[7px] flex-1 min-w-0 min-h-11 box-border px-3.5 font-mono text-control-sm text-ink bg-paper border-[1.5px] rounded-full cursor-pointer ${
-              isFiltered
-                ? "border-coral [box-shadow:2px_2px_0_color-mix(in_oklab,var(--color-coral)_30%,transparent)]"
-                : "border-ink [box-shadow:2px_2px_0_color-mix(in_oklab,var(--color-ink)_16%,transparent)]"
-            }`}
-            aria-expanded={sheetOpen}
-            aria-controls="journal-filter-sheet"
-            onClick={(e) => {
-              setOpener(e.currentTarget);
-              setSheetOpen(true);
+          <JournalFilterPill
+            text={pillText}
+            count={visible.length}
+            isFiltered={isFiltered}
+            entries={entries}
+            years={years}
+            value={{ filter, tag, year, sort }}
+            onApplyAction={(next) => {
+              setFilter(next.filter);
+              setTag(next.tag);
+              setYear(next.year);
+              setSort(next.sort);
             }}
-          >
-            <Label kind="stamp" as="span">filter</Label>
-            <span
-              className={`min-w-0 truncate ${
-                isFiltered ? "text-coral-ink" : ""
-              }`}
-            >
-              {pillText}
-            </span>
-            <span className="ml-auto text-ink-faint">{visible.length}</span>
-          </button>
+          />
           {isFiltered && (
             <button
               type="button"
@@ -325,22 +310,6 @@ export default function JournalIndex({
           </button>
         </div>
       )}
-
-      <JournalFilterSheet
-        open={sheetOpen}
-        id="journal-filter-sheet"
-        entries={entries}
-        years={years}
-        value={{ filter, tag, year, sort }}
-        opener={opener}
-        onApplyAction={(next) => {
-          setFilter(next.filter);
-          setTag(next.tag);
-          setYear(next.year);
-          setSort(next.sort);
-        }}
-        onCloseAction={() => setSheetOpen(false)}
-      />
 
       {/* The notebook stays on phones: it is the page's only paper cue. */}
       <div className="bg-paper border-2 border-ink rounded-md pt-7.5 pr-6.5 pb-[18px] pl-17 relative overflow-hidden max-wide:pt-2 max-wide:pr-3.5 max-wide:pb-3 max-wide:pl-10">
