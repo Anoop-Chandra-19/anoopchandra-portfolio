@@ -77,8 +77,9 @@ export default function ZoomableImage({
       fetchPriority={priority ? "high" : undefined}
       className="zoomable"
       onClick={openLightbox}
-      // The head script in app/layout.tsx may mark it data-loaded before
-      // hydration; that attribute is ours, not a mismatch.
+      // The head script in app/layout.tsx marks it data-loaded, possibly
+      // before hydration; that attribute is ours, not a mismatch.
+      data-mark-load
       suppressHydrationWarning
     />
   );

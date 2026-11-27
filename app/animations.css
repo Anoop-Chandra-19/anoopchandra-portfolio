@@ -84,6 +84,16 @@
   animation: shadowIn 0.4s cubic-bezier(.2,.7,.2,1) both;
   animation-delay: 1.05s;
 }
+/* The photo's entrance is timed to the ring, which assumes the photo is
+   there by 0.90s. On a slow connection it isn't, so its wrapper holds it
+   back until the head script in app/layout.tsx marks it loaded, then plays
+   the same entrance from that moment. A photo already loaded (most visits)
+   runs this while the photo's own entrance still hides it, so nothing
+   changes there. Only with JavaScript; without it nothing marks the photo. */
+.js .portrait-load:not(:has(> img[data-loaded])) { opacity: 0; }
+.js .portrait-load:has(> img[data-loaded]) {
+  animation: portraitImgIn 0.4s cubic-bezier(.2,.7,.2,1) both;
+}
 
 .d-hello   { --d: 0.00s; }
 .d-name1   { --d: 0.40s; }
@@ -118,6 +128,7 @@ body.ink-no-anim .ring-sweep,
 body.ink-no-anim .ring-done,
 body.ink-no-anim .anim-portrait-img,
 body.ink-no-anim .anim-portrait-shadow,
+body.ink-no-anim .portrait-load,
 body.ink-no-anim .marker-word::after {
   animation: none;
 }
@@ -132,6 +143,7 @@ body.ink-no-anim .marker-word::after {
   .ring-done,
   .anim-portrait-img,
   .anim-portrait-shadow,
+  .portrait-load,
   .marker-word::after {
     animation: none;
   }

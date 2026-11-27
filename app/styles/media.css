@@ -30,7 +30,8 @@
 }
 
 /* Image loading. The head script in app/layout.tsx adds .js to <html> and
-   marks each .zoomable [data-loaded] once it loads or fails, without waiting
+   marks each .zoomable [data-loaded] (they opt in with data-mark-load) once
+   it loads or fails, without waiting
    for hydration. Until then the frame is an empty paper well (.zoom-wait,
    over the image's content box); if the image is still loading after 400ms a
    quiet label says so; when it lands it fades up from washed-out paper to
