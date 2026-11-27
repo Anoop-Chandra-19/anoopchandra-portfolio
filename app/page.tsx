@@ -6,7 +6,7 @@ import { selectHomeJournalEntries } from "@/lib/journal-meta";
 
 export default function Home() {
   return (
-    <main id="main-content" className="page">
+    <main id="main-content" className="page page-in:animate-page-in">
       <HomeContent journalEntries={selectHomeJournalEntries(getEntryMetas())} />
       <SideNav />
       <MobileIndexNav />

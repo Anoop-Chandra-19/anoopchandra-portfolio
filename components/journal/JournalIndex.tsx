@@ -166,7 +166,7 @@ export default function JournalIndex({
   return (
     <main
       id={inert ? undefined : "main-content"}
-      className="page"
+      className="page page-in:animate-page-in"
       inert={inert}
     >
       <div

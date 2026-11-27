@@ -1,4 +1,5 @@
 import { ViewTransition, type ReactNode } from "react";
+import PageInCue from "./PageInCue";
 
 /**
  * The frame every route loader (`loading.tsx`) renders in. It is announced
@@ -7,8 +8,9 @@ import { ViewTransition, type ReactNode } from "react";
  *
  * The ViewTransition names the loader only as it leaves, when its page
  * arrives, so it fades off the page beneath (`.loader-out` in
- * app/ink-transition.css). Entering, it stays part of the page, which keeps an
- * ink navigation that lands on a loader exactly as it is.
+ * app/ink-transition.css) while the page fades in (`page-in:`, cued by
+ * PageInCue). Entering, it stays part of the page, which keeps an ink
+ * navigation that lands on a loader exactly as it is.
  */
 export default function RouteLoader({
   label,
@@ -23,6 +25,7 @@ export default function RouteLoader({
     <ViewTransition enter="none" exit="loader-out" update="none" default="none">
       <div role="status" className={className}>
         <span className="sr-only">{label}</span>
+        <PageInCue />
         {children}
       </div>
     </ViewTransition>
