@@ -4,6 +4,7 @@ import {
   disposeModelOutput,
   getModelOutputTensors,
   loadModel,
+  onFirstInteraction,
   subscribeModel,
   type ModelOutput,
   type ModelPhase,
@@ -88,13 +89,17 @@ export default function SentimentLab({ accent }: { accent: LabAccent }) {
   useEffect(() => {
     if (isTransitionActive) return;
     let isCancelled = false;
-    loadModel("sentiment").catch(() => {
-      if (!isCancelled) {
-        setError({ kind: "load", message: "The sentiment model could not load. Check your connection, then retry." });
-      }
+    // Not on mount: see onFirstInteraction in lib/lab-models.ts.
+    const stopWaiting = onFirstInteraction(() => {
+      loadModel("sentiment").catch(() => {
+        if (!isCancelled) {
+          setError({ kind: "load", message: "The sentiment model could not load. Check your connection, then retry." });
+        }
+      });
     });
     return () => {
       isCancelled = true;
+      stopWaiting();
     };
   }, [isTransitionActive]);
 

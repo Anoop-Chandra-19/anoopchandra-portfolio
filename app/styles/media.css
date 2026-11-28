@@ -36,7 +36,10 @@
    over the image's content box); if the image is still loading after 400ms a
    quiet label says so; when it lands it fades up from washed-out paper to
    full colour as the well fades off it. Without JavaScript nothing is
-   marked, so nothing is hidden. */
+   marked, so nothing is hidden. A priority (hero) image doesn't opt in: it
+   is usually the page's LCP element, and one held at opacity 0 until it
+   loads isn't counted until it shows, which PageSpeed's mobile simulation
+   pins behind all of the page's JS. */
 .zoom-wait { display: none; }
 .js .zoom-wait {
   position: absolute;
@@ -54,13 +57,13 @@
 .js .zoomable {
   transition: opacity 500ms ease, filter 500ms ease;
 }
-.js .zoomable:not([data-loaded]) {
+.js .zoomable[data-mark-load]:not([data-loaded]) {
   opacity: 0;
   filter: grayscale(1) contrast(0.75) sepia(0.4);
 }
-.js .zoomable:not([data-loaded]) ~ .zoom-wait { opacity: 1; }
+.js .zoomable[data-mark-load]:not([data-loaded]) ~ .zoom-wait { opacity: 1; }
 .zoom-wait-label { opacity: 0; }
-.js .zoomable:not([data-loaded]) ~ .zoom-wait .zoom-wait-label {
+.js .zoomable[data-mark-load]:not([data-loaded]) ~ .zoom-wait .zoom-wait-label {
   animation: zoom-wait-in 200ms ease 400ms both;
 }
 @keyframes zoom-wait-in { from { opacity: 0; } to { opacity: 1; } }
@@ -68,7 +71,7 @@
 @media (prefers-reduced-motion: reduce) {
   .js .zoomable,
   .js .zoom-wait { transition: none; }
-  .js .zoomable:not([data-loaded]) ~ .zoom-wait .zoom-wait-label { animation-duration: 0s; }
+  .js .zoomable[data-mark-load]:not([data-loaded]) ~ .zoom-wait .zoom-wait-label { animation-duration: 0s; }
 }
 
 /* Image lightbox */

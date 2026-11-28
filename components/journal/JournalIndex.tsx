@@ -191,7 +191,7 @@ export default function JournalIndex({
           a working notebook · {ppRange}
         </Label>
         <h1 className="mb-2 leading-[0.95] max-wide:text-[40px] max-wide:leading-[1.02] max-wide:tracking-[-0.02em] anim-swipe d-ix-title">
-          The <span className="text-coral">Journal</span>
+          The <span className="text-coral-ink">Journal</span>
         </h1>
         <p className="text-summary italic font-normal mt-[11px] mb-0 max-w-[720px] text-ink-soft max-wide:leading-[1.5] anim-rise d-ix-sum">
           A working notebook for bug stories, personal projects, opinions, and things I figured

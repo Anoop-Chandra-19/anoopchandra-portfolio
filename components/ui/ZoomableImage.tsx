@@ -78,8 +78,9 @@ export default function ZoomableImage({
       className="zoomable"
       onClick={openLightbox}
       // The head script in app/layout.tsx marks it data-loaded, possibly
-      // before hydration; that attribute is ours, not a mismatch.
-      data-mark-load
+      // before hydration; that attribute is ours, not a mismatch. A priority
+      // image skips the hidden-until-loaded fade (app/styles/media.css).
+      data-mark-load={priority ? undefined : true}
       suppressHydrationWarning
     />
   );

@@ -30,8 +30,8 @@ type BootLine = { key: string; tone?: BootTone; text: React.ReactNode };
 
 const TONE: Record<BootTone | "default", string> = {
   default: "text-ink-soft",
-  err: "text-coral",
-  ready: "text-(--lxa)",
+  err: "text-coral-ink",
+  ready: "text-(--lxa-ink)",
 };
 
 export default function BenchBoot({

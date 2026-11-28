@@ -168,3 +168,35 @@ export function loadModel(id: LabModelId): Promise<LoadedModel> {
   return e.promise;
 }
 
+/* Model work (TF.js parse, tf.ready(), the warm-up predict) blocks the main
+   thread for a few hundred ms. Run on mount, it lands inside the page's
+   start-up and counts as Total Blocking Time. Instead, start it on the
+   visitor's first sign of life: a pointer move, touch, key, wheel or scroll,
+   which comes within a moment on a real visit. A page reached by an
+   in-site click has already had a user gesture in this document
+   (navigator.userActivation), so it starts at once. */
+const FIRST_INTERACTION = ["pointerdown", "pointermove", "touchstart", "keydown", "wheel", "scroll"] as const;
+
+export function onFirstInteraction(fn: () => void): () => void {
+  if (typeof navigator !== "undefined" && navigator.userActivation?.hasBeenActive) {
+    fn();
+    return () => {};
+  }
+  let isDone = false;
+  const fire = () => {
+    if (isDone) return;
+    isDone = true;
+    stop();
+    fn();
+  };
+  const stop = () => {
+    for (const type of FIRST_INTERACTION) window.removeEventListener(type, fire, true);
+  };
+  for (const type of FIRST_INTERACTION) {
+    window.addEventListener(type, fire, { capture: true, passive: true });
+  }
+  return () => {
+    isDone = true;
+    stop();
+  };
+}

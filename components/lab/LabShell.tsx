@@ -46,7 +46,13 @@ export default function LabShell({ exp }: { exp: LabExp }) {
     <main
       id="main-content"
       className="max-w-[920px] mx-auto pt-9.5 px-10 pb-20 max-wide:pt-6.5 max-wide:px-5 max-wide:pb-[70px] page-in:animate-page-in"
-      style={{ "--lxa": `var(--color-${exp.accent})` } as React.CSSProperties}
+      style={
+        {
+          "--lxa": `var(--color-${exp.accent})`,
+          // Text-safe twin for small text and fills behind white text.
+          "--lxa-ink": `var(--color-${exp.accent}-ink)`,
+        } as React.CSSProperties
+      }
     >
       <div className="flex justify-between items-center gap-3.5 mb-6.5">
         <BackLink href="/" kind="box" peel>
@@ -55,7 +61,7 @@ export default function LabShell({ exp }: { exp: LabExp }) {
         <nav className="flex gap-2" aria-label="Experiments">
           {LAB_EXPS.map((x) =>
             x.slug === exp.slug ? (
-              <span key={x.slug} className={`${TAB} text-white bg-(--lxa) border-(--lxa)`} aria-current="page">
+              <span key={x.slug} className={`${TAB} text-white bg-(--lxa-ink) border-(--lxa-ink)`} aria-current="page">
                 {x.num}
               </span>
             ) : (
@@ -84,7 +90,7 @@ export default function LabShell({ exp }: { exp: LabExp }) {
       <KeyboardLegend isVisible={isKeyboardMode} hasPointField={exp.slug === "kmeans"} />
 
       <div className="flex flex-col gap-[5px] mt-6.5 py-3.5 px-[18px] border-[1.5px] border-dashed border-(--lxa) rounded-[4px] bg-[color-mix(in_oklab,var(--lxa)_8%,var(--color-paper))]">
-        <span className="font-mono text-caption uppercase text-(--lxa)">✎ how it actually works</span>
+        <span className="font-mono text-caption uppercase text-(--lxa-ink)">✎ how it actually works</span>
         <span className="text-[17.5px] leading-[1.55] text-ink max-wide:text-[17px]">{exp.foot}</span>
       </div>
     </main>
