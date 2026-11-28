@@ -4,6 +4,7 @@ import {
   disposeModelOutput,
   getModelOutputTensors,
   loadModel,
+  onFirstInteraction,
   subscribeModel,
   type ModelOutput,
   type ModelPhase,
@@ -46,13 +47,17 @@ export default function DoodleLab({ accent }: { accent: LabAccent }) {
   useEffect(() => {
     if (isTransitionActive) return;
     let isCancelled = false;
-    loadModel("doodle").catch(() => {
-      if (!isCancelled) {
-        setError({ kind: "load", message: "The drawing model could not load. Check your connection, then retry." });
-      }
+    // Not on mount: see onFirstInteraction in lib/lab-models.ts.
+    const stopWaiting = onFirstInteraction(() => {
+      loadModel("doodle").catch(() => {
+        if (!isCancelled) {
+          setError({ kind: "load", message: "The drawing model could not load. Check your connection, then retry." });
+        }
+      });
     });
     return () => {
       isCancelled = true;
+      stopWaiting();
     };
   }, [isTransitionActive]);
 

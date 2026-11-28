@@ -21,6 +21,13 @@
   from { opacity: 0; transform: translateX(-6px); }
   to   { opacity: 1; transform: translateX(0); }
 }
+/* Journal index rows slide without fading: a row can be the page's LCP
+   element, and one that starts at opacity 0 isn't counted until it shows,
+   which PageSpeed's mobile simulation pins behind all of the page's JS. */
+@keyframes railRowSlide {
+  from { transform: translateX(-6px); }
+  to   { transform: translateX(0); }
+}
 /* The ring sweep is split across two halves: the right window fills in the
    first half of the run, the left in the second. The two curves are mirror
    images whose slopes meet at the halfway point, so the sweep never jolts. */
@@ -121,6 +128,7 @@
 .d-ix-stamp  { --d: 0.26s; }
 .d-ix-filter { --d: 0.30s; }
 .d-ix-row    { --d: calc(0.36s + min(var(--i, 0), 7) * 0.04s); }
+.anim-rail.d-ix-row { animation-name: railRowSlide; }
 @media (max-width: 720px) {
   .d-ix-row  { --d: calc(0.33s + min(var(--i, 0), 5) * 0.03s); }
 }
