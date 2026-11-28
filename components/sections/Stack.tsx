@@ -10,6 +10,7 @@ function Tally({ n }: { n: number }) {
   }
   return (
     <span
+      role="img"
       aria-label={`${n} year${n === 1 ? "" : "s"}`}
       title={`${n} yr`}
       className="inline-flex gap-1.5 items-center"
@@ -80,12 +81,14 @@ type StackItem = readonly [name: string, years: number, obsession?: boolean];
 const COLS: ReadonlyArray<{
   h: string;
   c: string;
+  ink: string;
   note: string;
   items: ReadonlyArray<StackItem>;
 }> = [
   {
     h: "at work",
     c: "var(--color-electric)",
+    ink: "text-electric-ink",
     note: "shipping product, paid in PRs",
     items: [
       ["TypeScript", 4],
@@ -106,6 +109,7 @@ const COLS: ReadonlyArray<{
   {
     h: "in the lab",
     c: "var(--color-teal)",
+    ink: "text-teal-ink",
     note: "MS in applied ML, still hacking",
     items: [
       ["Python", 6],
@@ -122,6 +126,7 @@ const COLS: ReadonlyArray<{
   {
     h: "at home",
     c: "var(--color-coral)",
+    ink: "text-coral-ink",
     note: "linux daily, windows for games",
     items: [
       ["CachyOS + niri", 1, true],
@@ -152,7 +157,7 @@ export default function Stack() {
             className="sketch-box"
             style={{ borderTop: "5px solid", borderTopColor: col.c }}
           >
-            <h3 className="card-title" style={{ color: col.c }}>{col.h}</h3>
+            <h3 className={`card-title ${col.ink}`}>{col.h}</h3>
             <Label kind="meta" className="mt-0.5">{col.note}</Label>
             <ul className="font-mono list-none p-0 mt-[17px] text-[13px] tracking-[-0.01em] leading-[1.4] max-wide:text-[12.5px]">
               {col.items.map(([name, years, obsession]) => (

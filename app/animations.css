@@ -78,7 +78,8 @@
 .ring-window-r .ring-sweep { animation: ringSweepFirst 0.7s 0.20s both; }
 .ring-window-l .ring-sweep { animation: ringSweepSecond 0.7s 0.20s both; }
 /* The photo waits for this same 0.90s mark, so it appears once the ring is closed. */
-.ring-done { animation: ringDone 0s 0.90s both; }
+/* 1ms, not 0s: a zero duration keeps the animation off the compositor. */
+.ring-done { animation: ringDone 1ms 0.90s both; }
 .anim-portrait-img {
   animation: portraitImgIn 0.4s cubic-bezier(.2,.7,.2,1) both;
   animation-delay: 0.90s;

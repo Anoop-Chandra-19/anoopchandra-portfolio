@@ -109,7 +109,7 @@ export default function Notes({ entries }: { entries: JournalEntryMeta[] }) {
             </Label>
             <Link
               href="/journal"
-              className="text-[16px] text-electric no-underline"
+              className="text-[16px] text-electric-ink no-underline"
               onClick={(e) => {
                 // keep native behavior for new-tab/window clicks
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
