@@ -154,7 +154,7 @@ const DETAIL_LIST = "mt-[12px] pl-[18px] text-small grid gap-[8px]";
 
 function FlagshipPart() {
   const f = FLAGSHIP;
-  const accent = `var(--color-${f.k})`;
+  const accent = `var(--color-${f.k}-ink)`;
   return (
     <section className="part" aria-label={`Part ${f.n}, ${f.t}`}>
       <div className="pt-[18px] px-[22px] pb-[12px] border-b-2 border-ink max-wide:pt-[12px] max-wide:px-[14px] max-wide:pb-[8px]">
@@ -238,7 +238,7 @@ function CompactPart({ p }: { p: Part }) {
       </div>
       <div className="flex-1 min-w-0 pt-[22px] px-[26px] pb-[20px] max-wide:p-[16px]">
         <div className="flex items-baseline gap-[12px] mb-[6px]">
-          <span className="hand text-[36px] leading-[0.9]" style={{ color: `var(--color-${p.k})` }}>
+          <span className="hand text-[36px] leading-[0.9]" style={{ color: `var(--color-${p.k}-ink)` }}>
             {p.n}
           </span>
           <Label kind="tag" as="span">
@@ -355,7 +355,7 @@ function ProjectSlab({ p, i }: { p: Project; i: number }) {
       {!flip && <ProjectMedia p={p} />}
       <div className="p-8.5 max-mid:order-2 max-mid:p-[24px] max-wide:p-[18px]">
         <Label kind="eyebrow">
-          {p.cat} · <span style={{ color: `var(--color-${p.k})` }}>{p.org}</span>
+          {p.cat} · <span style={{ color: `var(--color-${p.k}-ink)` }}>{p.org}</span>
         </Label>
         <h3 className="mt-2 mb-[15px] text-[25px] leading-[1.18] tracking-[-0.012em] max-mid:text-[24px] max-wide:text-[20px] max-wide:leading-[1.2]">{p.t}</h3>
         <p className="mt-0 text-intro max-w-[520px] mb-[17px]">
